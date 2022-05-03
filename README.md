@@ -1,4 +1,4 @@
-# Draftbot-Assistant
+# Draftbot Assistant
 
 Draftbot Assistant is a discord bot to help you in your Draftbot aventure.
 
