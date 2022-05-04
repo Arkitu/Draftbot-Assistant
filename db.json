@@ -22,126 +22,6 @@
             ]
         }
     ],
-    "commands": [
-        {
-            "name": "help",
-            "description": "Renvoie la liste des commandes",
-            "options": [
-                {
-                    "choices": [
-                        {
-                            "name": "Classiques",
-                            "value": "Classiques"
-                        },
-                        {
-                            "name": "Reminders",
-                            "value": "Reminders"
-                        },
-                        {
-                            "name": "Tracking",
-                            "value": "Tracking"
-                        }
-                    ],
-                    "type": 3,
-                    "name": "categorie",
-                    "description": "La categorie sur laquelle vous voulez des précisions",
-                    "required": false
-                }
-            ],
-            "perms": "everyone"
-        },
-        {
-            "name": "ping",
-            "description": "Répond pong",
-            "options": [],
-            "perms": "everyone"
-        },
-        {
-            "name": "gtop",
-            "description": "Renvoie le classement des guildes",
-            "options": [],
-            "perms": "everyone"
-        },
-        {
-            "name": "add_reminder",
-            "description": "Ajoute un rappel",
-            "options": [
-                {
-                    "type": 4,
-                    "name": "time",
-                    "description": "Le temps avant que le rappel soit envoyé",
-                    "required": true
-                },
-                {
-                    "type": 3,
-                    "name": "message",
-                    "description": "Le message à rappeler",
-                    "required": true
-                },
-                {
-                    "choices": [
-                        {
-                            "name": "secondes",
-                            "value": "secondes"
-                        },
-                        {
-                            "name": "minutes",
-                            "value": "minutes"
-                        },
-                        {
-                            "name": "heures",
-                            "value": "heures"
-                        },
-                        {
-                            "name": "jours",
-                            "value": "jours"
-                        }
-                    ],
-                    "type": 3,
-                    "name": "unit",
-                    "description": "L'unité de temps (par defaut sur `minutes`)",
-                    "required": false
-                }
-            ],
-            "perms": "everyone"
-        },
-        {
-            "name": "config",
-            "description": "Paramètres du bot",
-            "options": [
-                {
-                    "choices": [
-                        {
-                            "name": "reminders",
-                            "value": "reminders"
-                        },
-                        {
-                            "name": "tracking",
-                            "value": "tracking"
-                        }
-                    ],
-                    "type": 3,
-                    "name": "category",
-                    "description": "La catégorie de paramètres à modifier",
-                    "required": false
-                }
-            ],
-            "perms": "everyone"
-        },
-        {
-            "name": "hash",
-            "description": "Renvoie le hash de la chaine de caractères passée en paramètre",
-            "options": [
-                {
-                    "type": 3,
-                    "name": "string",
-                    "description": "La chaine de caractères à hasher",
-                    "required": true
-                }
-            ],
-            "perms": "admin"
-        }
-    ],
     "users": {
         "6ca26e4a9685fc77648de7aee77767b8": {
             "config": {
@@ -462,5 +342,125 @@
             "last_update": 1650094913294
         }
     },
-    "reminders": []
+    "reminders": [],
+    "commands": [
+        {
+            "name": "config",
+            "description": "Paramètres du bot",
+            "options": [
+                {
+                    "choices": [
+                        {
+                            "name": "reminders",
+                            "value": "reminders"
+                        },
+                        {
+                            "name": "tracking",
+                            "value": "tracking"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "category",
+                    "description": "La catégorie de paramètres à modifier",
+                    "required": false
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "hash",
+            "description": "Renvoie le hash de la chaine de caractères passée en paramètre",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "string",
+                    "description": "La chaine de caractères à hasher",
+                    "required": true
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "add_reminder",
+            "description": "Ajoute un rappel",
+            "options": [
+                {
+                    "type": 4,
+                    "name": "time",
+                    "description": "Le temps avant que le rappel soit envoyé",
+                    "required": true
+                },
+                {
+                    "type": 3,
+                    "name": "message",
+                    "description": "Le message à rappeler",
+                    "required": true
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "secondes",
+                            "value": "secondes"
+                        },
+                        {
+                            "name": "minutes",
+                            "value": "minutes"
+                        },
+                        {
+                            "name": "heures",
+                            "value": "heures"
+                        },
+                        {
+                            "name": "jours",
+                            "value": "jours"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "unit",
+                    "description": "L'unité de temps (par default sur `minutes`)",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "gtop",
+            "description": "Renvoie le classement des guildes",
+            "options": [],
+            "perms": "everyone"
+        },
+        {
+            "name": "help",
+            "description": "Renvoie la liste des commandes",
+            "options": [
+                {
+                    "choices": [
+                        {
+                            "name": "Classiques",
+                            "value": "Classiques"
+                        },
+                        {
+                            "name": "Reminders",
+                            "value": "Reminders"
+                        },
+                        {
+                            "name": "Tracking",
+                            "value": "Tracking"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "categorie",
+                    "description": "La categorie sur laquelle vous voulez des précisions",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "ping",
+            "description": "Répond pong",
+            "options": [],
+            "perms": "everyone"
+        }
+    ]
 }
