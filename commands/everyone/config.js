@@ -16,6 +16,10 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction) {
+    if (interaction.user.id !== interaction.client.owner.id) {
+        await interaction.reply(":warning: Désolé, cette commande est encore en phase de développement.");
+        return;
+    }
     await interaction.deferReply();
 	const db = new JsonDB(new Config("db", true, true, '/'));
 	const config = new JsonDB(new Config("config", true, true, '/'));
