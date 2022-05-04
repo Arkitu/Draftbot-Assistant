@@ -51,29 +51,6 @@
     "reminders": [],
     "commands": [
         {
-            "name": "config",
-            "description": "Paramètres du bot",
-            "options": [
-                {
-                    "choices": [
-                        {
-                            "name": "reminders",
-                            "value": "reminders"
-                        },
-                        {
-                            "name": "tracking",
-                            "value": "tracking"
-                        }
-                    ],
-                    "type": 3,
-                    "name": "category",
-                    "description": "La catégorie de paramètres à modifier",
-                    "required": false
-                }
-            ],
-            "perms": "admin"
-        },
-        {
             "name": "hash",
             "description": "Renvoie le hash de la chaine de caractères passée en paramètre",
             "options": [
@@ -124,6 +101,29 @@
                     "type": 3,
                     "name": "unit",
                     "description": "L'unité de temps (par default sur `minutes`)",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "config",
+            "description": "Paramètres du bot",
+            "options": [
+                {
+                    "choices": [
+                        {
+                            "name": "reminders",
+                            "value": "reminders"
+                        },
+                        {
+                            "name": "tracking",
+                            "value": "tracking"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "category",
+                    "description": "La catégorie de paramètres à modifier",
                     "required": false
                 }
             ],
