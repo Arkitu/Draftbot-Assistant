@@ -4,16 +4,16 @@ import { Reminder } from '../../libs/Reminder.js';
 export const data = new SlashCommandBuilder()
 	.setName('add_reminder')
 	.setDescription('Ajoute un rappel')
-    .addIntegerOption(option => option
-		.setName("time")
-		.setDescription("Le temps avant que le rappel soit envoyé")
-		.setRequired(true)
-	)
     .addStringOption(option => option
         .setName("message")
         .setDescription("Le message à rappeler")
         .setRequired(true)
     )
+    .addIntegerOption(option => option
+		.setName("time")
+		.setDescription("Le temps avant que le rappel soit envoyé")
+		.setRequired(true)
+	)
     .addStringOption(option => option
         .setName("unit")
         .setDescription("L'unité de temps (par default sur `minutes`)")
