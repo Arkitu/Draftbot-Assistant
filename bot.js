@@ -1,8 +1,9 @@
-import { Client, Intents, Collection, MessageEmbed } from 'discord.js';
+import { Client, Intents, Collection, MessageActionRow, MessageButton } from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Reminder } from './libs/Reminder.js';
+import { createHash } from "crypto";
 
 // Import config
 const config = new JsonDB(new Config("config", true, true, '/'));
@@ -81,6 +82,21 @@ let msg_listener = async msg => {
 			case `<@${client.user.id}> help`:
 				await msg.channel.send("Si vous voulez la liste des commandes, utilisez la commande `/help`");
 				break;
+		}
+		let user_hash = createHash('md5').update(msg.author.id).digest('hex');
+		if (user_hash in db.getData(`/users/`)) {
+			let reminder_on = db.getData(`/users/${user_hash}/config/reminders/on`);
+			if (reminder_on) {
+				let components = new MessageActionRow()
+					.addComponents(
+						new MessageButton()
+							.setCustomId("add")
+							.setLabel("Ajouter")
+							.setStyle("PRIMARY")
+					)
+				await msg.channel.send({ content: `Voulez vous ajouter un rappel dans ${reminder_on[msg.content].duration} ${reminder_on[msg.content].unit} ?`, components: [components] });
+		
+			}
 		}
 	}
 	// Fetch the guilds messages

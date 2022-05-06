@@ -7,12 +7,53 @@ import { createHash } from "crypto";
 export const data = new SlashCommandBuilder()
 	.setName("config")
 	.setDescription("Paramètres du bot")
-    .addStringOption(option => option
-        .setName("category")
-        .setDescription("La catégorie de paramètres à modifier")
-        .setRequired(false)
-        .addChoice("reminders", "reminders")
-        .addChoice("tracking", "tracking"),
+    .addSubcommandGroup(subcommandgroup =>
+        subcommandgroup
+            .setName("reminders")
+            .setDescription("Paramètres des rappels")
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("view")
+                    .setDescription("Affiche les paramètres des rappels")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("add_propo")
+                    .setDescription("Ajouter une proposition de rappel")
+                    .addStringOption(option =>
+                        option
+                            .setName("trigger")
+                            .setDescription("Le mot clé pour déclencher la proposition de rappel")
+                            .setRequired(true)
+                    )
+                    .addIntegerOption(option =>
+                        option
+                            .setName("duration")
+                            .setDescription("La durée du rappel")
+                            .setRequired(true)
+                    )
+                    .addStringOption(option =>
+                        option
+                            .setName("unit")
+                            .setDescription("L'unité de temps")
+                            .setRequired(true)
+                            .addChoice("secondes", "secondes")
+                            .addChoice("minutes", "minutes")
+                            .addChoice("heures", "heures")
+                            .addChoice("jours", "jours")
+                    )
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("del_propo")
+                    .setDescription("Supprime une proposition de rappel")
+                    .addStringOption(option =>
+                        option
+                            .setName("trigger")
+                            .setDescription("Le mot clé pour déclencher la proposition de rappel")
+                            .setRequired(true)
+                    )
+            )
     );
 
 export async function execute(interaction) {
@@ -25,36 +66,50 @@ export async function execute(interaction) {
         return;
     }
 
-    let opt_category = interaction.options.getString("category");
+    let opt = {
+        subcommandgroup: interaction.options.getSubcommandGroup(),
+        subcommand: interaction.options.getSubcommand()
+    };
+    let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
+    let db_user = db.getData(`/users/${user_hash}`);
 
-    let db_user = db.getData(`/users/${createHash('md5').update(interaction.user.id).digest('hex')}`);
-
-    let embed;
-    switch (opt_category) {
-        case "reminders":
-            embed = new MessageEmbed()
+    switch (`${opt.subcommandgroup}/${opt.subcommand}`) {
+        case "reminders/view":
+            let reminders_embed = new MessageEmbed()
                 .setColor(config.getData("/main_color"))
                 .setAuthor({ name: `Paramètres des reminders de ${interaction.user.username}`, iconURL: interaction.client.user.avatarURL() })
-                .addField("Proposition de reminders :", (async()=>{
+                .addField("Proposition de reminders :", (()=>{
                     let str_propos = "";
                     for (let propo in db_user.config.reminders.on) {
-                        str_propos += `${propo} : \`${db_user.config.reminders.on[propo].duration}${db_user.config.reminders.on[propo].unit}\`\n`;
+                        str_propos += `${propo} : \`${db_user.config.reminders.on[propo].duration} ${db_user.config.reminders.on[propo].unit}\`\n`;
                     }
+                    str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <duration> <unit>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
                     return str_propos;
                 })());
-            await interaction.editReply({ embeds: [embed] });
+            await interaction.editReply({ embeds: [reminders_embed] });
+            let button_listener = async (button_interact) => {
+                if (!button_interact.isButton()) return;
+                if (button_interact.message.id != (await interaction.fetchReply()).id) return;
+
+                switch (button_interact.custom_id) {
+                    case "add_reminder":
+                        let embed_add_reminder = new MessageEmbed()
+                            .setColor("GREEN")
+                            .setTitle("Ajouter une proposition de reminder")
+                            .setDescription("Pour ajouter une proposition de reminder, utiliser la commande `/config reminders add <proposition> <duration> <unité>`")
+
+                        await button_interact.reply({ embed: [embed_add_reminder] });
+                }
+            }
+            interaction.client.on("interactionCreate", button_listener);
             break;
-        case "tracking":
-            embed = new MessageEmbed()
-                .setColor(config.getData("/main_color"))
-                .setAuthor({ name: `Paramètres du tracking de ${interaction.user.username}`, iconURL: interaction.client.user.avatarURL() })
-        default:
-            let embed = new MessageEmbed()
-                .setColor(config.getData("/main_color"))
-                .setAuthor({ name: `Paramètres de ${interaction.user.username}`, iconURL: interaction.client.user.avatarURL() })
-                .addField("Reminders", "`/config reminders`")
-                .addField("Tracking", "`/config tracking`");
-            await interaction.editReply({ embeds: [embed] });
+        case "reminders/add_propo":
+            db.push(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`, { duration: interaction.options.getInteger("duration"), unit: interaction.options.getString("unit") });
+            await interaction.editReply("Proposition ajoutée avec succès !");
+            break;
+        case "reminders/del_propo":
+            db.delete(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`);
+            await interaction.editReply("Proposition supprimée avec succès !");
             break;
     }
 }

@@ -27,12 +27,12 @@
             "config": {
                 "reminders": {
                     "on": {
-                        "gd": {
+                        "!gd": {
                             "duration": "22",
                             "unit": "heures"
                         },
-                        "da": {
-                            "duration": "22",
+                        "!da": {
+                            "duration": 22,
                             "unit": "heures"
                         }
                     }
@@ -111,20 +111,73 @@
             "description": "Paramètres du bot",
             "options": [
                 {
-                    "choices": [
+                    "type": 2,
+                    "name": "reminders",
+                    "description": "Paramètres des rappels",
+                    "options": [
                         {
-                            "name": "reminders",
-                            "value": "reminders"
+                            "type": 1,
+                            "name": "view",
+                            "description": "Affiche les paramètres des rappels",
+                            "options": []
                         },
                         {
-                            "name": "tracking",
-                            "value": "tracking"
+                            "type": 1,
+                            "name": "add_propo",
+                            "description": "Ajouter une proposition de rappel",
+                            "options": [
+                                {
+                                    "type": 3,
+                                    "name": "trigger",
+                                    "description": "Le mot clé pour déclencher la proposition de rappel",
+                                    "required": true
+                                },
+                                {
+                                    "type": 4,
+                                    "name": "duration",
+                                    "description": "La durée du rappel",
+                                    "required": true
+                                },
+                                {
+                                    "choices": [
+                                        {
+                                            "name": "secondes",
+                                            "value": "secondes"
+                                        },
+                                        {
+                                            "name": "minutes",
+                                            "value": "minutes"
+                                        },
+                                        {
+                                            "name": "heures",
+                                            "value": "heures"
+                                        },
+                                        {
+                                            "name": "jours",
+                                            "value": "jours"
+                                        }
+                                    ],
+                                    "type": 3,
+                                    "name": "unit",
+                                    "description": "L'unité de temps",
+                                    "required": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": 1,
+                            "name": "del_propo",
+                            "description": "Supprime une proposition de rappel",
+                            "options": [
+                                {
+                                    "type": 3,
+                                    "name": "trigger",
+                                    "description": "Le mot clé pour déclencher la proposition de rappel",
+                                    "required": true
+                                }
+                            ]
                         }
-                    ],
-                    "type": 3,
-                    "name": "category",
-                    "description": "La catégorie de paramètres à modifier",
-                    "required": false
+                    ]
                 }
             ],
             "perms": "everyone"
