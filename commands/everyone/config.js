@@ -71,6 +71,9 @@ export async function execute(interaction) {
         subcommand: interaction.options.getSubcommand()
     };
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
+    if (!(user_hash in db.getData("/users"))) {
+        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}}});
+    }
     let db_user = db.getData(`/users/${user_hash}`);
 
     switch (`${opt.subcommandgroup}/${opt.subcommand}`) {
@@ -82,6 +85,9 @@ export async function execute(interaction) {
                     let str_propos = "";
                     for (let propo in db_user.config.reminders.on) {
                         str_propos += `${propo} : \`${db_user.config.reminders.on[propo].duration} ${db_user.config.reminders.on[propo].unit}\`\n`;
+                    }
+                    if (!str_propos) {
+                        str_propos = "Aucune proposition de rappel\n";
                     }
                     str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <duration> <unit>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
                     return str_propos;
@@ -108,8 +114,12 @@ export async function execute(interaction) {
             await interaction.editReply("Proposition ajoutée avec succès !");
             break;
         case "reminders/del_propo":
-            db.delete(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`);
-            await interaction.editReply("Proposition supprimée avec succès !");
+            if (interaction.options.getString("trigger") in db_user.config.reminders.on) {
+                db.delete(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`);
+                await interaction.editReply("Proposition supprimée avec succès !");
+            } else {
+                await interaction.editReply("Cette proposition n'existe pas !");
+            }
             break;
     }
 }

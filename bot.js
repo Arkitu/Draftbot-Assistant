@@ -4,6 +4,7 @@ import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Reminder } from './libs/Reminder.js';
 import { createHash } from "crypto";
+import { SlashCommandRoleOption } from '@discordjs/builders';
 
 // Import config
 const config = new JsonDB(new Config("config", true, true, '/'));
@@ -84,48 +85,49 @@ let msg_listener = async msg => {
 				break;
 		}
 		let user_hash = createHash('md5').update(msg.author.id).digest('hex');
-		if (user_hash in db.getData(`/users/`)) {
-			let reminder_on = db.getData(`/users/${user_hash}/config/reminders/on`);
-			let reminder = reminder_on[msg.content];
-			if (reminder) {
-				let components = new MessageActionRow()
-					.addComponents(
-						new MessageButton()
-							.setCustomId("add")
-							.setLabel("Ajouter")
-							.setStyle("PRIMARY")
-					)
-				let propo_msg = await msg.channel.send({ content: `Voulez vous ajouter un rappel dans ${reminder.duration} ${reminder.unit} ?`, components: [components] });
-				let listener = async button_interaction => {
-					if (!button_interaction.isButton()) return;
-					if (button_interaction.message.id != propo_msg.id) return;
-					
-					let dead_line = msg.createdAt;
-					switch (reminder.unit) {
-						case "secondes":
-							dead_line.setSeconds(dead_line.getSeconds() + reminder.duration);
-							break;
-						case "minutes":
-							dead_line.setMinutes(dead_line.getMinutes() + reminder.duration);
-							break;
-						case "heures":
-							dead_line.setHours(dead_line.getHours() + reminder.duration);
-							break;
-						case "jours":
-							dead_line.setDate(dead_line.getDate() + reminder.duration);
-							break;
-					}
-					let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author);
-					await new_reminder.save();
-					await new_reminder.start();
-					await button_interaction.update({ content: "Rappel ajouté !", components: [] });
+		if (!(user_hash in db.getData("/users"))) {
+			db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}}});
+		}
+		let reminder_on = db.getData(`/users/${user_hash}/config/reminders/on`);
+		let reminder = reminder_on[msg.content];
+		if (reminder) {
+			let components = new MessageActionRow()
+				.addComponents(
+					new MessageButton()
+						.setCustomId("add")
+						.setLabel("Ajouter")
+						.setStyle("PRIMARY")
+				)
+			let propo_msg = await msg.channel.send({ content: `Voulez vous ajouter un rappel dans ${reminder.duration} ${reminder.unit} ?`, components: [components] });
+			let listener = async button_interaction => {
+				if (!button_interaction.isButton()) return;
+				if (button_interaction.message.id != propo_msg.id) return;
+
+				let dead_line = msg.createdAt;
+				switch (reminder.unit) {
+					case "secondes":
+						dead_line.setSeconds(dead_line.getSeconds() + reminder.duration);
+						break;
+					case "minutes":
+						dead_line.setMinutes(dead_line.getMinutes() + reminder.duration);
+						break;
+					case "heures":
+						dead_line.setHours(dead_line.getHours() + reminder.duration);
+						break;
+					case "jours":
+						dead_line.setDate(dead_line.getDate() + reminder.duration);
+						break;
 				}
-				client.on('interactionCreate', listener);
-				setTimeout(() => {
-					client.removeListener('interactionCreate', listener);
-				}, 60000);
-				await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
+				let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author);
+				await new_reminder.save();
+				await new_reminder.start();
+				await button_interaction.update({ content: "Rappel ajouté !", components: [] });
 			}
+			client.on('interactionCreate', listener);
+			setTimeout(() => {
+				client.removeListener('interactionCreate', listener);
+			}, 60000);
+			await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
 		}
 	}
 	// Fetch the guilds messages

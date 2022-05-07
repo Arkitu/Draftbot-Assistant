@@ -22,30 +22,19 @@
             ]
         }
     ],
-    "users": {
-        "6ca26e4a9685fc77648de7aee77767b8": {
-            "config": {
-                "reminders": {
-                    "on": {
-                        "!gd": {
-                            "duration": "22",
-                            "unit": "heures"
-                        },
-                        "!da": {
-                            "duration": 22,
-                            "unit": "heures"
-                        }
-                    }
-                }
-            }
-        }
-    },
+    "users": {},
     "guilds": {
         "Exemple de guilde": {
             "name": "Exemple de nom",
             "level": 42,
             "description": "Exemple de description",
             "last_update": 936868140
+        },
+        "Les Draft Potes": {
+            "name": "Les Draft Potes",
+            "level": 77,
+            "description": "Actuellement GOA 4, membre de l'empire des gentils",
+            "last_update": 1651914725006
         }
     },
     "reminders": [],
