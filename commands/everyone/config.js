@@ -58,8 +58,8 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     await interaction.deferReply();
-    const db = new JsonDB(new
-
+    const config = new JsonDB(new Config("config", 
+    const db = new JsonDB(new Config("db", true, true, '/'));
     let opt = {
         subcommandgroup: interaction.options.getSubcommandGroup(),
         subcommand: interaction.options.getSubcommand()
