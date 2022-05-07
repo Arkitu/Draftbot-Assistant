@@ -57,6 +57,7 @@ client.once('ready', async () => {
 
 let cmd_listener = async interaction => {
 	if (interaction.isCommand()) {
+		db.reload();
 		const { commandName } = interaction;
 		const command = client.commands.get(commandName);
 
@@ -74,6 +75,7 @@ let cmd_listener = async interaction => {
 
 let msg_listener = async msg => {
 	if (msg.content) {
+		db.reload();
 		switch (msg.content.toLowerCase()) {
 			case "help":
 			case "$help":
