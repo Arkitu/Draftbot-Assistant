@@ -58,13 +58,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
     await interaction.deferReply();
-    const db = new JsonDB(new Config("db", true, true, '/'));
-	const config = new JsonDB(new Config("config", true, true, '/'));
-
-    if (interaction.user.id !== config.getData("/creator_id")) {
-        await interaction.reply(":warning: Désolé, cette commande est encore en phase de développement.");
-        return;
-    }
+    const db = new JsonDB(new
 
     let opt = {
         subcommandgroup: interaction.options.getSubcommandGroup(),
