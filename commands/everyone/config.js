@@ -83,7 +83,7 @@ export async function execute(interaction) {
                     if (!str_propos) {
                         str_propos = "Aucune proposition de rappel\n";
                     }
-                    str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <duration> <unit>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
+                    str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <durée> <unité>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
                     return str_propos;
                 })());
             await interaction.editReply({ embeds: [reminders_embed] });
