@@ -4,7 +4,6 @@ import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Reminder } from './libs/Reminder.js';
 import { createHash } from "crypto";
-import { SlashCommandRoleOption } from '@discordjs/builders';
 
 // Import config
 const config = new JsonDB(new Config("config", true, true, '/'));
@@ -99,7 +98,7 @@ let msg_listener = async msg => {
 						.setCustomId("add")
 						.setLabel("Ajouter")
 						.setStyle("PRIMARY")
-				)
+				);
 			let propo_msg = await msg.channel.send({ content: `Voulez vous ajouter un rappel dans ${reminder.duration} ${reminder.unit} ?`, components: [components] });
 			let listener = async button_interaction => {
 				if (!button_interaction.isButton()) return;
