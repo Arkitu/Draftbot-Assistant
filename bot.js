@@ -75,6 +75,7 @@ let cmd_listener = async interaction => {
 let msg_listener = async msg => {
 	if (msg.content) {
 		db.reload();
+		// Check if there is a help message to send
 		switch (msg.content.toLowerCase()) {
 			case "help":
 			case "$help":
@@ -85,6 +86,7 @@ let msg_listener = async msg => {
 				await msg.channel.send("Si vous voulez la liste des commandes, utilisez la commande `/help`");
 				break;
 		}
+		// Check if there is a proposition to send
 		let user_hash = createHash('md5').update(msg.author.id).digest('hex');
 		if (!(user_hash in db.getData("/users"))) {
 			db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}}});
