@@ -87,21 +87,6 @@ export async function execute(interaction) {
                     return str_propos;
                 })());
             await interaction.editReply({ embeds: [reminders_embed] });
-            let button_listener = async (button_interact) => {
-                if (!button_interact.isButton()) return;
-                if (button_interact.message.id != (await interaction.fetchReply()).id) return;
-
-                switch (button_interact.custom_id) {
-                    case "add_reminder":
-                        let embed_add_reminder = new MessageEmbed()
-                            .setColor("GREEN")
-                            .setTitle("Ajouter une proposition de reminder")
-                            .setDescription("Pour ajouter une proposition de reminder, utiliser la commande `/config reminders add <proposition> <duration> <unité>`")
-
-                        await button_interact.reply({ embed: [embed_add_reminder] });
-                }
-            }
-            interaction.client.on("interactionCreate", button_listener);
             break;
         case "reminders/add_propo":
             db.push(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`, { duration: interaction.options.getInteger("duration"), unit: interaction.options.getString("unit") });
