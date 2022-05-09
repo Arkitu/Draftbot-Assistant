@@ -22,7 +22,15 @@
             ]
         }
     ],
-    "users": {},
+    "users": {
+        "11825eca3320ff5eb1a8712df9e83518": {
+            "config": {
+                "reminders": {
+                    "on": {}
+                }
+            }
+        }
+    },
     "guilds": {
         "Exemple de guilde": {
             "name": "Exemple de nom",
@@ -31,7 +39,27 @@
             "last_update": 936868140
         }
     },
-    "reminders": [],
+    "reminders": [
+        {
+            "channel": {
+                "channel_id": "694235386658160760"
+            },
+            "dead_line_timestamp": 1652119948609,
+            "message": "5min",
+            "author_id": "694235386658160760",
+            "id": "69423538665816076016521199486095min694235386658160760"
+        },
+        {
+            "channel": {
+                "channel_id": "735091182769537037",
+                "channel_type": true
+            },
+            "dead_line_timestamp": 1652119929435,
+            "message": "test",
+            "author_id": "694235386658160760",
+            "id": "7350911827695370371652119929435test694235386658160760"
+        }
+    ],
     "commands": [
         {
             "name": "hash",
@@ -201,6 +229,12 @@
         {
             "name": "ping",
             "description": "Répond pong",
+            "options": [],
+            "perms": "everyone"
+        },
+        {
+            "name": "reminders",
+            "description": "Renvois la liste des rappels",
             "options": [],
             "perms": "everyone"
         }
