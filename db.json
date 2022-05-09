@@ -39,27 +39,7 @@
             "last_update": 936868140
         }
     },
-    "reminders": [
-        {
-            "channel": {
-                "channel_id": "694235386658160760"
-            },
-            "dead_line_timestamp": 1652119948609,
-            "message": "5min",
-            "author_id": "694235386658160760",
-            "id": "69423538665816076016521199486095min694235386658160760"
-        },
-        {
-            "channel": {
-                "channel_id": "735091182769537037",
-                "channel_type": true
-            },
-            "dead_line_timestamp": 1652119929435,
-            "message": "test",
-            "author_id": "694235386658160760",
-            "id": "7350911827695370371652119929435test694235386658160760"
-        }
-    ],
+    "reminders": [],
     "commands": [
         {
             "name": "hash",
