@@ -123,12 +123,12 @@ let msg_listener = async msg => {
 				await new_reminder.save();
 				await new_reminder.start();
 				await button_interaction.update({ content: "Rappel ajouté !", components: [] });
+				await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
 			}
 			client.on('interactionCreate', listener);
 			setTimeout(() => {
 				client.removeListener('interactionCreate', listener);
 			}, 60000);
-			await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
 		}
 	}
 	// Fetch the guilds messages
