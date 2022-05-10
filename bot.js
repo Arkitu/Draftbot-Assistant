@@ -88,9 +88,7 @@ let msg_listener = async msg => {
 		}
 		// Check if there is a proposition to send
 		let user_hash = createHash('md5').update(msg.author.id).digest('hex');
-		if (!(user_hash in db.getData("/users"))) {
-			db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}}});
-		}
+		if (!(user_hash in db.getData("/users"))) return;
 		let reminder_on = db.getData(`/users/${user_hash}/config/reminders/on`);
 		let reminder = reminder_on[msg.content];
 		if (reminder) {
