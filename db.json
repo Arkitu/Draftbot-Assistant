@@ -28,6 +28,20 @@
             "config": {
                 "reminders": {
                     "on": {}
+                },
+                "tracking": {
+                    "reports": false
+                }
+            }
+        },
+        "6ca26e4a9685fc77648de7aee77767b8": {
+            "config": {
+                "reminders": {
+                    "on": {}
+                },
+                "tracking": {
+                    "reminders": false,
+                    "reports": true
                 }
             }
         }
@@ -165,6 +179,38 @@
                                     "type": 3,
                                     "name": "trigger",
                                     "description": "Le mot clé pour déclencher la proposition de rappel",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": 2,
+                    "name": "tracking",
+                    "description": "Paramètres de suivi",
+                    "options": [
+                        {
+                            "type": 1,
+                            "name": "view",
+                            "description": "Affiche les paramètres de suivi",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "switch_option",
+                            "description": "Active ou désactive une option de suivi",
+                            "options": [
+                                {
+                                    "choices": [
+                                        {
+                                            "name": "reports",
+                                            "value": "reports"
+                                        }
+                                    ],
+                                    "type": 3,
+                                    "name": "option",
+                                    "description": "L'option à activer ou désactiver",
                                     "required": true
                                 }
                             ]

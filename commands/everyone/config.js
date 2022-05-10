@@ -54,6 +54,28 @@ export const data = new SlashCommandBuilder()
                             .setRequired(true)
                     )
             )
+    )
+    .addSubcommandGroup(subcommandgroup =>
+        subcommandgroup
+            .setName("tracking")
+            .setDescription("Paramètres de suivi")
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("view")
+                    .setDescription("Affiche les paramètres de suivi")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("switch_option")
+                    .setDescription("Active ou désactive une option de suivi")
+                    .addStringOption(option =>
+                        option
+                            .setName("option")
+                            .setDescription("L'option à activer ou désactiver")
+                            .setRequired(true)
+                            .addChoice("reports", "reports")
+                    )
+            )
     );
 
 export async function execute(interaction) {
@@ -67,7 +89,7 @@ export async function execute(interaction) {
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         console.log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
-        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}}});
+        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reminders": false}}});
     }
     let db_user = db.getData(`/users/${user_hash}`);
 
@@ -101,5 +123,25 @@ export async function execute(interaction) {
                 await interaction.editReply("Cette proposition n'existe pas !");
             }
             break;
+        case "tracking/view":
+            let tracking_embed = new MessageEmbed()
+                .setColor(config.getData("/main_color"))
+                .setAuthor({ name: `Paramètres de suivi de ${interaction.user.username}`, iconURL: interaction.client.user.avatarURL() })
+                .setDescription(`Suivi des reports : ${(()=>{
+                    if (db_user.config.tracking.reports) {
+                        return "🟢";
+                    } else {
+                        return "🔴";
+                    }
+                })()}`);
+            await interaction.editReply({ embeds: [tracking_embed] });
+            break;
+        case "tracking/switch_option":
+            switch (interaction.options.getString("option")) {
+                case "reports":
+                    db.push(`/users/${user_hash}/config/tracking/reports`, !db_user.config.tracking.reports);
+                    await interaction.editReply("L'option a été modifiée avec succès !");
+                    break;
+            }
     }
 }
