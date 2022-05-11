@@ -155,20 +155,13 @@ let long_report_listener = async msg => {
 	if (msg.author.id != "448110812801007618") return;
 	if (!msg.content) return;
 	if (!(msg.content.startsWith("📰 ** Journal de ") || msg.content.startsWith(":newspaper: ** Journal de "))) return;
-	console.debug(msg.content.split(":").slice(1).join(":").slice(3));
 	if (!msg.content.split(":").slice(1).join(":").slice(3).startsWith("🏅 Points gagnés :")) return;
-	console.debug("premiers tests passés");
 
 	db.reload();
 	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
-	console.debug(user_hash);
-	console.debug(db.getData("/users"));
-	console.debug(user_hash in db.getData("/users"));
 	if (!(user_hash in db.getData("/users"))) return;
-	console.debug("utilisateur trouvé");
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.reports) return;
-	console.debug("tracking activé");
 
 	// Training message : 📰 ** Journal de <@694235386658160760>  :** 🏅 Points gagnés : ** 328** | 💰 Argent gagné : ** 49** | ⭐ XP gagné : ** 325** | 🕙 Temps perdu : ** 15 Min ** | 🚪 Vous entrez dans la maison et fouillez autour de vous pendant une quinzaine de minutes. En sortant vous trouvez un objet qui pourra peut être vous être utile !
 	let data = {
@@ -231,8 +224,9 @@ let long_report_listener = async msg => {
 		type: "long_report",
 		timestamp: msg.createdTimestamp,
 		data: data
-	})
+	});
 
+	log("Long repport tracked");
 }
 
 client.on('interactionCreate', cmd_listener);
