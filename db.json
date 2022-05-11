@@ -24,26 +24,25 @@
         }
     ],
     "users": {
-        "11825eca3320ff5eb1a8712df9e83518": {
-            "config": {
-                "reminders": {
-                    "on": {}
-                },
-                "tracking": {
-                    "reports": false
-                }
-            }
-        },
         "6ca26e4a9685fc77648de7aee77767b8": {
             "config": {
                 "reminders": {
-                    "on": {}
+                    "on": {
+                        "!gd": {
+                            "duration": 22,
+                            "unit": "heures"
+                        },
+                        "!da": {
+                            "duration": 22,
+                            "unit": "heures"
+                        }
+                    }
                 },
                 "tracking": {
-                    "reminders": false,
                     "reports": true
                 }
-            }
+            },
+            "tracking": []
         }
     },
     "guilds": {
@@ -67,6 +66,12 @@
                     "required": true
                 }
             ],
+            "perms": "admin"
+        },
+        {
+            "name": "timestamp",
+            "description": "Affiche le timestamp actuel",
+            "options": [],
             "perms": "admin"
         },
         {

@@ -89,7 +89,7 @@ export async function execute(interaction) {
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         console.log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
-        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reminders": false}}});
+        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false}}});
     }
     let db_user = db.getData(`/users/${user_hash}`);
 
@@ -140,6 +140,12 @@ export async function execute(interaction) {
             switch (interaction.options.getString("option")) {
                 case "reports":
                     db.push(`/users/${user_hash}/config/tracking/reports`, !db_user.config.tracking.reports);
+                    if (!db_user.config.tracking.reports) {
+                        // Delete all tracked reports
+                        for (let report of db.getData(`/users/${user_hash}/tracking`).filter(e=>["long_report", "short_report"].includes(e.type))) {
+                            db.delete(`/users/${user_hash}/tracking[${db.getIndex(`/users/${user_hash}/tracking`, report.id, "id")}]`);
+                        }
+                    }
                     await interaction.editReply("L'option a été modifiée avec succès !");
                     break;
             }

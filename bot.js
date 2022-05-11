@@ -4,12 +4,13 @@ import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Reminder } from './libs/Reminder.js';
 import { createHash } from "crypto";
+import { debug } from 'console';
 
-// Import config
+// Import config and db
 const config = new JsonDB(new Config("config", true, true, '/'));
 const db = new JsonDB(new Config("db", true, true, '/'));
 
-// For log with the current date
+// Log with the current date
 async function log(msg) {
 	var datetime = new Date().toLocaleString();
 	console.log(`[${datetime}] ${msg}`);
@@ -54,6 +55,7 @@ client.once('ready', async () => {
 	}
 });
 
+// Set listeners
 let cmd_listener = async interaction => {
 	if (interaction.isCommand()) {
 		db.reload();
@@ -149,20 +151,104 @@ let propo_msg_listener = async msg => {
 	}
 }
 
+let long_report_listener = async msg => {
+	if (msg.author.id != "448110812801007618") return;
+	if (!msg.content) return;
+	if (!(msg.content.startsWith("📰 ** Journal de ") || msg.content.startsWith(":newspaper: ** Journal de "))) return;
+	console.debug(msg.content.split(":").slice(1).join(":").slice(3));
+	if (!msg.content.split(":").slice(1).join(":").slice(3).startsWith("🏅 Points gagnés :")) return;
+	console.debug("premiers tests passés");
+
+	db.reload();
+	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
+	console.debug(user_hash);
+	console.debug(db.getData("/users"));
+	console.debug(user_hash in db.getData("/users"));
+	if (!(user_hash in db.getData("/users"))) return;
+	console.debug("utilisateur trouvé");
+	let db_user = db.getData(`/users/${user_hash}`);
+	if (!db_user.config.tracking.reports) return;
+	console.debug("tracking activé");
+
+	// Training message : 📰 ** Journal de <@694235386658160760>  :** 🏅 Points gagnés : ** 328** | 💰 Argent gagné : ** 49** | ⭐ XP gagné : ** 325** | 🕙 Temps perdu : ** 15 Min ** | 🚪 Vous entrez dans la maison et fouillez autour de vous pendant une quinzaine de minutes. En sortant vous trouvez un objet qui pourra peut être vous être utile !
+	let data = {
+		points: 0,
+		gold: 0,
+		xp: 0,
+		time: 0,
+		pv: 0,
+		id: `long_report${msg.createdTimestamp}`
+	};
+	for (let e of msg.content.split(":") // str -> array
+		.slice(1) // array
+		.join(":") // array -> str
+		.slice(3) // str
+		.split(" | ") // str -> array
+		.slice(0, -1) // array
+	) {
+		let modif = {
+			"name": e.split("**").slice(0, 2)[0].slice(0, -3),
+			"value": e.split("**").slice(0, 2)[1].slice(1)
+		}
+		switch (modif.name) {
+			case "🏅 Points gagnés" :
+				data.points += parseInt(modif.value);
+				break;
+			case "💰 Argent gagné" :
+				data.gold += parseInt(modif.value);
+				break;
+			case "💸 Argent perdu" :
+				data.gold -= parseInt(modif.value);
+				break;
+			case "⭐ XP gagné" :
+				data.xp += parseInt(modif.value);
+				break;
+			case "❤️ Vie gagnée" :
+				data.pv += parseInt(modif.value);
+				break;
+			case "💔 Vie perdue" :
+				data.pv -= parseInt(modif.value);
+				break;
+			case "🕙 Temps perdu" :
+				data.time = 0;
+				let time_array = modif.value.split(" ");
+				while (time_array.length > 1) {
+					switch (time_array[1]) {
+						case "H" :
+							data.time += parseInt(time_array[0]) * 3600000;
+							break;
+						case "Min" :
+							data.time += parseInt(time_array[0]) * 60000;
+							break;
+					}
+					time_array.splice(0, 2);
+				}
+				break;
+		}
+	}
+
+	db.push(`/users/${user_hash}/tracking[]`, {
+		type: "long_report",
+		timestamp: msg.createdTimestamp,
+		data: data
+	})
+
+}
+
 client.on('interactionCreate', cmd_listener);
 client.on('messageCreate', help_msg_listener);
 client.on('messageCreate', fetch_guild_listener);
 client.on('messageCreate', propo_msg_listener);
+client.on('messageCreate', long_report_listener);
 
-// Commands
+// Import all the commands from the commands files
 client.commands = new Collection();
 const admin_path = "./commands/admin";
 const everyone_path = "./commands/everyone";
 const commandFiles = {
 	admin: readdirSync(admin_path).filter(file => file.endsWith(".js")),
 	everyone: readdirSync(everyone_path).filter(file => file.endsWith(".js"))
-}
-
+};
 for (const file of commandFiles.admin) {
 	import(`./commands/admin/${file}`)
   		.then((command) => {
@@ -176,5 +262,5 @@ for (const file of commandFiles.everyone) {
   		});
 }
 
-// Login to Discord with your client's token
+// Login to Discord
 client.login(config.getData("/token"));
