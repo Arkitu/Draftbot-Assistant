@@ -10,12 +10,12 @@ const config = new JsonDB(new Config("config", true, true, '/'));
 const db = new JsonDB(new Config("db", true, true, '/'));
 
 // Log with the current date
-async function log(msg) {
+export async function log(msg) {
 	var datetime = new Date().toLocaleString();
 	console.log(`[${datetime}] ${msg}`);
 };
 
-async function log_error(msg) {
+export async function log_error(msg) {
 	log(`ERROR: ${msg}`);
 	await (await client.users.fetch(config.getData("/creator_id"))).send(`:warning: ERROR: ${msg}`);
 }

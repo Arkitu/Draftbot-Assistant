@@ -3,6 +3,7 @@ import { MessageEmbed } from "discord.js";
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { createHash } from "crypto";
+import { log, log_error } from "../../bot.js";
 
 export const data = new SlashCommandBuilder()
 	.setName("config")
@@ -88,7 +89,7 @@ export async function execute(interaction) {
     };
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
-        console.log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
+        log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
         db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false}}});
     }
     let db_user = db.getData(`/users/${user_hash}`);
@@ -149,5 +150,8 @@ export async function execute(interaction) {
                     await interaction.editReply("L'option a été modifiée avec succès !");
                     break;
             }
+            break;
+        default:
+            log_error(`${interaction.user.username} a utilisé une commande inconnue ("/config ${opt.subcommandgroup} ${opt.subcommand}")`);
     }
 }
