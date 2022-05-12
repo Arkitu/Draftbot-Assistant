@@ -9,7 +9,7 @@ for (let user in db.getData("/users")) {
     if (db.getData(`/users/${user}`) == {"config": {"reminders": {"on": {}}}}) {
         db.delete(`/users/${user}`);
     } else {
-        db.push(`/users/${user}/config/tracking/reports`, true);
+        db.push(`/users/${user}/config/tracking/reports`, false);
     }
 }
 
