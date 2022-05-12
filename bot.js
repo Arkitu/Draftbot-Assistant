@@ -4,7 +4,6 @@ import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Reminder } from './libs/Reminder.js';
 import { createHash } from "crypto";
-import { debug } from 'console';
 
 // Import config and db
 const config = new JsonDB(new Config("config", true, true, '/'));
