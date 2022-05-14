@@ -1,7 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
-import { JsonDB } from 'node-json-db';
-import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { createHash } from "crypto";
 import { log, log_error } from "../../bot.js";
 
@@ -79,10 +77,8 @@ export const data = new SlashCommandBuilder()
             )
     );
 
-export async function execute(interaction) {
+export async function execute(interaction, config, db) {
     await interaction.deferReply();
-    const config = new JsonDB(new Config("config", true, true, '/'));
-    const db = new JsonDB(new Config("db", true, true, '/'));
     let opt = {
         subcommandgroup: interaction.options.getSubcommandGroup(),
         subcommand: interaction.options.getSubcommand()

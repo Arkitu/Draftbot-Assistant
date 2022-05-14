@@ -23,7 +23,7 @@ export const data = new SlashCommandBuilder()
         .addChoice("heures", "heures")
         .addChoice("jours", "jours")
     );
-export async function execute(interaction) {
+export async function execute(interaction, config, db) {
     await interaction.deferReply();
     let args = {
         time: interaction.options.getInteger("time"),
@@ -61,7 +61,7 @@ export async function execute(interaction) {
         }
     }
 
-    let reminder = new Reminder(interaction.client, channel, dead_line.getTime(), args.message, await interaction.user);
+    let reminder = new Reminder(interaction.client, channel, dead_line.getTime(), args.message, await interaction.user, db, config);
     await reminder.save();
     await reminder.start();
 

@@ -1,7 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
-import { JsonDB } from 'node-json-db';
-import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js'
 
 export const data = new SlashCommandBuilder()
 	.setName("help")
@@ -15,10 +13,8 @@ export const data = new SlashCommandBuilder()
 		.addChoice("Tracking", "Tracking")
 	);
 
-export async function execute(interaction) {
+export async function execute(interaction, config, db) {
 	await interaction.deferReply();
-	const db = new JsonDB(new Config("db", true, true, '/'));
-	const config = new JsonDB(new Config("config", true, true, '/'));
 
 	const opt_categorie = interaction.options.getString("categorie");
 

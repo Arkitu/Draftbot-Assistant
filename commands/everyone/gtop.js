@@ -1,15 +1,11 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbed, MessageActionRow, MessageButton } from 'discord.js';
-import { JsonDB } from 'node-json-db';
-import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js'
 
 export const data = new SlashCommandBuilder()
 	.setName('gtop')
 	.setDescription('Renvoie le classement des guildes');
-export async function execute(interaction) {
+export async function execute(interaction, config, db) {
 	await interaction.deferReply();
-	const db = new JsonDB(new Config("db", true, true, '/'));
-	const config = new JsonDB(new Config("config", true, true, '/'));
 
 	let embed = new MessageEmbed()
 		.setTitle("Classement des guildes")

@@ -1,15 +1,11 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbed } from 'discord.js';
-import { JsonDB } from 'node-json-db';
-import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('reminders')
 	.setDescription('Renvois la liste des rappels');
-export async function execute(interaction) {
+export async function execute(interaction, config, db) {
 	await interaction.deferReply();
-	const db = new JsonDB(new Config("db", true, false, '/'));
-	const config = new JsonDB(new Config("config", true, false, '/'));
 
 	let reminders = db.getData('/reminders').filter(reminder => reminder.author_id == interaction.user.id);
 

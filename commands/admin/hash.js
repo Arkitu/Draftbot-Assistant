@@ -10,7 +10,7 @@ export const data = new SlashCommandBuilder()
 		.setRequired(true)
 	);
 
-export async function execute(interaction) {
+export async function execute(interaction, config, db) {
 	await interaction.deferReply();
 	const opt_string = interaction.options.getString("string");
 

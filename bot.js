@@ -50,14 +50,13 @@ client.once('ready', async () => {
 				channel_type: reminder.channel.channel_type
 			}
 		}
-		new Reminder(client, channel, reminder.dead_line_timestamp, reminder.message, await client.users.fetch(reminder.author_id)).start();
+		new Reminder(client, channel, reminder.dead_line_timestamp, reminder.message, await client.users.fetch(reminder.author_id), db, config).start();
 	}
 });
 
 // Set listeners
 let cmd_listener = async interaction => {
 	if (interaction.isCommand()) {
-		db.reload();
 		const { commandName } = interaction;
 		const command = client.commands.get(commandName);
 
@@ -66,7 +65,7 @@ let cmd_listener = async interaction => {
 		log(`${interaction.user.username} execute ${commandName}`);
 
 		try {
-			await command.execute(interaction);
+			await command.execute(interaction, config, db);
 		} catch (error) {
 			log_error(error);
 		}
@@ -104,7 +103,6 @@ let fetch_guild_listener = async msg => {
 
 let propo_msg_listener = async msg => {
 	if (!msg.content) return;
-	db.reload();
 	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let reminder_on = db.getData(`/users/${user_hash}/config/reminders/on`);
@@ -137,7 +135,7 @@ let propo_msg_listener = async msg => {
 					dead_line.setDate(dead_line.getDate() + reminder.duration);
 					break;
 			}
-			let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author);
+			let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author, db, config);
 			await new_reminder.save();
 			await new_reminder.start();
 			await button_interaction.update({ content: "Rappel ajouté !", components: [] });
@@ -156,7 +154,6 @@ let long_report_listener = async msg => {
 	if (!(msg.content.startsWith("📰 ** Journal de ") || msg.content.startsWith(":newspaper: ** Journal de "))) return;
 	if (!msg.content.split(":").slice(1).join(":").slice(3).startsWith("🏅 Points gagnés :")) return;
 
-	db.reload();
 	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let db_user = db.getData(`/users/${user_hash}`);
