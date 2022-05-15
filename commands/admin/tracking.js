@@ -1,6 +1,7 @@
-import { ChartJSImage } from 'chart.js-image';
+import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbed } from 'discord.js';
+import { createHash } from "crypto";
 
 export const data = new SlashCommandBuilder()
 	.setName('tracking')
@@ -24,7 +25,7 @@ export async function execute(interaction, config, db) {
 
     switch (opt.subcommand) {
         case 'reports':
-            const line_chart = ChartJSImage().chart({
+            const line_chart = await ChartJSImage().chart({
                 "type": "line",
                 "data": {
                   "labels": [
@@ -127,7 +128,7 @@ export async function execute(interaction, config, db) {
         
         let embed = new MessageEmbed()
             .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
-            .setImage(line_chart.toDataURL())
+            .setImage(line_chart.toURL())
         await interaction.editReply({ embeds: [embed] });
     }
 }

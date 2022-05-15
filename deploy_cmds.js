@@ -21,7 +21,7 @@ const commandFiles = {
 
     console.log("Started refreshing application (/) commands.");
     
-    await db.delete("/commands");
+    db.delete("/commands");
 
     let cmds = {
         admin: [],

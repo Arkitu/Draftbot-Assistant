@@ -75,6 +75,19 @@
             "perms": "admin"
         },
         {
+            "name": "tracking",
+            "description": "Affiche des statistiques sur vous",
+            "options": [
+                {
+                    "type": 1,
+                    "name": "reports",
+                    "description": "Affiche les statistiques sur les rapports",
+                    "options": []
+                }
+            ],
+            "perms": "admin"
+        },
+        {
             "name": "add_reminder",
             "description": "Ajoute un rappel",
             "options": [
