@@ -69,6 +69,19 @@
             "perms": "admin"
         },
         {
+            "name": "infos",
+            "description": "Infos sur le bot",
+            "options": [
+                {
+                    "type": 1,
+                    "name": "tracked",
+                    "description": "Affiche le nombre d'utilisateurs suivis",
+                    "options": []
+                }
+            ],
+            "perms": "admin"
+        },
+        {
             "name": "timestamp",
             "description": "Affiche le timestamp actuel",
             "options": [],
