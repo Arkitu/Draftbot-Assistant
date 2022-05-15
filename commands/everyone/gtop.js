@@ -98,7 +98,7 @@ export async function execute(interaction, config, db) {
 							emoji = "⚫";
 							break;
 					}
-				} else emoji = "🎖️";
+				} else emoji = "⚫";
 				description += `${emoji}${i + 1 + (15 * (page - 1))} **${guilds_limited[i].name}** | \`Niveau ${guilds_limited[i].level}\`\n`
 			}
 			embed.setDescription(description);
