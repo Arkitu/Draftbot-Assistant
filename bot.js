@@ -148,18 +148,18 @@ let propo_msg_listener = async msg => {
 	}
 }
 
-let long_report_listener = async msg => {
+export let long_report_listener = async msg => {
 	if (msg.author.id != "448110812801007618") return;
 	if (!msg.content) return;
-	if (!(msg.content.startsWith("📰 ** Journal de ") || msg.content.startsWith(":newspaper: ** Journal de "))) return;
-	if (!msg.content.split(":").slice(1).join(":").slice(3).startsWith("🏅 Points gagnés :")) return;
+	if (!msg.content.startsWith(":newspaper: ** Journal de ")) return;
+	if (!msg.content.split(":").slice(1).join(":").slice(3).startsWith(":medal: Points gagnés :")) return;
 
 	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.reports) return;
 
-	// Training message : 📰 ** Journal de <@694235386658160760>  :** 🏅 Points gagnés : ** 328** | 💰 Argent gagné : ** 49** | ⭐ XP gagné : ** 325** | 🕙 Temps perdu : ** 15 Min ** | 🚪 Vous entrez dans la maison et fouillez autour de vous pendant une quinzaine de minutes. En sortant vous trouvez un objet qui pourra peut être vous être utile !
+	// Training message : :newspaper: ** Journal de @Arkitu  :** :medal: Points gagnés : ** 358** | :moneybag: Argent gagné : ** 24** | :star: XP gagné : ** 25** | :clock10: Temps perdu : ** 45 Min ** | ⛓️ Vous grimpez jusqu'en haut des échafaudages, mais à l'exception d'un magnifique paysage, vous ne trouvez rien. Après avoir passé quelques minutes à l'admirer, vous repartez.
 	let data = {
 		points: 0,
 		gold: 0,
