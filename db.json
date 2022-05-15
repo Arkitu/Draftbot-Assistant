@@ -51,6 +51,18 @@
             "level": 42,
             "description": "Exemple de description",
             "last_update": 936868140
+        },
+        "Yo": {
+            "name": "Yo",
+            "level": 100,
+            "description": "",
+            "last_update": 1652622177593
+        },
+        "Barbie team 8": {
+            "name": "Barbie team 8",
+            "level": 0,
+            "description": "Le T majuscule était déjà pris par un mec random",
+            "last_update": 1652622202054
         }
     },
     "reminders": [],
