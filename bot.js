@@ -90,14 +90,14 @@ let fetch_guild_listener = async msg => {
 			description: "",
 			last_update: Date.now(),
         }
-		if (guild.level === NaN) {
+		if (guild.level == NaN) {
 			guild.level = 100;
 		}
 		if (msg.embeds[0].description) {
 			guild.description = msg.embeds[0].description.split("`")[1];
 		}
         db.push(`/guilds/${guild.name}`, guild);
-		log(`Guild ${guild.name} fetched`);
+		log(`Guild ${guild.name} fetched. Level: ${guild.level}`);
     }
 }
 
