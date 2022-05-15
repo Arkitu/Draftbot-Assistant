@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { long_report_listener } from './bot';
+import { long_report_listener } from '../../../bot';
 
 export const data = new SlashCommandBuilder()
 	.setName('get_message')
