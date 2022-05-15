@@ -214,6 +214,7 @@ let long_report_listener = async msg => {
 				}
 				break;
 		}
+		log("Long repport fetched");
 	}
 
 	db.push(`/users/${user_hash}/tracking[]`, {

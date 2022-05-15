@@ -122,7 +122,7 @@ export async function execute(interaction, config, db) {
                   }
                 }
               }) // Line chart
-              .backgroundColor('white')
+              .backgroundColor("#2F3135") // Color of embed background
               .width(500) // 500px
               .height(300); // 300px
         
