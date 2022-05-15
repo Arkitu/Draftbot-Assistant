@@ -27,7 +27,7 @@ export async function execute(interaction, config, db) {
 			} else {
 				str_date = "maintenant";
 			}
-			str_reminders += `• **message :** ${reminder.message} - **temps restant :** ${str_date} - **salon :** <#${reminder.channel.channel_id}>\n`;
+			str_reminders += `• **message :** ${reminder.message} - **temps restant :** ${str_date} - **salon :** <#${reminder.channel.channel_id}>\n\n`;
 		}
 	} else {
 		str_reminders = "Vous n'avez aucun rappel";
