@@ -6,11 +6,7 @@ console.log("Updating database...");
 const db = new JsonDB(new Config("db", true, true, '/'));
 
 for (let user in db.getData("/users")) {
-    if (db.getData(`/users/${user}`) == {"config": {"reminders": {"on": {}}}}) {
-        db.delete(`/users/${user}`);
-    } else {
-        db.push(`/users/${user}/config/tracking/reports`, false);
-    }
+    db.push(`/users/${user}/tracking`, []);
 }
 
 console.log("Done");
