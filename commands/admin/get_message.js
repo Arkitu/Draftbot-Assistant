@@ -5,5 +5,5 @@ export const data = new SlashCommandBuilder()
 	.setDescription('Tkt)');
 
 export async function execute(interaction, config, db) {
-    await interaction.reply((await (await interaction.client.channels.fetch("807634694602489876")).messages.fetch("975438110471094403")).content.replaceAll(" ", "÷"));
+    await interaction.reply((await (await interaction.client.channels.fetch("807634694602489876")).messages.fetch("975438110471094403")).content.replaceAll(" ", "÷").replaceAll("*", "ù"));
 }
