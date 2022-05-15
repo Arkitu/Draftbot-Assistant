@@ -72,6 +72,7 @@ export async function execute(interaction, config, db) {
 			guilds_limited = guilds.slice((page - 1) * 15, page * 15 - 1);
 			embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length * 0.1)}` });
 			embed.setFields([]);
+			description = "";
 			for (let i = 0; i < guilds_limited.length; i++) {
 				let emoji;
 				if (page == 1) {
