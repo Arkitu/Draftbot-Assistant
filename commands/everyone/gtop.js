@@ -8,14 +8,14 @@ export async function execute(interaction, config, db) {
 	await interaction.deferReply();
 
 	let embed = new MessageEmbed()
-		.setTitle("Classement des guildes")
+		.setTitle("🏆 Classement des guildes")
 		.setColor(config.getData("/main_color"));
 	let components;
 	let guilds = Object.values(await db.getData("/guilds")).sort((a, b) => {return b.level - a.level;});
 	let guilds_limited;
 	let page = 1;
-	if (guilds.length > 10) {
-		guilds_limited = guilds.slice((page-1)*10, page*10-1);
+	if (guilds.length > 15) {
+		guilds_limited = guilds.slice((page-1)*15, page*15-1);
 		embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length*0.1)}` });
 		components = new MessageActionRow()
 			.addComponents(
@@ -28,9 +28,27 @@ export async function execute(interaction, config, db) {
 		guilds_limited = guilds;
 	}
 
-	for (let guild of guilds_limited) {
-		embed.addField(guild.name, `level: \`${guild.level}\``);
+	let description = "";
+
+	for (let i = 0; i < guilds_limited.length; i++) {
+		let emoji;
+		switch (i) {
+			case 0:
+				emoji = "🥇";
+				break;
+			case 1:
+				emoji = "🥈";
+				break;
+			case 2:
+				emoji = "🥉";
+				break;
+			default:
+				emoji = "🎖️";
+				break;
+		}
+		description += `${emoji}${i + 1} **${guilds_limited[i].name}** | Niveau ${guilds_limited[i].level}`
 	}
+	embed.setDescription(description);
 	if (components) {
 		await interaction.editReply({ embeds: [embed], components: [components] });
 	} else {
@@ -51,13 +69,30 @@ export async function execute(interaction, config, db) {
 					page--;
 					break;
 			}
-			guilds_limited = guilds.slice((page - 1) * 10, page * 10 - 1);
+			guilds_limited = guilds.slice((page - 1) * 15, page * 15 - 1);
 			embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length * 0.1)}` });
 			embed.setFields([]);
-			for (let guild of guilds_limited) {
-				let last_update = new Date(guild.last_update);
-				embed.addField(guild.name, `level: \`${guild.level}\``);
+			for (let i = 0; i < guilds_limited.length; i++) {
+				let emoji;
+				if (page == 1) {
+					switch (i) {
+						case 0:
+							emoji = "🥇";
+							break;
+						case 1:
+							emoji = "🥈";
+							break;
+						case 2:
+							emoji = "🥉";
+							break;
+						default:
+							emoji = "🎖️";
+							break;
+					}
+				} else emoji = "🎖️";
+				description += `${emoji}${i + 1 + (15 * page)} **${guilds_limited[i].name}** | Niveau ${guilds_limited[i].level}`
 			}
+			embed.setDescription(description);
 			components.setComponents();
 			if (page > 1) {
 				components.addComponents([
