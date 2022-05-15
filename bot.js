@@ -90,7 +90,7 @@ let fetch_guild_listener = async msg => {
 			description: "",
 			last_update: Date.now(),
         }
-		if (!guild.level) {
+		if (guild.level === undefined) {
 			guild.level = 100;
 		}
 		if (msg.embeds[0].description) {
