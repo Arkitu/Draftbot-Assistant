@@ -42,11 +42,15 @@ export async function execute(interaction, config, db) {
 			case 2:
 				emoji = "🥉";
 				break;
-			default:
+			case 3:
+			case 4:
 				emoji = "🎖️";
 				break;
+			default:
+				emoji = "⚫";
+				break;
 		}
-		description += `${emoji}${i + 1} **${guilds_limited[i].name}** | Niveau ${guilds_limited[i].level}\n`
+		description += `${emoji}${i + 1} **${guilds_limited[i].name}** | \`Niveau ${guilds_limited[i].level}\`\n`
 	}
 	embed.setDescription(description);
 	if (components) {
@@ -86,12 +90,16 @@ export async function execute(interaction, config, db) {
 						case 2:
 							emoji = "🥉";
 							break;
-						default:
+						case 3:
+						case 4:
 							emoji = "🎖️";
+							break;
+						default:
+							emoji = "⚫";
 							break;
 					}
 				} else emoji = "🎖️";
-				description += `${emoji}${i + 1 + (15 * (page - 1))} **${guilds_limited[i].name}** | Niveau ${guilds_limited[i].level}\n`
+				description += `${emoji}${i + 1 + (15 * (page - 1))} **${guilds_limited[i].name}** | \`Niveau ${guilds_limited[i].level}\`\n`
 			}
 			embed.setDescription(description);
 			components.setComponents();

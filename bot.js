@@ -1,4 +1,4 @@
-import { Client, Intents, Collection, MessageActionRow, MessageButton } from 'discord.js';
+import { Client, Intents, Collection, MessageActionRow, MessageButton, MessageManager } from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
@@ -214,7 +214,6 @@ let long_report_listener = async msg => {
 				}
 				break;
 		}
-		log("Long repport fetched");
 	}
 
 	db.push(`/users/${user_hash}/tracking[]`, {
