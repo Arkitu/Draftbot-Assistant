@@ -99,7 +99,7 @@ export async function execute(interaction, config, db) {
 							break;
 					}
 				} else emoji = "⚫";
-				description += `${emoji}${i + 1 + (16 * (page - 1))} **${guilds_limited[i].name}** | \`Niveau ${guilds_limited[i].level}\`\n`
+				description += `${emoji}${i + 1 + (15 * (page - 1))} **${guilds_limited[i].name}** | \`Niveau ${guilds_limited[i].level}\`\n`
 			}
 			embed.setDescription(description);
 			components.setComponents();
