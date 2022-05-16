@@ -77,6 +77,12 @@
                     "name": "tracked",
                     "description": "Affiche le nombre d'utilisateurs suivis",
                     "options": []
+                },
+                {
+                    "type": 1,
+                    "name": "tracked_events",
+                    "description": "Affiche le nombre d'événements suivis",
+                    "options": []
                 }
             ],
             "perms": "admin"
