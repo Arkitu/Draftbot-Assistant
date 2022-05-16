@@ -8,6 +8,11 @@ export const data = new SlashCommandBuilder()
             .setName('tracked')
             .setDescription("Affiche le nombre d'utilisateurs suivis")
     )
+    .addSubcommand(subcmd =>
+        subcmd
+            .setName('tracked_events')
+            .setDescription("Affiche le nombre d'événements suivis")
+    );
 
 export async function execute(interaction, config, db) {
     await interaction.deferReply();
@@ -20,6 +25,13 @@ export async function execute(interaction, config, db) {
                 }
             }
             await interaction.editReply(`${tracked} utilisateurs suivis`);
+            break;
+        case 'tracked_events':
+            let tracked_events = 0;
+            for (let user in db.getData("/users")) {
+                tracked_events += db.getData(`/users/${user}/tracking`).length;
+            }
+            await interaction.editReply(`${tracked_events} événements suivis`);
             break;
     }
 }
