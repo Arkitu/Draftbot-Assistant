@@ -11,7 +11,7 @@ export const data = new SlashCommandBuilder()
     .addSubcommand(subcmd =>
         subcmd
             .setName('tracked_events')
-            .setDescription("Affiche le nombre d'événements suivis")
+            .setDescription("Affiche le nombre d'événements trackés")
     );
 
 export async function execute(interaction, config, db) {
@@ -31,7 +31,7 @@ export async function execute(interaction, config, db) {
             for (let user in db.getData("/users")) {
                 tracked_events += db.getData(`/users/${user}/tracking`).length;
             }
-            await interaction.editReply(`${tracked_events} événements suivis`);
+            await interaction.editReply(`${tracked_events} événements trackés`);
             break;
     }
 }
