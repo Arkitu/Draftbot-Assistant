@@ -14,9 +14,9 @@ export async function execute(interaction, config, db) {
 	let guilds = Object.values(await db.getData("/guilds")).sort((a, b) => {return b.level - a.level;});
 	let guilds_limited;
 	let page = 1;
-	if (guilds.length > 15) {
-		guilds_limited = guilds.slice((page-1)*15, page*15-1);
-		embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/15)} | ${guilds.length} guildes` });
+	if (guilds.length > 16) {
+		guilds_limited = guilds.slice((page-1)*16, page*16-1);
+		embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/16)} | ${guilds.length} guildes` });
 		components = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
@@ -73,8 +73,8 @@ export async function execute(interaction, config, db) {
 					page--;
 					break;
 			}
-			guilds_limited = guilds.slice((page - 1) * 15, page * 15 - 1);
-			embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/15)} | ${guilds.length} guildes` });
+			guilds_limited = guilds.slice((page - 1) * 16, page * 16 - 1);
+			embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/16)} | ${guilds.length} guildes` });
 			embed.setFields([]);
 			description = "";
 			for (let i = 0; i < guilds_limited.length; i++) {
@@ -99,7 +99,7 @@ export async function execute(interaction, config, db) {
 							break;
 					}
 				} else emoji = "⚫";
-				description += `${emoji}${i + 1 + (15 * (page - 1))} **${guilds_limited[i].name}** | \`Niveau ${guilds_limited[i].level}\`\n`
+				description += `${emoji}${i + 1 + (16 * (page - 1))} **${guilds_limited[i].name}** | \`Niveau ${guilds_limited[i].level}\`\n`
 			}
 			embed.setDescription(description);
 			components.setComponents();
@@ -111,7 +111,7 @@ export async function execute(interaction, config, db) {
 						.setEmoji('⬅')
 				]);
 			}
-			if (page < Math.ceil(guilds.length/15)) {
+			if (page < Math.ceil(guilds.length/16)) {
 				components.addComponents([
 					new MessageButton()
 						.setCustomId('next_page')
