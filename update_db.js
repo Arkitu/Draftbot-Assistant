@@ -6,7 +6,7 @@ console.log("Updating database...");
 const db = new JsonDB(new Config("db", true, true, '/'));
 
 for (let user in db.getData("/users")) {
-    if (!db.getData(`/users/${user}/tracking`)) {
+    if (!db.getData(`/users/${user}`).hasOwnProperty("tracking")) {
         db.push(`/users/${user}/tracking`, []);
     }
 }
