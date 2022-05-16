@@ -148,11 +148,11 @@ let propo_msg_listener = async msg => {
 	}
 }
 
-export let long_report_listener = async msg => {
+let long_report_listener = async msg => {
 	if (msg.author.id != "448110812801007618") return;
 	if (!msg.content) return;
 	if (!msg.content.startsWith(":newspaper: ** Journal de ")) return;
-	if (!msg.content.split(":").slice(1).join(":").slice(3).startsWith(":medal: Points gagnés :")) return;
+	if (!msg.content.split(":").slice(3).join(":").slice(3).startsWith(":medal: Points gagnés :")) return;
 
 	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
@@ -169,7 +169,7 @@ export let long_report_listener = async msg => {
 		id: `long_report${msg.createdTimestamp}`
 	};
 	for (let e of msg.content.split(":") // str -> array
-		.slice(1) // array
+		.slice(3) // array
 		.join(":") // array -> str
 		.slice(3) // str
 		.split(" | ") // str -> array
