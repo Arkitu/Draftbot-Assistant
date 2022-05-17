@@ -76,7 +76,7 @@ export async function execute(interaction, config, db) {
                     max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
                     break;
             }
-            for (let i = min_date; i.getDate() <= max_date.getDate(); i.setDate(i.getDate() + 1)) {
+            for (let i = new Date(min_date.getTime()); i.getDate() <= max_date.getDate(); i.setDate(i.getDate() + 1)) {
                 reports_in_days[i.getFullYear() + "-" + i.getMonth() + "-" + i.getDate()] = {long: 0, short: 0};
             }
             for (let event of db_user.tracking) {
