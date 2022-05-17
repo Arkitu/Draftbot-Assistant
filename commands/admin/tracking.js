@@ -39,8 +39,9 @@ export async function execute(interaction, config, db) {
             let line_chart = await ChartJSImage().chart({
                 type: 'line',
                 data: {
+                    labels: Object.keys(reports_in_days),
                     datasets: [{
-                        data: []
+                        data: Object.values(reports_in_days)
                     }]
                 }
             }) // Line chart
