@@ -81,7 +81,7 @@
                 {
                     "type": 1,
                     "name": "tracked_events",
-                    "description": "Affiche le nombre d'événements suivis",
+                    "description": "Affiche le nombre d'événements trackés",
                     "options": []
                 }
             ],
@@ -91,19 +91,6 @@
             "name": "timestamp",
             "description": "Affiche le timestamp actuel",
             "options": [],
-            "perms": "admin"
-        },
-        {
-            "name": "tracking",
-            "description": "Affiche des statistiques sur vous",
-            "options": [
-                {
-                    "type": 1,
-                    "name": "reports",
-                    "description": "Affiche les statistiques sur les rapports",
-                    "options": []
-                }
-            ],
             "perms": "admin"
         },
         {
@@ -300,6 +287,19 @@
             "name": "reminders",
             "description": "Renvois la liste des rappels",
             "options": [],
+            "perms": "everyone"
+        },
+        {
+            "name": "tracking",
+            "description": "Affiche des statistiques sur vous",
+            "options": [
+                {
+                    "type": 1,
+                    "name": "reports",
+                    "description": "Affiche les statistiques sur les rapports",
+                    "options": []
+                }
+            ],
             "perms": "everyone"
         }
     ]

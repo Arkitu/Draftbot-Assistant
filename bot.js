@@ -238,13 +238,15 @@ let short_report_listener = async msg => {
 
 	let response_listener = async response => {
 		if (response.author.id != "448110812801007618") return;
-		console.debug(3);
+
 		if (response.channel.id != msg.channel.id) return;
 		console.debug(4);
 		if (!response.embeds[0]) return;
 		console.debug(5);
-		if (response.embeds[0].footer.text == `Journal de ${msg.author.username}`) return;
+		if (!response.embeds[0].footer) return;
 		console.debug(6);
+		if (response.embeds[0].footer.text != `Journal de ${msg.author.username}`) return;
+		console.debug(7);
 		db.push(`/users/${user_hash}/tracking[]`, {
 			type: "short_report",
 			timestamp: response.createdTimestamp
@@ -255,7 +257,7 @@ let short_report_listener = async msg => {
 
 	setTimeout(() => {
 		client.removeListener('messageCreate', response_listener);
-		console.debug(7);
+		console.debug(8);
 	}, 10000);
 }
 
