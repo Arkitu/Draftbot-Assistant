@@ -100,11 +100,13 @@ export async function execute(interaction, config, db) {
                     datasets: [
                         {
                             label: 'Rapports longs',
-                            data: Object.values(reports_in_days).map(x => x.long)
+                            data: Object.values(reports_in_days).map(x => x.long),
+                            fill : false
                         },
                         {
                             label: 'Rapports courts',
-                            data: Object.values(reports_in_days).map(x => x.short)
+                            data: Object.values(reports_in_days).map(x => x.short),
+                            fill : false
                         }
                     ]
                 }
