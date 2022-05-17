@@ -79,17 +79,14 @@ export async function execute(interaction, config, db) {
             for (let i = new Date(min_date.getTime()); i.getDate() <= max_date.getDate(); i.setDate(i.getDate() + 1)) {
                 reports_in_days[i.getFullYear() + "-" + i.getMonth() + "-" + i.getDate()] = {long: 0, short: 0};
             }
+            console.debug(Object.keys(reports_in_days));
             for (let event of db_user.tracking) {
                 let event_date = new Date(event.timestamp);
-                console.debug(event_date.getTime(), min_date.getTime(), max_date.getTime());
                 if (!(event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime())) continue;
-                console.debug(0);
                 let day = event_date.getFullYear() + "-" + event_date.getMonth() + "-" + event_date.getDate();
                 if (event.type == "long_report") {
-                    console.debug(1);
                     reports_in_days[day].long++;
                 } else if (event.type == "short_report") {
-                    console.debug(2);
                     reports_in_days[day].short++;
                 }
             }
