@@ -243,9 +243,9 @@ let short_report_listener = async msg => {
 		console.debug(4);
 		if (!response.embeds[0]) return;
 		console.debug(5);
-		if (!response.embeds[0].footer) return;
+		if (!response.embeds[0].author.name) return;
 		console.debug(6);
-		if (response.embeds[0].footer.text != `Journal de ${msg.author.username}`) return;
+		if (response.embeds[0].author.name != `Journal de ${msg.author.username}`) return;
 		console.debug(7);
 		db.push(`/users/${user_hash}/tracking[]`, {
 			type: "short_report",
