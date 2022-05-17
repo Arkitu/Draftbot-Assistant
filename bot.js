@@ -241,7 +241,7 @@ let short_report_listener = async msg => {
 		console.debug(3);
 		if (response.channel.id != msg.channel.id) return;
 		console.debug(4);
-		if (!response.embeds.lenght) return;
+		if (!response.embeds[0]) return;
 		console.debug(5);
 		if (response.embeds[0].footer.text == `Journal de ${msg.author.username}`) return;
 		console.debug(6);

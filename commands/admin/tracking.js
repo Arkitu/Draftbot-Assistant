@@ -41,6 +41,7 @@ export async function execute(interaction, config, db) {
                 data: {
                     labels: Object.keys(reports_in_days),
                     datasets: [{
+                        label: 'Rapports longs',
                         data: Object.values(reports_in_days)
                     }]
                 }
