@@ -250,7 +250,6 @@ let short_report_listener = async msg => {
 
 	setTimeout(() => {
 		client.removeListener('messageCreate', response_listener);
-		console.debug(8);
 	}, 10000);
 }
 
