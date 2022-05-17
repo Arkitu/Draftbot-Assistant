@@ -227,26 +227,19 @@ let long_report_listener = async msg => {
 
 let short_report_listener = async msg => {
 	if (msg.content != "!r") return;
-	console.debug(0);
 
 	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
-	console.debug(1);
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.reports) return;
-	console.debug(2);
 
 	let response_listener = async response => {
 		if (response.author.id != "448110812801007618") return;
 
 		if (response.channel.id != msg.channel.id) return;
-		console.debug(4);
 		if (!response.embeds[0]) return;
-		console.debug(5);
 		if (!response.embeds[0].author) return;
-		console.debug(6);
 		if (response.embeds[0].author.name != `Journal de ${msg.author.username}`) return;
-		console.debug(7);
 		db.push(`/users/${user_hash}/tracking[]`, {
 			type: "short_report",
 			timestamp: response.createdTimestamp
