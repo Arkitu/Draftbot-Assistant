@@ -81,12 +81,16 @@ export async function execute(interaction, config, db) {
             }
             for (let event of db_user.tracking) {
                 let event_date = new Date(event.timestamp);
+                console.debug(event_date.getTime(), min_date.getTime(), max_date.getTime());
                 if (!(event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime())) continue;
+                console.debug(0);
                 let day = event_date.getFullYear() + "-" + event_date.getMonth() + "-" + event_date.getDate();
                 if (event.type == "long_report") {
-                    reports_in_days[day].long += 1;
+                    console.debug(1);
+                    reports_in_days[day].long++;
                 } else if (event.type == "short_report") {
-                    reports_in_days[day].short += 1;
+                    console.debug(2);
+                    reports_in_days[day].short++;
                 }
             }
             let line_chart = await ChartJSImage().chart({
