@@ -1,7 +1,8 @@
 import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, MessageAttachment } from 'discord.js';
 import { createHash } from "crypto";
+import { unlink } from 'fs';
 
 export const data = new SlashCommandBuilder()
 	.setName('tracking')
@@ -20,8 +21,6 @@ export const data = new SlashCommandBuilder()
                     .addChoice('3 mois', '3 mois')
                     .addChoice('6 mois', '6 mois')
                     .addChoice('1 an', '1 an')
-                    .addChoice('2 ans', '2 ans')
-                    .addChoice('3 ans', '3 ans')
             )
     )
 export async function execute(interaction, config, db) {
@@ -63,26 +62,14 @@ export async function execute(interaction, config, db) {
                     min_date = new Date(cur.getTime() - (cur.getMonth() * 30 * 24 * 60 * 60 * 1000));
                     max_date = new Date(min_date.getTime() + 365.25 * 24 * 60 * 60 * 1000);
                     break;
-                case '2 ans':
-                    min_date = new Date(cur.getTime() - (cur.getMonth() * 30 * 24 * 60 * 60 * 1000) - (365.25 * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 2 * 365.25 * 24 * 60 * 60 * 1000);
-                    break;
-                case '3 ans':
-                    min_date = new Date(cur.getTime() - (cur.getMonth() * 30 * 24 * 60 * 60 * 1000) - (2 * 365.25 * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 3 * 365.25 * 24 * 60 * 60 * 1000);
-                    break;
                 default:
                     min_date = new Date(cur.getTime() - (cur.getDay() * 24 * 60 * 60 * 1000));
                     max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
                     break;
             }
-            min_date.setDate(min_date.getDate() + 1);
-            console.debug(min_date.getDate() + min_date.getMonth() * 30);
-            console.debug(max_date.getDate() + max_date.getMonth() * 30);
-            for (let i = new Date(min_date.getTime()); i.getDate() <= max_date.getDate(); i.setDate(i.getDate() + 1)) {
+            for (let i = new Date(min_date.getTime()); i.getTime() <= max_date.getTime(); i.setTime(i.getTime() + 24 * 60 * 60 * 1000)) {
                 reports_in_days[i.getFullYear() + "-" + i.getMonth() + "-" + i.getDate()] = {long: 0, short: 0};
             }
-            console.debug(Object.keys(reports_in_days));
             for (let event of db_user.tracking) {
                 let event_date = new Date(event.timestamp);
                 if (!(event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime())) continue;
@@ -93,7 +80,7 @@ export async function execute(interaction, config, db) {
                     reports_in_days[day].short++;
                 }
             }
-            let line_chart = await ChartJSImage().chart({
+            let chart = await ChartJSImage().chart({
                 type: 'line',
                 data: {
                     labels: Object.keys(reports_in_days),
@@ -115,9 +102,13 @@ export async function execute(interaction, config, db) {
               .width(500) // 500px
               .height(300); // 300px
         
-        let embed = new MessageEmbed()
-            .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
-            .setImage(line_chart.toURL())
-        await interaction.editReply({ embeds: [embed] });
+            await chart.toFile(`./temporary_files/${interaction.user.id}_chart.png`);
+
+            let embed = new MessageEmbed()
+                .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
+                .setImage(`attachment://${interaction.user.id}_chart.png`);
+            await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${interaction.user.id}_chart.png`] });
+            unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) console.error(err);});
+            break;
     }
 }

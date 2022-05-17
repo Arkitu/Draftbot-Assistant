@@ -297,7 +297,36 @@
                     "type": 1,
                     "name": "reports",
                     "description": "Affiche les statistiques sur les rapports",
-                    "options": []
+                    "options": [
+                        {
+                            "choices": [
+                                {
+                                    "name": "1 semaine",
+                                    "value": "1 semaine"
+                                },
+                                {
+                                    "name": "1 mois",
+                                    "value": "1 mois"
+                                },
+                                {
+                                    "name": "3 mois",
+                                    "value": "3 mois"
+                                },
+                                {
+                                    "name": "6 mois",
+                                    "value": "6 mois"
+                                },
+                                {
+                                    "name": "1 an",
+                                    "value": "1 an"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "duration",
+                            "description": "La période des statistiques (par défaut : 1 semaine)",
+                            "required": false
+                        }
+                    ]
                 }
             ],
             "perms": "everyone"
