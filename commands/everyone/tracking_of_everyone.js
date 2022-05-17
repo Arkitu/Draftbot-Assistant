@@ -107,7 +107,7 @@ export async function execute(interaction, config, db) {
                 .setTitle(`Statistiques les rapports de tous les utilisateurs`)
                 .setImage(`attachment://everyone_chart.png`);
             await interaction.editReply({ embeds: [embed], files: [`./temporary_files/everyone_chart.png`] });
-            unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) console.error(err);});
+            unlink(`./temporary_files/everyone_chart.png`, (err) => {if (err) console.error(err);});
             break;
     }
 }
