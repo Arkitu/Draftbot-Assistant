@@ -19,7 +19,8 @@
             "name": "Tracking",
             "commands": [
                 "gtop",
-                "config"
+                "config",
+                "tracking"
             ]
         }
     ],
