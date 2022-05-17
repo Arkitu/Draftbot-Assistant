@@ -29,7 +29,9 @@ export async function execute(interaction, config, db) {
     };
     let all_users_tracking = [];
     for (let user_hash in db.getData("/users")) {
-        all_users_tracking.push(db.getData(`/users/${user_hash}/tracking`));
+        for (let event of db.getData(`/users/${user_hash}/tracking`)) {
+            all_users_tracking.push(event);
+        }
     }
 
     switch (opt.subcommand) {
@@ -99,12 +101,12 @@ export async function execute(interaction, config, db) {
               .width(500) // 500px
               .height(300); // 300px
         
-            await chart.toFile(`./temporary_files/${interaction.user.id}_chart.png`);
+            await chart.toFile(`./temporary_files/everyone_chart.png`);
 
             let embed = new MessageEmbed()
-                .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
-                .setImage(`attachment://${interaction.user.id}_chart.png`);
-            await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${interaction.user.id}_chart.png`] });
+                .setTitle(`Statistiques les rapports de tous les utilisateurs`)
+                .setImage(`attachment://everyone_chart.png`);
+            await interaction.editReply({ embeds: [embed], files: [`./temporary_files/everyone_chart.png`] });
             unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) console.error(err);});
             break;
     }
