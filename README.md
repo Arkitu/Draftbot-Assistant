@@ -12,7 +12,7 @@ The bot invite link (Draftbot Assistant) : https://discord.com/api/oauth2/author
 
 • Reminders (`/add_reminder`) to notify you for your `!gd`, `!da`, or to think to water your plants.
 
-• Soon a performance tracker
+• A tracker to make charts with your reports
 
 ## Users data
 
