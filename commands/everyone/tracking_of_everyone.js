@@ -1,7 +1,8 @@
 import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed, MessageAttachment } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import { unlink } from 'fs';
+import { log_error } from "../../bot.js";
 
 export const data = new SlashCommandBuilder()
 	.setName('tracking_of_everyone')
@@ -125,7 +126,7 @@ export async function execute(interaction, config, db) {
                     .setTitle(`Statistiques les rapports de tous les utilisateurs`)
                     .setImage(`attachment://everyone_chart.png`);
                 await interaction.editReply({ embeds: [embed], files: [`./temporary_files/everyone_chart.png`] });
-                unlink(`./temporary_files/everyone_chart.png`, (err) => {if (err) console.error(err);});
+                unlink(`./temporary_files/everyone_chart.png`, (err) => {if (err) log_error(err);});
             }
             break;
     }

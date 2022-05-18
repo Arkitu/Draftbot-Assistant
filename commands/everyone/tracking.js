@@ -1,8 +1,9 @@
 import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed, MessageAttachment } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import { createHash } from "crypto";
 import { unlink } from 'fs';
+import { log, log_error } from "../../bot.js";
 
 export const data = new SlashCommandBuilder()
 	.setName('tracking')
@@ -126,7 +127,7 @@ export async function execute(interaction, config, db) {
                     .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
                     .setImage(`attachment://${interaction.user.id}_chart.png`);
                 await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${interaction.user.id}_chart.png`] });
-                unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) console.error(err);});
+                unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) log_error(err);});
             }
             break;
     }
