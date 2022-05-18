@@ -111,7 +111,7 @@ export async function execute(interaction, config, db) {
 						.setEmoji('⬅')
 				]);
 			}
-			if (page < Math.ceil(guilds.length/16)) {
+			if (page < Math.ceil(guilds.length/15)) {
 				components.addComponents([
 					new MessageButton()
 						.setCustomId('next_page')
