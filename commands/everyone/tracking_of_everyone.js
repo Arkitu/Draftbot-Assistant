@@ -97,17 +97,25 @@ export async function execute(interaction, config, db) {
                     ]
                 }
             }) // Line chart
-              .backgroundColor("#2F3135") // Color of embed background
-              .width(500) // 500px
-              .height(300); // 300px
-        
-            await chart.toFile(`./temporary_files/everyone_chart.png`);
+                .backgroundColor("#2F3135") // Color of embed background
+                .width(500) // 500px
+                .height(300); // 300px
+            
+            let url_chart = await chart.toURL();
 
-            let embed = new MessageEmbed()
-                .setTitle(`Statistiques les rapports de tous les utilisateurs`)
-                .setImage(`attachment://everyone_chart.png`);
-            await interaction.editReply({ embeds: [embed], files: [`./temporary_files/everyone_chart.png`] });
-            unlink(`./temporary_files/everyone_chart.png`, (err) => {if (err) console.error(err);});
+            if (url_chart.length < 2048) {
+                let embed = new MessageEmbed()
+                    .setTitle(`Statistiques les rapports de tous les utilisateurs`)
+                    .setImage(url_chart);
+                await interaction.editReply({ embeds: [embed] });
+            } else {
+                await chart.toFile(`./temporary_files/everyone_chart.png`);
+                let embed = new MessageEmbed()
+                    .setTitle(`Statistiques les rapports de tous les utilisateurs`)
+                    .setImage(`attachment://everyone_chart.png`);
+                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/everyone_chart.png`] });
+                unlink(`./temporary_files/everyone_chart.png`, (err) => {if (err) console.error(err);});
+            }
             break;
     }
 }

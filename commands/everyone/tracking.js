@@ -95,20 +95,35 @@ export async function execute(interaction, config, db) {
                             data: Object.values(reports_in_days).map(x => x.short),
                             fill : false
                         }
-                    ]
+                    ],
+                    options: {
+                        legend: {
+                            labels: {
+                                fontColor: 'white'
+                            }
+                        }
+                    }
                 }
             }) // Line chart
-              .backgroundColor("#2F3135") // Color of embed background
-              .width(500) // 500px
-              .height(300); // 300px
-        
-            await chart.toFile(`./temporary_files/${interaction.user.id}_chart.png`);
+                .backgroundColor("#2F3135") // Color of embed background
+                .width(500) // 500px
+                .height(300); // 300px
+            
+            let url_chart = await chart.toURL();
 
-            let embed = new MessageEmbed()
-                .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
-                .setImage(`attachment://${interaction.user.id}_chart.png`);
-            await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${interaction.user.id}_chart.png`] });
-            unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) console.error(err);});
+            if (url_chart.length < 2048) {
+                let embed = new MessageEmbed()
+                    .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
+                    .setImage(url_chart);
+                await interaction.editReply({ embeds: [embed] });
+            } else {
+                await chart.toFile(`./temporary_files/${interaction.user.id}_chart.png`);
+                let embed = new MessageEmbed()
+                    .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
+                    .setImage(`attachment://${interaction.user.id}_chart.png`);
+                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${interaction.user.id}_chart.png`] });
+                unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) console.error(err);});
+            }
             break;
     }
 }
