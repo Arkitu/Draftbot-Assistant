@@ -93,7 +93,7 @@ export async function execute(interaction, config, db) {
                             borderColor: "rgba(54,162,235,1)"
                         },
                         {
-                            label: 'Nbr Events',
+                            label: 'Nbr Mini-events',
                             data: Object.values(reports_in_days).map(x => x.short),
                             fill : "origin",
                             backgroundColor: "rgba(255,159,64,0.5)",
