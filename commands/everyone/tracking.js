@@ -86,14 +86,18 @@ export async function execute(interaction, config, db) {
                     labels: Object.keys(reports_in_days),
                     datasets: [
                         {
-                            label: 'Rapports longs',
+                            label: 'Nbr Reports',
                             data: Object.values(reports_in_days).map(x => x.long),
-                            fill : false
+                            fill : "origin",
+                            backgroundColor: "rgba(54,162,235,0.5)",
+                            borderColor: "rgba(54,162,235,1)"
                         },
                         {
-                            label: 'Rapports courts',
+                            label: 'Nbr Events',
                             data: Object.values(reports_in_days).map(x => x.short),
-                            fill : false
+                            fill : "origin",
+                            backgroundColor: "rgba(255,159,64,0.5)",
+                            borderColor: "rgba(255,159,64,1)"
                         }
                     ]
                 }
