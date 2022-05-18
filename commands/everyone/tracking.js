@@ -95,14 +95,7 @@ export async function execute(interaction, config, db) {
                             data: Object.values(reports_in_days).map(x => x.short),
                             fill : false
                         }
-                    ],
-                    options: {
-                        legend: {
-                            labels: {
-                                fontColor: 'white'
-                            }
-                        }
-                    }
+                    ]
                 }
             }) // Line chart
                 .backgroundColor("#2F3135") // Color of embed background
