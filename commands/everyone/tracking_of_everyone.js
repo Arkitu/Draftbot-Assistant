@@ -97,8 +97,15 @@ export async function execute(interaction, config, db) {
                             fill : "origin",
                             backgroundColor: "rgba(255,159,64,0.5)",
                             borderColor: "rgba(255,159,64,1)"
-                        }
+                        },
                     ]
+                },
+                options: {
+                    legend: {
+                        labels: {
+                            fontColor: 'white'
+                        }
+                    }
                 }
             }) // Line chart
                 .backgroundColor("#2F3135") // Color of embed background
