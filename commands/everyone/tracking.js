@@ -87,7 +87,7 @@ export async function execute(interaction, config, db) {
                     labels: Object.keys(reports_in_days),
                     datasets: [
                         {
-                            label: 'Nbr Reports',
+                            label: 'Nbr Events',
                             data: Object.values(reports_in_days).map(x => x.long),
                             fill : "origin",
                             backgroundColor: "rgba(54,162,235,0.5)",
