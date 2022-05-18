@@ -15,7 +15,7 @@ export async function execute(interaction, config, db) {
 	let guilds_limited;
 	let page = 1;
 	if (guilds.length > 16) {
-		guilds_limited = guilds.slice(0, 14);
+		guilds_limited = guilds.slice(0, 15);
 		embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/16)} | ${guilds.length} guildes` });
 		components = new MessageActionRow()
 			.addComponents(
