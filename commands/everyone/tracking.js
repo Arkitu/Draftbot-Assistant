@@ -14,6 +14,15 @@ export const data = new SlashCommandBuilder()
             .setDescription('Affiche les statistiques sur les rapports')
             .addStringOption(opt =>
                 opt
+                    .setName('only')
+                    .setDescription('Affiche seulement les statistiques sur cette catégorie')
+                    .setRequired(false)
+                    .addChoice('all', 'all')
+                    .addChoice('events', 'events')
+                    .addChoice('mini-events', 'mini-events')
+            )
+            .addStringOption(opt =>
+                opt
                     .setName('duration')
                     .setDescription('La période des statistiques (par défaut : 1 semaine)')
                     .setRequired(false)
@@ -81,26 +90,49 @@ export async function execute(interaction, config, db) {
                     reports_in_days[day].short++;
                 }
             }
+            let datasets = [];
+            switch (interaction.options.getString('only')) {
+                case 'events':
+                    datasets.push({
+                        label: 'Nbr Events',
+                        data: Object.values(reports_in_days).map(x => x.long),
+                        fill : "origin",
+                        backgroundColor: "rgba(54,162,235,0.5)",
+                        borderColor: "rgba(54,162,235,1)"
+                    });
+                    break;
+                case 'mini-events':
+                    datasets.push({
+                        label: 'Nbr Mini-events',
+                        data: Object.values(reports_in_days).map(x => x.short),
+                        fill : "origin",
+                        backgroundColor: "rgba(255,159,64,0.5)",
+                        borderColor: "rgba(255,159,64,1)"
+                    });
+                    break;
+                case 'all':
+                default:
+                    datasets.push({
+                        label: 'Nbr Events',
+                        data: Object.values(reports_in_days).map(x => x.long),
+                        fill : "origin",
+                        backgroundColor: "rgba(54,162,235,0.5)",
+                        borderColor: "rgba(54,162,235,1)"
+                    });
+                    datasets.push({
+                        label: 'Nbr Mini-events',
+                        data: Object.values(reports_in_days).map(x => x.short),
+                        fill : "origin",
+                        backgroundColor: "rgba(255,159,64,0.5)",
+                        borderColor: "rgba(255,159,64,1)"
+                    });
+                    break;
+            }
             let chart = await ChartJSImage().chart({
                 type: 'line',
                 data: {
                     labels: Object.keys(reports_in_days),
-                    datasets: [
-                        {
-                            label: 'Nbr Events',
-                            data: Object.values(reports_in_days).map(x => x.long),
-                            fill : "origin",
-                            backgroundColor: "rgba(54,162,235,0.5)",
-                            borderColor: "rgba(54,162,235,1)"
-                        },
-                        {
-                            label: 'Nbr Mini-events',
-                            data: Object.values(reports_in_days).map(x => x.short),
-                            fill : "origin",
-                            backgroundColor: "rgba(255,159,64,0.5)",
-                            borderColor: "rgba(255,159,64,1)"
-                        }
-                    ]
+                    datasets: datasets
                 },
                 options: {
                     legend: {
