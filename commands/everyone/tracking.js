@@ -169,13 +169,13 @@ export async function execute(interaction, config, db) {
                 let embed = new MessageEmbed()
                     .setTitle(`Statistiques les rapports de ${opt.user.username}`)
                     .setImage(url_chart);
-                await interaction.editReply({ embeds: [embed] });
+                await interaction.editReply({ embeds: [embed], ephemeral: !db_user.config.tracking.public });
             } else {
                 await chart.toFile(`./temporary_files/${opt.user.id}_chart.png`);
                 let embed = new MessageEmbed()
                     .setTitle(`Statistiques les rapports de ${opt.user.username}`)
                     .setImage(`attachment://${opt.user.id}_chart.png`);
-                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${opt.user.id}_chart.png`] });
+                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${opt.user.id}_chart.png`], ephemeral: !db_user.config.tracking.public });
                 unlink(`./temporary_files/${opt.user.id}_chart.png`, (err) => {if (err) log_error(err);});
             }
             break;
