@@ -20,7 +20,8 @@
             "commands": [
                 "gtop",
                 "config",
-                "tracking"
+                "tracking",
+                "tracking_of_everyone"
             ]
         }
     ],
@@ -40,7 +41,8 @@
                     }
                 },
                 "tracking": {
-                    "reports": true
+                    "reports": true,
+                    "public": true
                 }
             },
             "tracking": []
