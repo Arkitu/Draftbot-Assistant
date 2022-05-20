@@ -164,7 +164,6 @@ export async function execute(interaction, config, db) {
                 .height(300); // 300px
             
             let url_chart = await chart.toURL();
-            console.debug(!db_user.config.tracking.public);
             if (url_chart.length < 2048) {
                 let embed = new MessageEmbed()
                     .setTitle(`Statistiques les rapports de ${opt.user.username}`)
