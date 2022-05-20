@@ -73,6 +73,7 @@ export const data = new SlashCommandBuilder()
                             .setDescription("L'option à activer ou désactiver")
                             .setRequired(true)
                             .addChoice("reports", "reports")
+                            .addChoice("public", "public")
                     )
             )
     );
@@ -86,7 +87,7 @@ export async function execute(interaction, config, db) {
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
-        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false}}, "tracking": []});
+        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false, "public": false}}, "tracking": []});
     }
     let db_user = db.getData(`/users/${user_hash}`);
 
@@ -130,6 +131,12 @@ export async function execute(interaction, config, db) {
                     } else {
                         return "🔴";
                     }
+                })()}\nTracking public : ${(()=>{
+                    if (db_user.config.tracking.public) {
+                        return "🟢";
+                    } else {
+                        return "🔴";
+                    }
                 })()}`);
             await interaction.editReply({ embeds: [tracking_embed] });
             break;
@@ -143,6 +150,10 @@ export async function execute(interaction, config, db) {
                             db.delete(`/users/${user_hash}/tracking[${db.getIndex(`/users/${user_hash}/tracking`, report.id, "id")}]`);
                         }
                     }
+                    await interaction.editReply("L'option a été modifiée avec succès !");
+                    break;
+                case "public":
+                    db.push(`/users/${user_hash}/config/tracking/public`, !db_user.config.tracking.public);
                     await interaction.editReply("L'option a été modifiée avec succès !");
                     break;
             }

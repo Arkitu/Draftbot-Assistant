@@ -32,18 +32,35 @@ export const data = new SlashCommandBuilder()
                     .addChoice('6 mois', '6 mois')
                     .addChoice('1 an', '1 an')
             )
+            .addUserOption(opt =>
+                opt
+                    .setName('user')
+                    .setDescription('L\'utilisateur dont les statistiques doivent être affichées (par defaut vous même)')
+                    .setRequired(false)
+            )
     )
 export async function execute(interaction, config, db) {
 	await interaction.deferReply();
     let opt = {
-        subcommand: interaction.options.getSubcommand()
+        subcommand: interaction.options.getSubcommand(),
+        only: interaction.options.getString('only'),
+        duration: interaction.options.getString('duration'),
+        user: interaction.options.getUser('user') || interaction.user
     };
-    let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
+    let user_hash = createHash('md5').update(opt.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
-        log(`Création de l'utilisateur ${interaction.user.username} à partir de /tracking`);
-        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false}}, "tracking": []});
+        if (opt.user.id != interaction.user.id) {
+            await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option public`");
+            return;
+        }
+        log(`Création de l'utilisateur ${opt.user.username} à partir de /tracking`);
+        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false, "public": false}}, "tracking": []});
     }
     let db_user = db.getData(`/users/${user_hash}`);
+    if (opt.user.id != interaction.user.id && !db_user.config.tracking.public) {
+        await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option public`");
+        return;
+    }
 
     switch (opt.subcommand) {
         case 'reports':
@@ -51,7 +68,7 @@ export async function execute(interaction, config, db) {
             let cur = new Date();
             let min_date = new Date();
             let max_date = new Date();
-            switch (interaction.options.getString('duration')) {
+            switch (opt.duration) {
                 case '1 semaine':
                     min_date = new Date(cur.getTime() - (cur.getDay() * 24 * 60 * 60 * 1000));
                     max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
@@ -150,16 +167,16 @@ export async function execute(interaction, config, db) {
 
             if (url_chart.length < 2048) {
                 let embed = new MessageEmbed()
-                    .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
+                    .setTitle(`Statistiques les rapports de ${opt.user.username}`)
                     .setImage(url_chart);
                 await interaction.editReply({ embeds: [embed] });
             } else {
-                await chart.toFile(`./temporary_files/${interaction.user.id}_chart.png`);
+                await chart.toFile(`./temporary_files/${opt.user.id}_chart.png`);
                 let embed = new MessageEmbed()
-                    .setTitle(`Statistiques les rapports de ${interaction.user.username}`)
-                    .setImage(`attachment://${interaction.user.id}_chart.png`);
-                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${interaction.user.id}_chart.png`] });
-                unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => {if (err) log_error(err);});
+                    .setTitle(`Statistiques les rapports de ${opt.user.username}`)
+                    .setImage(`attachment://${opt.user.id}_chart.png`);
+                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${opt.user.id}_chart.png`] });
+                unlink(`./temporary_files/${opt.user.id}_chart.png`, (err) => {if (err) log_error(err);});
             }
             break;
     }

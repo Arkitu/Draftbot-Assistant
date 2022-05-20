@@ -9,6 +9,9 @@ for (let user in db.getData("/users")) {
     if (!db.getData(`/users/${user}`).hasOwnProperty("tracking")) {
         db.push(`/users/${user}/tracking`, []);
     }
+    if (!db.getData(`/users/${user}/config/tracking`).hasOwnProperty("public")) {
+        db.push(`/users/${user}/config/tracking/public`, false);
+    }
 }
 
 console.log("Done");
