@@ -233,6 +233,10 @@
                                         {
                                             "name": "reports",
                                             "value": "reports"
+                                        },
+                                        {
+                                            "name": "public",
+                                            "value": "public"
                                         }
                                     ],
                                     "type": 3,
@@ -304,6 +308,26 @@
                         {
                             "choices": [
                                 {
+                                    "name": "all",
+                                    "value": "all"
+                                },
+                                {
+                                    "name": "events",
+                                    "value": "events"
+                                },
+                                {
+                                    "name": "mini-events",
+                                    "value": "mini-events"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "only",
+                            "description": "Affiche seulement les statistiques sur cette catégorie",
+                            "required": false
+                        },
+                        {
+                            "choices": [
+                                {
                                     "name": "1 semaine",
                                     "value": "1 semaine"
                                 },
@@ -328,6 +352,12 @@
                             "name": "duration",
                             "description": "La période des statistiques (par défaut : 1 semaine)",
                             "required": false
+                        },
+                        {
+                            "name": "user",
+                            "description": "L'utilisateur dont les statistiques doivent être affichées (par defaut vous même)",
+                            "required": false,
+                            "type": 6
                         }
                     ]
                 }
@@ -343,6 +373,26 @@
                     "name": "reports",
                     "description": "Affiche les statistiques sur les rapports",
                     "options": [
+                        {
+                            "choices": [
+                                {
+                                    "name": "all",
+                                    "value": "all"
+                                },
+                                {
+                                    "name": "events",
+                                    "value": "events"
+                                },
+                                {
+                                    "name": "mini-events",
+                                    "value": "mini-events"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "only",
+                            "description": "Affiche seulement les statistiques sur cette catégorie",
+                            "required": false
+                        },
                         {
                             "choices": [
                                 {

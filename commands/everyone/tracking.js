@@ -40,7 +40,6 @@ export const data = new SlashCommandBuilder()
             )
     )
 export async function execute(interaction, config, db) {
-	await interaction.deferReply();
     let opt = {
         subcommand: interaction.options.getSubcommand(),
         only: interaction.options.getString('only'),
@@ -50,7 +49,7 @@ export async function execute(interaction, config, db) {
     let user_hash = createHash('md5').update(opt.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         if (opt.user.id != interaction.user.id) {
-            await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
+            await interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
             return;
         }
         log(`Création de l'utilisateur ${opt.user.username} à partir de /tracking`);
@@ -58,9 +57,10 @@ export async function execute(interaction, config, db) {
     }
     let db_user = db.getData(`/users/${user_hash}`);
     if (opt.user.id != interaction.user.id && !db_user.config.tracking.public) {
-        await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
+        await interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
         return;
     }
+    await interaction.deferReply({ ephemeral: !db_user.config.tracking.public })
 
     switch (opt.subcommand) {
         case 'reports':
@@ -164,18 +164,18 @@ export async function execute(interaction, config, db) {
                 .height(300); // 300px
             
             let url_chart = await chart.toURL();
-
+            console.debug(!db_user.config.tracking.public);
             if (url_chart.length < 2048) {
                 let embed = new MessageEmbed()
                     .setTitle(`Statistiques les rapports de ${opt.user.username}`)
                     .setImage(url_chart);
-                await interaction.editReply({ embeds: [embed], ephemeral: !db_user.config.tracking.public });
+                await interaction.editReply({ embeds: [embed] });
             } else {
                 await chart.toFile(`./temporary_files/${opt.user.id}_chart.png`);
                 let embed = new MessageEmbed()
                     .setTitle(`Statistiques les rapports de ${opt.user.username}`)
                     .setImage(`attachment://${opt.user.id}_chart.png`);
-                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${opt.user.id}_chart.png`], ephemeral: !db_user.config.tracking.public });
+                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${opt.user.id}_chart.png`] });
                 unlink(`./temporary_files/${opt.user.id}_chart.png`, (err) => {if (err) log_error(err);});
             }
             break;
