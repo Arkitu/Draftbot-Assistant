@@ -50,7 +50,7 @@ export async function execute(interaction, config, db) {
     let user_hash = createHash('md5').update(opt.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         if (opt.user.id != interaction.user.id) {
-            await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option public`");
+            await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
             return;
         }
         log(`Création de l'utilisateur ${opt.user.username} à partir de /tracking`);
@@ -58,7 +58,7 @@ export async function execute(interaction, config, db) {
     }
     let db_user = db.getData(`/users/${user_hash}`);
     if (opt.user.id != interaction.user.id && !db_user.config.tracking.public) {
-        await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option public`");
+        await interaction.editReply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
         return;
     }
 
