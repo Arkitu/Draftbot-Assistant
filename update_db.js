@@ -12,6 +12,9 @@ for (let user in db.getData("/users")) {
     if (!db.getData(`/users/${user}/config/tracking`).hasOwnProperty("public")) {
         db.push(`/users/${user}/config/tracking/public`, false);
     }
+    if (!db.getData(`/users/${user}/config/tracking`).hasOwnProperty("profile")) {
+        db.push(`/users/${user}/config/tracking/profile`, false);
+    }
 }
 
 console.log("Done");

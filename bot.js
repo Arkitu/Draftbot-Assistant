@@ -226,7 +226,7 @@ let long_report_listener = async msg => {
 }
 
 let short_report_listener = async msg => {
-	if (msg.content != "!r") return;
+	if (!msg.content.toLowerCase().replace(" ", "").slice(1) in ["r", "report" ]) return;
 
 	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
@@ -253,12 +253,90 @@ let short_report_listener = async msg => {
 	}, 10000);
 }
 
+let profile_listener = async msg => {
+	if (!msg.content.toLowerCase().replace(" ", "").slice(1) in ["p", "profile", "profil"]) return;
+
+	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
+	if (!(user_hash in db.getData("/users"))) return;
+	let db_user = db.getData(`/users/${user_hash}`);
+	if (!db_user.config.tracking.profile) return;
+
+	let response_listener = async response => {
+		if (response.author.id != "448110812801007618") return;
+
+		if (response.channel.id != msg.channel.id) return;
+		if (!response.embeds[0]) return;
+		if (!response.embeds[0].title) return;
+		if (response.embeds[0].title.split(" | ")[1]!= msg.author.username) return;
+
+		let embed = response.embeds[0];
+
+		let splited_embed = {
+			"title": embed.title.split(" | "),
+			"fields": embed.fields.map(f => {
+				return f.value.split(" | ").map(e => {
+					return {
+						"full": e,
+						"emoji": e.split(":")[1],
+						"value": (() => {
+							if (!e.split(":")[2]) return undefined;
+							let v = e.split(":")[2].slice(1)
+							if (v.includes("/")) {
+								v = v.split("/").map(int => parseInt(int));
+							} else if (!isNaN(parseInt(v))) {
+								v = parseInt(v);
+							}
+							return v;
+						})()
+					}
+				})
+			})
+		}
+
+		let data = {
+			lvl: parseInt(splited_embed.title[2].split(" ")[1]),
+			pv: splited_embed.fields[0][0].value[0],
+			max_pv: splited_embed.fields[0][0].value[1],
+			xp: splited_embed.fields[0][1].value[0],
+			max_xp: splited_embed.fields[0][1].value[1],
+			gold: splited_embed.fields[0][2].value,
+			vitality: splited_embed.fields[1][0].value[0],
+			max_vitality: splited_embed.fields[1][0].value[1],
+			strength: splited_embed.fields[1][1].value,
+			defense: splited_embed.fields[1][2].value,
+			speed: splited_embed.fields[1][3].value,
+			gems: splited_embed.fields[2][0].value,
+			quest_missions_percentage: splited_embed.fields[2][1].value,
+			ranking: splited_embed.fields[3][0].value[0],
+			rank_points: splited_embed.fields[3][1].value,
+			class: {
+				name: splited_embed.fields[5][0].value,
+				emoji: `:${splited_embed.fields[5][0].emoji}:`,
+			},
+			guild_name: splited_embed.fields[6][0].value,
+			destination: splited_embed.fields[7][0].full
+		}
+
+		db.push(`/users/${user_hash}/tracking[]`, {
+			type: "profile",
+			timestamp: response.createdTimestamp,
+			data: data
+		});
+	}
+	client.on('messageCreate', response_listener);
+
+	setTimeout(() => {
+		client.removeListener('messageCreate', response_listener);
+	}, 10000);
+}
+
 client.on('interactionCreate', cmd_listener);
 client.on('messageCreate', help_msg_listener);
 client.on('messageCreate', fetch_guild_listener);
 client.on('messageCreate', propo_msg_listener);
 client.on('messageCreate', long_report_listener);
 client.on('messageCreate', short_report_listener);
+client.on('messageCreate', profile_listener);
 
 // Import all the commands from the commands files
 client.commands = new Collection();

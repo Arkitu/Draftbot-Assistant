@@ -42,7 +42,8 @@
                 },
                 "tracking": {
                     "reports": true,
-                    "public": true
+                    "public": true,
+                    "profile": true
                 }
             },
             "tracking": []
