@@ -53,7 +53,7 @@ export async function execute(interaction, config, db) {
             return;
         }
         log(`Création de l'utilisateur ${opt.user.username} à partir de /tracking`);
-        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false, "public": false}}, "tracking": []});
+        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false, "public": false, "profile": false}}, "tracking": []});
     }
     let db_user = db.getData(`/users/${user_hash}`);
     if (opt.user.id != interaction.user.id && !db_user.config.tracking.public) {
