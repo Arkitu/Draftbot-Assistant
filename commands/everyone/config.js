@@ -74,6 +74,7 @@ export const data = new SlashCommandBuilder()
                             .setRequired(true)
                             .addChoice("reports", "reports")
                             .addChoice("public", "public")
+                            .addChoice("profile", "profile")
                     )
             )
     );
@@ -137,6 +138,12 @@ export async function execute(interaction, config, db) {
                     } else {
                         return "🔴";
                     }
+                })()}\n Tracking du profil : ${(()=>{
+                    if (db_user.config.tracking.profile) {
+                        return "🟢";
+                    } else {
+                        return "🔴";
+                    }
                 })()}`);
             await interaction.editReply({ embeds: [tracking_embed] });
             break;
@@ -154,6 +161,10 @@ export async function execute(interaction, config, db) {
                     break;
                 case "public":
                     db.push(`/users/${user_hash}/config/tracking/public`, !db_user.config.tracking.public);
+                    await interaction.editReply("L'option a été modifiée avec succès !");
+                    break;
+                case "profile":
+                    db.push(`/users/${user_hash}/config/tracking/profile`, !db_user.config.tracking.profile);
                     await interaction.editReply("L'option a été modifiée avec succès !");
                     break;
             }
