@@ -21,7 +21,7 @@ export class Reminder {
                     .setTitle("Reminder")
                     .setDescription(this.message)
                 if (this.channel.channel.permissionsFor(this.client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
-                    this.channel.channel.send({ content: `${this.author}`, embeds: [embed] });
+                    await this.channel.channel.send({ content: `${this.author}`, embeds: [embed] });
                 }
                 this.delete();
 
