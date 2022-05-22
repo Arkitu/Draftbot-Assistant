@@ -153,8 +153,8 @@ export async function execute(interaction, config, db) {
                     db.push(`/users/${user_hash}/config/tracking/reports`, !db_user.config.tracking.reports);
                     if (!db_user.config.tracking.reports) {
                         // Delete all tracked reports
-                        for (let report of db.getData(`/users/${user_hash}/tracking`).filter(e=>["long_report", "short_report"].includes(e.type))) {
-                            db.delete(`/users/${user_hash}/tracking[${db.getIndex(`/users/${user_hash}/tracking`, report.id, "id")}]`);
+                        for (let report in db.getData(`/users/${user_hash}/tracking`).filter(e=>["long_report", "short_report"].includes(e.type))) {
+                            db.delete(`/users/${user_hash}/tracking[${report}]`);
                         }
                     }
                     await interaction.editReply("L'option a été modifiée avec succès !");
@@ -165,6 +165,12 @@ export async function execute(interaction, config, db) {
                     break;
                 case "profile":
                     db.push(`/users/${user_hash}/config/tracking/profile`, !db_user.config.tracking.profile);
+                    if (!db_user.config.tracking.profile) {
+                        // Delete all tracked reports
+                        for (let profile in db.getData(`/users/${user_hash}/tracking`).filter(e=>["profile"].includes(e.type))) {
+                            db.delete(`/users/${user_hash}/tracking[${profile}]`);
+                        }
+                    }
                     await interaction.editReply("L'option a été modifiée avec succès !");
                     break;
             }
