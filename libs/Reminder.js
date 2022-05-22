@@ -14,7 +14,7 @@ export class Reminder {
     }
 
     async start() {
-        setTimeout(() => {
+        setTimeout(async () => {
             if (!this.deleted) {
                 let embed = new MessageEmbed()
                     .setColor(this.config.getData("/main_color"))
