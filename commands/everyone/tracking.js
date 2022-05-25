@@ -5,7 +5,7 @@ import { createHash } from "crypto";
 import { unlink } from 'fs';
 import { log, log_error } from "../../bot.js";
 
-var property_data = {
+export var property_data = {
     "reports/long": {
         "label": "Nbr Events",
         "color": "54,162,235"
@@ -241,6 +241,7 @@ export async function execute(interaction, config, db) {
             if (opt.category == "all" || opt.category == "events") {
                 let data = [];
                 for (let event in events) {
+                    if (events[event].long == 0 && events[event].short == 0) continue;
                     data.push({
                         x: parseInt(event),
                         y: events[event].long
@@ -257,6 +258,7 @@ export async function execute(interaction, config, db) {
             if (opt.category == "all" || opt.category == "mini-events") {
                 let data = [];
                 for (let event in events) {
+                    if (events[event].long == 0 && events[event].short == 0 && parseInt(event) != min_date.getTime() && parseInt(event) != max_date.getTime()) continue;
                     data.push({
                         x: parseInt(event),
                         y: events[event].short
@@ -283,10 +285,8 @@ export async function execute(interaction, config, db) {
                     },
                     scales: {
                         x: {
-                            stacked: true,
-                        },
-                        y: {
-                            stacked: true,
+                            min: min_date.getTime(),
+                            max: max_date.getTime(),
                         },
                         xAxes: [{
                             type: "time",
@@ -328,18 +328,20 @@ export async function execute(interaction, config, db) {
                 backgroundColor: `rgba(${property_data["profile/" + opt.category].color}, 0.2)`,
                 data: [],
             }];
-            let events = {};
             for (let event of db_user.tracking) {
                 if (event.type == "profile") {
                     let event_date = new Date(event.timestamp);
                     if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
-                        events[event_date] = event;
+                        datasets[0].data.push({
+                            x: event.timestamp,
+                            y: event.data[opt.category]
+                        });
                     }
-                    datasets[0].data.push({
-                        x: event.timestamp,
-                        y: event.data[opt.category]
-                    });
                 }
+            }
+            if (datasets[0].data.length == 0) {
+                await interaction.editReply(":warning: Je n'ai enregistré aucun évènement de ce type pour cette période.");
+                return;
             }
             chart = await ChartJSImage().chart({
                 type: 'line',
@@ -356,19 +358,16 @@ export async function execute(interaction, config, db) {
                         xAxes: [{
                             type: "time",
                             time: {
-                                unit: "day",
-                                displayFormats: {
-                                    day: "DD-MM",
-                                    week: "DD-MM",
-                                    month: "MM-YYYY",
-                                    quarter: "MM-YYYY",
-                                    year: "YYYY"
-                                },
+                                tooltipFormat: "DD-MM-YYYY"
                             },
                             display: true,
                             scaleLabel: {
                                 display: true,
                                 labelString: "Date"
+                            },
+                            ticks: {
+                                min: min_date.getTime(),
+                                max: max_date.getTime(),
                             }
                         }],
                         yAxes: [{

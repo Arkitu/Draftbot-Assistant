@@ -503,9 +503,9 @@
                                 }
                             ],
                             "type": 3,
-                            "name": "only",
-                            "description": "Affiche seulement les statistiques sur cette catégorie",
-                            "required": false
+                            "name": "category",
+                            "description": "La catégorie des statistiques",
+                            "required": true
                         },
                         {
                             "choices": [
