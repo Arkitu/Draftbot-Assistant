@@ -5,6 +5,77 @@ import { createHash } from "crypto";
 import { unlink } from 'fs';
 import { log, log_error } from "../../bot.js";
 
+var property_data = {
+    "reports/long": {
+        "label": "Nbr Events",
+        "color": "54,162,235"
+    },
+    "reports/short": {
+        "label": "Nbr Mini-events",
+        "color": "255,159,64"
+    },
+    "profile/lvl": {
+        "label": "Niveau",
+        "color": "255,159,64"
+    },
+    "profile/pv": {
+        "label": "PV",
+        "color": "255,0,0"
+    },
+    "profile/max_pv": {
+        "label": "Max PV",
+        "color": "128,0,0"
+    },
+    "profile/xp": {
+        "label": "XP",
+        "color": "0,255,0"
+    },
+    "profile/max_xp": {
+        "label": "Max XP",
+        "color": "0,128,0"
+    },
+    "profile/gold": {
+        "label": "Or",
+        "color": "184,134,11"
+    },
+    "profile/energy": {
+        "label": "Energie",
+        "color": "255,215,0"
+    },
+    "profile/max_energy": {
+        "label": "Max Energie",
+        "color": "218,165,32"
+    },
+    "profile/strenght": {
+        "label": "Force",
+        "color": "178,34,34"
+    },
+    "profile/defense": {
+        "label": "Défense",
+        "color": "30,144,255"
+    },
+    "profile/speed": {
+        "label": "Vitesse",
+        "color": "173,216,230"
+    },
+    "profile/gems": {
+        "label": "Gems",
+        "color": "102,205,170"
+    },
+    "profile/quest_missions_percentage": {
+        "label": "Avancement des missions de quête (en %)",
+        "color": "255,222,173"
+    },
+    "profile/rank": {
+        "label": "Rang dans le classement",
+        "color": "192,192,192"
+    },
+    "profile/rank_points": {
+        "label": "Points de classement",
+        "color": "112,128,144"
+    }
+};
+
 export const data = new SlashCommandBuilder()
 	.setName('tracking')
 	.setDescription('Affiche des statistiques sur vous')
@@ -14,9 +85,9 @@ export const data = new SlashCommandBuilder()
             .setDescription('Affiche les statistiques sur les rapports')
             .addStringOption(opt =>
                 opt
-                    .setName('only')
-                    .setDescription('Affiche seulement les statistiques sur cette catégorie')
-                    .setRequired(false)
+                    .setName('category')
+                    .setDescription('La catégorie des statistiques')
+                    .setRequired(true)
                     .addChoice('all', 'all')
                     .addChoice('events', 'events')
                     .addChoice('mini-events', 'mini-events')
@@ -39,10 +110,53 @@ export const data = new SlashCommandBuilder()
                     .setRequired(false)
             )
     )
+    .addSubcommand(subcmd =>
+        subcmd
+            .setName('profile')
+            .setDescription('Affiche les statistiques sur les profiles')
+            .addStringOption(opt =>
+                opt
+                    .setName('category')
+                    .setDescription('La catégorie des statistiques')
+                    .setRequired(true)
+                    .addChoice('level', 'lvl')
+                    .addChoice('gold', 'gold')
+                    .addChoice('pv', 'pv')
+                    .addChoice('max_pv', 'max_pv')
+                    .addChoice('xp', 'xp')
+                    .addChoice('max_xp', 'max_xp')
+                    .addChoice('energy', 'energy')
+                    .addChoice('max_energy', 'max_energy')
+                    .addChoice('strenght', 'strenght')
+                    .addChoice('defense', 'defense')
+                    .addChoice('speed', 'speed')
+                    .addChoice('gems', 'gems')
+                    .addChoice('quest_missions', 'quest_missions_percentage')
+                    .addChoice('rank', 'rank')
+                    .addChoice('rank_points', 'rank_points')
+            )
+            .addStringOption(opt =>
+                opt
+                    .setName('duration')
+                    .setDescription('La période des statistiques (par défaut : 1 semaine)')
+                    .setRequired(false)
+                    .addChoice('1 semaine', '1 semaine')
+                    .addChoice('1 mois', '1 mois')
+                    .addChoice('3 mois', '3 mois')
+                    .addChoice('6 mois', '6 mois')
+                    .addChoice('1 an', '1 an')
+            )
+            .addUserOption(opt =>
+                opt
+                    .setName('user')
+                    .setDescription('L\'utilisateur dont les statistiques doivent être affichées (par defaut vous même)')
+                    .setRequired(false)
+            )
+    )
 export async function execute(interaction, config, db) {
     let opt = {
         subcommand: interaction.options.getSubcommand(),
-        only: interaction.options.getString('only'),
+        category: interaction.options.getString('category') || 'all',
         duration: interaction.options.getString('duration'),
         user: interaction.options.getUser('user') || interaction.user
     };
@@ -60,95 +174,105 @@ export async function execute(interaction, config, db) {
         await interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
         return;
     }
-    await interaction.deferReply({ ephemeral: !db_user.config.tracking.public })
+    await interaction.deferReply({ ephemeral: !db_user.config.tracking.public });
 
+    // Get min_date and max_date
+    let cur = new Date();
+    let min_date = new Date();
+    let max_date = new Date();
+    switch (opt.duration) {
+        case '1 semaine':
+            min_date = new Date(cur.getTime() - ((cur.getDay() - 1) * 24 * 60 * 60 * 1000));
+            max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
+            break;
+        case '1 mois':
+            min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000));
+            max_date = new Date(min_date.getTime() + 30 * 24 * 60 * 60 * 1000);
+            break;
+        case '3 mois':
+            min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000) - (2 * 30 * 24 * 60 * 60 * 1000));
+            max_date = new Date(min_date.getTime() + 3 * 30 * 24 * 60 * 60 * 1000);
+            break;
+        case '6 mois':
+            min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000) - (5 * 30 * 24 * 60 * 60 * 1000));
+            max_date = new Date(min_date.getTime() + 6 * 30 * 24 * 60 * 60 * 1000);
+            break;
+        case '1 an':
+            min_date = new Date(cur.getTime() - (cur.getMonth() * 30 * 24 * 60 * 60 * 1000));
+            max_date = new Date(min_date.getTime() + 365.25 * 24 * 60 * 60 * 1000);
+            break;
+        default:
+            min_date = new Date(cur.getTime() - ((()=>{
+                switch (cur.getDay()) {
+                    case 0:
+                        return 6;
+                    default:
+                        return cur.getDay() - 1;
+                }
+            })() * 24 * 60 * 60 * 1000));
+            max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
+            break;
+    }
+    min_date.setHours(0, 0, 0, 0);
+    max_date.setHours(23, 59, 59, 999);
+
+    // Get data and create the chart
+    let chart;
     switch (opt.subcommand) {
-        case 'reports':
-            let reports_in_days = {};
-            let cur = new Date();
-            let min_date = new Date();
-            let max_date = new Date();
-            switch (opt.duration) {
-                case '1 semaine':
-                    min_date = new Date(cur.getTime() - (cur.getDay() * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
-                    break;
-                case '1 mois':
-                    min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 30 * 24 * 60 * 60 * 1000);
-                    break;
-                case '3 mois':
-                    min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000) - (2 * 30 * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 3 * 30 * 24 * 60 * 60 * 1000);
-                    break;
-                case '6 mois':
-                    min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000) - (5 * 30 * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 6 * 30 * 24 * 60 * 60 * 1000);
-                    break;
-                case '1 an':
-                    min_date = new Date(cur.getTime() - (cur.getMonth() * 30 * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 365.25 * 24 * 60 * 60 * 1000);
-                    break;
-                default:
-                    min_date = new Date(cur.getTime() - (cur.getDay() * 24 * 60 * 60 * 1000));
-                    max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
-                    break;
-            }
-            for (let i = new Date(min_date.getTime()); i.getTime() <= max_date.getTime(); i.setTime(i.getTime() + 24 * 60 * 60 * 1000)) {
-                reports_in_days[i.getFullYear() + "-" + i.getMonth() + "-" + i.getDate()] = {long: 0, short: 0};
+        case 'reports': {
+            let events = {};
+            for (let i = new Date(min_date.getTime()); i.getTime() <= max_date.getTime(); i.setDate(i.getDate() + 1)) {
+                events[i.getTime()] = {long: 0, short: 0};
             }
             for (let event of db_user.tracking) {
-                let event_date = new Date(event.timestamp);
-                if (!(event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime())) continue;
-                let day = event_date.getFullYear() + "-" + event_date.getMonth() + "-" + event_date.getDate();
-                if (event.type == "long_report") {
-                    reports_in_days[day].long++;
-                } else if (event.type == "short_report") {
-                    reports_in_days[day].short++;
+                if (["long_report", "short_report"].includes(event.type)) {
+                    let event_date = new Date(event.timestamp);
+                    if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
+                        event_date.setHours(0, 0, 0, 0);
+                        if (event.type == "long_report") {
+                            events[event_date.getTime()].long++;
+                        } else {
+                            events[event_date.getTime()].short++;
+                        }
+                    }
                 }
             }
             let datasets = [];
-            switch (interaction.options.getString('only')) {
-                case 'events':
-                    datasets.push({
-                        label: 'Nbr Events',
-                        data: Object.values(reports_in_days).map(x => x.long),
-                        fill : "origin",
-                        backgroundColor: "rgba(54,162,235,0.5)",
-                        borderColor: "rgba(54,162,235,1)"
+            if (opt.category == "all" || opt.category == "events") {
+                let data = [];
+                for (let event in events) {
+                    data.push({
+                        x: parseInt(event),
+                        y: events[event].long
                     });
-                    break;
-                case 'mini-events':
-                    datasets.push({
-                        label: 'Nbr Mini-events',
-                        data: Object.values(reports_in_days).map(x => x.short),
-                        fill : "origin",
-                        backgroundColor: "rgba(255,159,64,0.5)",
-                        borderColor: "rgba(255,159,64,1)"
-                    });
-                    break;
-                case 'all':
-                default:
-                    datasets.push({
-                        label: 'Nbr Events',
-                        data: Object.values(reports_in_days).map(x => x.long),
-                        fill : "origin",
-                        backgroundColor: "rgba(54,162,235,0.5)",
-                        borderColor: "rgba(54,162,235,1)"
-                    });
-                    datasets.push({
-                        label: 'Nbr Mini-events',
-                        data: Object.values(reports_in_days).map(x => x.short),
-                        fill : "origin",
-                        backgroundColor: "rgba(255,159,64,0.5)",
-                        borderColor: "rgba(255,159,64,1)"
-                    });
-                    break;
+                }
+                datasets.push({
+                    label: property_data["reports/long"].label,
+                    borderColor: `rgba(${property_data["reports/long"].color}, 1)`,
+                    backgroundColor: `rgba(${property_data["reports/long"].color}, 0.2)`,
+                    borderWidth: 2,
+                    data: data,
+                });
             }
-            let chart = await ChartJSImage().chart({
-                type: 'line',
+            if (opt.category == "all" || opt.category == "mini-events") {
+                let data = [];
+                for (let event in events) {
+                    data.push({
+                        x: parseInt(event),
+                        y: events[event].short
+                    });
+                }
+                datasets.push({
+                    label: property_data["reports/short"].label,
+                    borderColor: `rgba(${property_data["reports/short"].color}, 1)`,
+                    backgroundColor: `rgba(${property_data["reports/short"].color}, 0.2)`,
+                    borderWidth: 2,
+                    data: data,
+                });
+            }
+            chart = await ChartJSImage().chart({
+                type: 'bar',
                 data: {
-                    labels: Object.keys(reports_in_days),
                     datasets: datasets
                 },
                 options: {
@@ -156,27 +280,140 @@ export async function execute(interaction, config, db) {
                         labels: {
                             fontColor: 'white'
                         }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                        },
+                        xAxes: [{
+                            type: "time",
+                            time: {
+                                unit: "day",
+                                displayFormats: {
+                                    day: "DD-MM",
+                                    week: "DD-MM",
+                                    month: "MM-YYYY",
+                                    quarter: "MM-YYYY",
+                                    year: "YYYY"
+                                },
+                            },
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Date"
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'value'
+                            }
+                        }]
+                    }
+                }
+            }) // Bar chart
+                .backgroundColor("#2F3135") // Color of embed background
+                .width(500) // 500px
+                .height(300); // 300px
+            break;
+        }
+        case 'profile': {
+            let datasets = [{
+                label: property_data["profile/" + opt.category].label,
+                borderColor: `rgba(${property_data["profile/" + opt.category].color}, 1)`,
+                backgroundColor: `rgba(${property_data["profile/" + opt.category].color}, 0.2)`,
+                data: [],
+            }];
+            let events = {};
+            for (let event of db_user.tracking) {
+                if (event.type == "profile") {
+                    let event_date = new Date(event.timestamp);
+                    if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
+                        events[event_date] = event;
+                    }
+                    datasets[0].data.push({
+                        x: event.timestamp,
+                        y: event.data[opt.category]
+                    });
+                }
+            }
+            chart = await ChartJSImage().chart({
+                type: 'line',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    legend: {
+                        labels: {
+                            fontColor: 'white'
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: "time",
+                            time: {
+                                unit: "day",
+                                displayFormats: {
+                                    day: "DD-MM",
+                                    week: "DD-MM",
+                                    month: "MM-YYYY",
+                                    quarter: "MM-YYYY",
+                                    year: "YYYY"
+                                },
+                            },
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Date"
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'value'
+                            }
+                        }]
                     }
                 }
             }) // Line chart
                 .backgroundColor("#2F3135") // Color of embed background
                 .width(500) // 500px
                 .height(300); // 300px
-            
-            let url_chart = await chart.toURL();
-            if (url_chart.length < 2048) {
-                let embed = new MessageEmbed()
-                    .setTitle(`Statistiques les rapports de ${opt.user.username}`)
-                    .setImage(url_chart);
-                await interaction.editReply({ embeds: [embed] });
-            } else {
-                await chart.toFile(`./temporary_files/${opt.user.id}_chart.png`);
-                let embed = new MessageEmbed()
-                    .setTitle(`Statistiques les rapports de ${opt.user.username}`)
-                    .setImage(`attachment://${opt.user.id}_chart.png`);
-                await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${opt.user.id}_chart.png`] });
-                unlink(`./temporary_files/${opt.user.id}_chart.png`, (err) => {if (err) log_error(err);});
-            }
             break;
+        }
+    }
+    
+    let url_chart = await chart.toURL();
+    if (url_chart.length < 2048) {
+        let embed = new MessageEmbed()
+            .setTitle(`Statistiques ${(()=>{
+                switch (opt.subcommand) {
+                    case 'reports':
+                        return "des reports";
+                    case 'profile':
+                        return "du profil";
+                }
+            })()} de ${opt.user.username}`)
+            .setImage(url_chart);
+        await interaction.editReply({ embeds: [embed] });
+    } else {
+        await chart.toFile(`./temporary_files/${opt.user.id}_chart.png`);
+        let embed = new MessageEmbed()
+            .setTitle(`Statistiques ${(()=>{
+                switch (opt.subcommand) {
+                    case 'reports':
+                        return "des reports";
+                    case 'profile':
+                        return "du profil";
+                }
+            })()} de ${opt.user.username}`)
+            .setImage(`attachment://${opt.user.id}_chart.png`);
+        await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${opt.user.id}_chart.png`] });
+        unlink(`./temporary_files/${opt.user.id}_chart.png`, (err) => { if (err) log_error(err); });
     }
 }

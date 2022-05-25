@@ -7,6 +7,7 @@
     "discord-api-types": "^0.27.2",
     "discord.js": "^13.6.0",
     "forever-monitor": "^3.0.3",
+    "moment": "^2.29.3",
     "node-json-db": "^1.4.1"
   },
   "name": "drafbot-assistant",

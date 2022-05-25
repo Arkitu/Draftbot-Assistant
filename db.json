@@ -46,7 +46,227 @@
                     "profile": true
                 }
             },
-            "tracking": []
+            "tracking": [
+                {
+                    "type": "profile",
+                    "timestamp": 1653204525037,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 231,
+                        "max_pv": 233,
+                        "xp": 104,
+                        "max_xp": 6169,
+                        "gold": 748,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 141,
+                        "quest_missions_percentage": 88,
+                        "rank": 155,
+                        "rank_points": 503167,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🛖 Boug-Coton"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1653416803413,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 231,
+                        "max_pv": 233,
+                        "xp": 1364,
+                        "max_xp": 6169,
+                        "gold": 748,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 146,
+                        "quest_missions_percentage": 88,
+                        "rank": 153,
+                        "rank_points": 506541,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🛣️ Grand Axe"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1653416867738,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 231,
+                        "max_pv": 233,
+                        "xp": 1364,
+                        "max_xp": 6169,
+                        "gold": 748,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 146,
+                        "quest_missions_percentage": 88,
+                        "rank": 153,
+                        "rank_points": 506541,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🛣️ Grand Axe"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1653463048169,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 233,
+                        "max_pv": 233,
+                        "xp": 1619,
+                        "max_xp": 6169,
+                        "gold": 1105,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 147,
+                        "quest_missions_percentage": 88,
+                        "rank": 153,
+                        "rank_points": 507439,
+                        "class": {
+                            "name": "Reprise du jeu possible",
+                            "emoji": ":hospital:"
+                        },
+                        "destination": ":stadium: Les Draft Potes"
+                    }
+                },
+                {
+                    "type": "short_report",
+                    "timestamp": 1653463557091
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1653463611857,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 233,
+                        "max_pv": 233,
+                        "xp": 1619,
+                        "max_xp": 6169,
+                        "gold": 1105,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 147,
+                        "quest_missions_percentage": 88,
+                        "rank": 153,
+                        "rank_points": 507439,
+                        "class": {
+                            "name": "Reprise du jeu possible",
+                            "emoji": ":hospital:"
+                        },
+                        "destination": ":stadium: Les Draft Potes"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1653465525699,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 233,
+                        "max_pv": 233,
+                        "xp": 1619,
+                        "max_xp": 6169,
+                        "gold": 1105,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 147,
+                        "quest_missions_percentage": 88,
+                        "rank": 153,
+                        "rank_points": 507439,
+                        "class": {
+                            "name": "Reprise du jeu possible",
+                            "emoji": ":hospital:"
+                        },
+                        "destination": ":stadium: Les Draft Potes"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1653465575899,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 233,
+                        "max_pv": 233,
+                        "xp": 1619,
+                        "max_xp": 6169,
+                        "gold": 105,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 147,
+                        "quest_missions_percentage": 88,
+                        "rank": 153,
+                        "rank_points": 507439,
+                        "class": {
+                            "name": "Reprise du jeu possible",
+                            "emoji": ":hospital:"
+                        },
+                        "destination": ":stadium: Les Draft Potes"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1653465575899,
+                    "data": {
+                        "lvl": 73,
+                        "pv": 233,
+                        "max_pv": 233,
+                        "xp": 1619,
+                        "max_xp": 6169,
+                        "gold": 105,
+                        "energy": 1397,
+                        "max_energy": 1397,
+                        "strenght": 202,
+                        "defense": 277,
+                        "speed": 13,
+                        "gems": 147,
+                        "quest_missions_percentage": 88,
+                        "rank": 153,
+                        "rank_points": 507439,
+                        "class": {
+                            "name": "Reprise du jeu possible",
+                            "emoji": ":hospital:"
+                        },
+                        "destination": ":stadium: Les Draft Potes"
+                    }
+                },
+                {
+                    "type": "short_report",
+                    "timestamp": 1653467215772
+                }
+            ]
         }
     },
     "guilds": {
@@ -55,6 +275,12 @@
             "level": 42,
             "description": "Exemple de description",
             "last_update": 936868140
+        },
+        "Les Draft Potes": {
+            "name": "Les Draft Potes",
+            "level": 78,
+            "description": "Actuellement GOA 4, membre de l'empire des gentils",
+            "last_update": 1653465572002
         }
     },
     "reminders": [],
@@ -238,6 +464,10 @@
                                         {
                                             "name": "public",
                                             "value": "public"
+                                        },
+                                        {
+                                            "name": "profile",
+                                            "value": "profile"
                                         }
                                     ],
                                     "type": 3,
@@ -322,9 +552,122 @@
                                 }
                             ],
                             "type": 3,
-                            "name": "only",
-                            "description": "Affiche seulement les statistiques sur cette catégorie",
+                            "name": "category",
+                            "description": "La catégorie des statistiques",
+                            "required": true
+                        },
+                        {
+                            "choices": [
+                                {
+                                    "name": "1 semaine",
+                                    "value": "1 semaine"
+                                },
+                                {
+                                    "name": "1 mois",
+                                    "value": "1 mois"
+                                },
+                                {
+                                    "name": "3 mois",
+                                    "value": "3 mois"
+                                },
+                                {
+                                    "name": "6 mois",
+                                    "value": "6 mois"
+                                },
+                                {
+                                    "name": "1 an",
+                                    "value": "1 an"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "duration",
+                            "description": "La période des statistiques (par défaut : 1 semaine)",
                             "required": false
+                        },
+                        {
+                            "name": "user",
+                            "description": "L'utilisateur dont les statistiques doivent être affichées (par defaut vous même)",
+                            "required": false,
+                            "type": 6
+                        }
+                    ]
+                },
+                {
+                    "type": 1,
+                    "name": "profile",
+                    "description": "Affiche les statistiques sur les profiles",
+                    "options": [
+                        {
+                            "choices": [
+                                {
+                                    "name": "all",
+                                    "value": "all"
+                                },
+                                {
+                                    "name": "gold",
+                                    "value": "gold"
+                                },
+                                {
+                                    "name": "pv",
+                                    "value": "pv"
+                                },
+                                {
+                                    "name": "max_pv",
+                                    "value": "max_pv"
+                                },
+                                {
+                                    "name": "xp",
+                                    "value": "xp"
+                                },
+                                {
+                                    "name": "max_xp",
+                                    "value": "max_xp"
+                                },
+                                {
+                                    "name": "gold",
+                                    "value": "gold"
+                                },
+                                {
+                                    "name": "energy",
+                                    "value": "vitality"
+                                },
+                                {
+                                    "name": "max_energy",
+                                    "value": "max_vitality"
+                                },
+                                {
+                                    "name": "strength",
+                                    "value": "strength"
+                                },
+                                {
+                                    "name": "defense",
+                                    "value": "defense"
+                                },
+                                {
+                                    "name": "speed",
+                                    "value": "speed"
+                                },
+                                {
+                                    "name": "gems",
+                                    "value": "gems"
+                                },
+                                {
+                                    "name": "quest_missions",
+                                    "value": "quest_missions"
+                                },
+                                {
+                                    "name": "ranking",
+                                    "value": "ranking"
+                                },
+                                {
+                                    "name": "rank_points",
+                                    "value": "rank_points"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "category",
+                            "description": "La catégorie des statistiques",
+                            "required": true
                         },
                         {
                             "choices": [

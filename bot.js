@@ -64,11 +64,7 @@ let cmd_listener = async interaction => {
 
 		log(`${interaction.user.username} execute ${commandName}`);
 
-		try {
-			await command.execute(interaction, config, db);
-		} catch (error) {
-			log_error(error);
-		}
+		await command.execute(interaction, config, db);
 	}
 }
 
@@ -300,21 +296,24 @@ let profile_listener = async msg => {
 			xp: splited_embed.fields[0][1].value[0],
 			max_xp: splited_embed.fields[0][1].value[1],
 			gold: splited_embed.fields[0][2].value,
-			vitality: splited_embed.fields[1][0].value[0],
-			max_vitality: splited_embed.fields[1][0].value[1],
-			strength: splited_embed.fields[1][1].value,
+			energy: splited_embed.fields[1][0].value[0],
+			max_energy: splited_embed.fields[1][0].value[1],
+			strenght: splited_embed.fields[1][1].value,
 			defense: splited_embed.fields[1][2].value,
 			speed: splited_embed.fields[1][3].value,
 			gems: splited_embed.fields[2][0].value,
 			quest_missions_percentage: splited_embed.fields[2][1].value,
-			ranking: splited_embed.fields[3][0].value[0],
+			rank: splited_embed.fields[3][0].value[0],
 			rank_points: splited_embed.fields[3][1].value,
 			class: {
-				name: splited_embed.fields[5][0].value,
-				emoji: `:${splited_embed.fields[5][0].emoji}:`,
+				name: splited_embed.fields[4][0].value,
+				emoji: `:${splited_embed.fields[4][0].emoji}:`,
 			},
-			guild_name: splited_embed.fields[6][0].value,
-			destination: splited_embed.fields[7][0].full
+			guild_name: (()=>{
+				if (embed.fields[5].name != "Guilde :") return undefined;
+				return splited_embed.fields[5][0].value;
+			})(),
+			destination: splited_embed.fields[6][0].full
 		}
 
 		db.push(`/users/${user_hash}/tracking[]`, {
