@@ -46,227 +46,7 @@
                     "profile": true
                 }
             },
-            "tracking": [
-                {
-                    "type": "profile",
-                    "timestamp": 1653204525037,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 231,
-                        "max_pv": 233,
-                        "xp": 104,
-                        "max_xp": 6169,
-                        "gold": 748,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 141,
-                        "quest_missions_percentage": 88,
-                        "rank": 155,
-                        "rank_points": 503167,
-                        "class": {
-                            "name": "Tank",
-                            "emoji": ":shield:"
-                        },
-                        "guild_name": "Les Draft Potes",
-                        "destination": "🛖 Boug-Coton"
-                    }
-                },
-                {
-                    "type": "profile",
-                    "timestamp": 1653416803413,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 231,
-                        "max_pv": 233,
-                        "xp": 1364,
-                        "max_xp": 6169,
-                        "gold": 748,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 146,
-                        "quest_missions_percentage": 88,
-                        "rank": 153,
-                        "rank_points": 506541,
-                        "class": {
-                            "name": "Tank",
-                            "emoji": ":shield:"
-                        },
-                        "guild_name": "Les Draft Potes",
-                        "destination": "🛣️ Grand Axe"
-                    }
-                },
-                {
-                    "type": "profile",
-                    "timestamp": 1653416867738,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 231,
-                        "max_pv": 233,
-                        "xp": 1364,
-                        "max_xp": 6169,
-                        "gold": 748,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 146,
-                        "quest_missions_percentage": 88,
-                        "rank": 153,
-                        "rank_points": 506541,
-                        "class": {
-                            "name": "Tank",
-                            "emoji": ":shield:"
-                        },
-                        "guild_name": "Les Draft Potes",
-                        "destination": "🛣️ Grand Axe"
-                    }
-                },
-                {
-                    "type": "profile",
-                    "timestamp": 1653463048169,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 233,
-                        "max_pv": 233,
-                        "xp": 1619,
-                        "max_xp": 6169,
-                        "gold": 1105,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 147,
-                        "quest_missions_percentage": 88,
-                        "rank": 153,
-                        "rank_points": 507439,
-                        "class": {
-                            "name": "Reprise du jeu possible",
-                            "emoji": ":hospital:"
-                        },
-                        "destination": ":stadium: Les Draft Potes"
-                    }
-                },
-                {
-                    "type": "short_report",
-                    "timestamp": 1653463557091
-                },
-                {
-                    "type": "profile",
-                    "timestamp": 1653463611857,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 233,
-                        "max_pv": 233,
-                        "xp": 1619,
-                        "max_xp": 6169,
-                        "gold": 1105,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 147,
-                        "quest_missions_percentage": 88,
-                        "rank": 153,
-                        "rank_points": 507439,
-                        "class": {
-                            "name": "Reprise du jeu possible",
-                            "emoji": ":hospital:"
-                        },
-                        "destination": ":stadium: Les Draft Potes"
-                    }
-                },
-                {
-                    "type": "profile",
-                    "timestamp": 1653465525699,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 233,
-                        "max_pv": 233,
-                        "xp": 1619,
-                        "max_xp": 6169,
-                        "gold": 1105,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 147,
-                        "quest_missions_percentage": 88,
-                        "rank": 153,
-                        "rank_points": 507439,
-                        "class": {
-                            "name": "Reprise du jeu possible",
-                            "emoji": ":hospital:"
-                        },
-                        "destination": ":stadium: Les Draft Potes"
-                    }
-                },
-                {
-                    "type": "profile",
-                    "timestamp": 1653465575899,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 233,
-                        "max_pv": 233,
-                        "xp": 1619,
-                        "max_xp": 6169,
-                        "gold": 105,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 147,
-                        "quest_missions_percentage": 88,
-                        "rank": 153,
-                        "rank_points": 507439,
-                        "class": {
-                            "name": "Reprise du jeu possible",
-                            "emoji": ":hospital:"
-                        },
-                        "destination": ":stadium: Les Draft Potes"
-                    }
-                },
-                {
-                    "type": "profile",
-                    "timestamp": 1653465575899,
-                    "data": {
-                        "lvl": 73,
-                        "pv": 233,
-                        "max_pv": 233,
-                        "xp": 1619,
-                        "max_xp": 6169,
-                        "gold": 105,
-                        "energy": 1397,
-                        "max_energy": 1397,
-                        "strenght": 202,
-                        "defense": 277,
-                        "speed": 13,
-                        "gems": 147,
-                        "quest_missions_percentage": 88,
-                        "rank": 153,
-                        "rank_points": 507439,
-                        "class": {
-                            "name": "Reprise du jeu possible",
-                            "emoji": ":hospital:"
-                        },
-                        "destination": ":stadium: Les Draft Potes"
-                    }
-                },
-                {
-                    "type": "short_report",
-                    "timestamp": 1653467215772
-                }
-            ]
+            "tracking": []
         }
     },
     "guilds": {
@@ -275,12 +55,6 @@
             "level": 42,
             "description": "Exemple de description",
             "last_update": 936868140
-        },
-        "Les Draft Potes": {
-            "name": "Les Draft Potes",
-            "level": 78,
-            "description": "Actuellement GOA 4, membre de l'empire des gentils",
-            "last_update": 1653465572002
         }
     },
     "reminders": [],
@@ -600,8 +374,8 @@
                         {
                             "choices": [
                                 {
-                                    "name": "all",
-                                    "value": "all"
+                                    "name": "level",
+                                    "value": "lvl"
                                 },
                                 {
                                     "name": "gold",
@@ -624,20 +398,16 @@
                                     "value": "max_xp"
                                 },
                                 {
-                                    "name": "gold",
-                                    "value": "gold"
-                                },
-                                {
                                     "name": "energy",
-                                    "value": "vitality"
+                                    "value": "energy"
                                 },
                                 {
                                     "name": "max_energy",
-                                    "value": "max_vitality"
+                                    "value": "max_energy"
                                 },
                                 {
-                                    "name": "strength",
-                                    "value": "strength"
+                                    "name": "strenght",
+                                    "value": "strenght"
                                 },
                                 {
                                     "name": "defense",
@@ -653,11 +423,11 @@
                                 },
                                 {
                                     "name": "quest_missions",
-                                    "value": "quest_missions"
+                                    "value": "quest_missions_percentage"
                                 },
                                 {
-                                    "name": "ranking",
-                                    "value": "ranking"
+                                    "name": "rank",
+                                    "value": "rank"
                                 },
                                 {
                                     "name": "rank_points",
