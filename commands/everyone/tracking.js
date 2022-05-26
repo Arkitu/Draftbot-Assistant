@@ -59,7 +59,7 @@ export var property_data = {
         "color": "173,216,230"
     },
     "profile/gems": {
-        "label": "Gems",
+        "label": "Gemmes",
         "color": "102,205,170"
     },
     "profile/quest_missions_percentage": {
