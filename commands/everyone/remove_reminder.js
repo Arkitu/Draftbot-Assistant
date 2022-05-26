@@ -14,6 +14,10 @@ export async function execute(interaction, config, db) {
     let opt = {
         msg: interaction.options.getString("message")
     }
+    if (db.getData(`/reminders`).filter(r => r.author_id == interaction.user.id && r.message == opt.msg).length == 0) {
+        await interaction.editReply(":warning: Aucun rappel ne correspond à ce message");
+        return;
+    }
     for (let reminder of db.getData(`/reminders`).filter(r => r.author_id == interaction.user.id && r.message == opt.msg)) {
         let channel;
 		if (reminder.channel.channel_type) {
