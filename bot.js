@@ -329,6 +329,7 @@ let profile_listener = async msg => {
 	}, 10000);
 }
 
+client.setMaxListeners(0);
 client.on('interactionCreate', cmd_listener);
 client.on('messageCreate', help_msg_listener);
 client.on('messageCreate', fetch_guild_listener);
