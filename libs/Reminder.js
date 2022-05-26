@@ -15,7 +15,7 @@ export class Reminder {
 
     async start() {
         setTimeout(async () => {
-            if (!this.deleted) {
+            if (!this.deleted && !this.db.getIndex("/reminders", this.id, "id") == -1) {
                 let embed = new MessageEmbed()
                     .setColor(this.config.getData("/main_color"))
                     .setTitle("Reminder")
@@ -24,7 +24,6 @@ export class Reminder {
                     await this.channel.channel.send({ content: `${this.author}`, embeds: [embed] });
                 }
                 this.delete();
-
             }
         }, (this.dead_line_timestamp - Date.now()));
         return this;
