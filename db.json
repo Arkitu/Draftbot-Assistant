@@ -302,6 +302,19 @@
             "perms": "everyone"
         },
         {
+            "name": "remove_reminder",
+            "description": "Supprime un rappel",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "message",
+                    "description": "Le message du rappel",
+                    "required": true
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
             "name": "tracking",
             "description": "Affiche des statistiques sur vous",
             "options": [
