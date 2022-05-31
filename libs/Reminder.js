@@ -15,7 +15,7 @@ export class Reminder {
 
     async start() {
         setTimeout(async () => {
-            if (!this.deleted && !this.db.getIndex("/reminders", this.id, "id") == -1) {
+            if ((!this.deleted) && this.db.getIndex("/reminders", this.id, "id") != -1) {
                 let embed = new MessageEmbed()
                     .setColor(this.config.getData("/main_color"))
                     .setTitle("Reminder")
