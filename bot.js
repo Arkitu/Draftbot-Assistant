@@ -110,36 +110,54 @@ let propo_msg_listener = async msg => {
 					.setCustomId("add")
 					.setLabel("Ajouter")
 					.setStyle("PRIMARY")
+			)
+			.addComponents(
+				new MessageButton()
+					.setCustomId("remove")
+					.setLabel("Non")
+					.setStyle("DANGER")
 			);
 		let propo_msg = await msg.channel.send({ content: `Voulez vous ajouter un rappel dans ${reminder.duration} ${reminder.unit} ?`, components: [components] });
 		let listener = async button_interaction => {
 			if (!button_interaction.isButton()) return;
 			if (button_interaction.message.id != propo_msg.id) return;
 
-			let dead_line = msg.createdAt;
-			switch (reminder.unit) {
-				case "secondes":
-					dead_line.setSeconds(dead_line.getSeconds() + reminder.duration);
+			switch (button_interaction.button.customId) {
+				case "add":
+					let dead_line = msg.createdAt;
+					switch (reminder.unit) {
+						case "secondes":
+							dead_line.setSeconds(dead_line.getSeconds() + reminder.duration);
+							break;
+						case "minutes":
+							dead_line.setMinutes(dead_line.getMinutes() + reminder.duration);
+							break;
+						case "heures":
+							dead_line.setHours(dead_line.getHours() + reminder.duration);
+							break;
+						case "jours":
+							dead_line.setDate(dead_line.getDate() + reminder.duration);
+							break;
+					}
+					let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author, db, config);
+					await new_reminder.save();
+					await new_reminder.start();
+					await button_interaction.update({ content: "Rappel ajouté !", components: [] });
+					await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
 					break;
-				case "minutes":
-					dead_line.setMinutes(dead_line.getMinutes() + reminder.duration);
-					break;
-				case "heures":
-					dead_line.setHours(dead_line.getHours() + reminder.duration);
-					break;
-				case "jours":
-					dead_line.setDate(dead_line.getDate() + reminder.duration);
+				case "remove":
+					if (button_interaction.message.deletable) {
+						button_interaction.message.delete();
+					}
 					break;
 			}
-			let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author, db, config);
-			await new_reminder.save();
-			await new_reminder.start();
-			await button_interaction.update({ content: "Rappel ajouté !", components: [] });
-			await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
 		}
 		client.on('interactionCreate', listener);
 		setTimeout(() => {
 			client.removeListener('interactionCreate', listener);
+			if (propo_msg.deletable) {
+				propo_msg.delete();
+			}
 		}, 60000);
 	}
 }
