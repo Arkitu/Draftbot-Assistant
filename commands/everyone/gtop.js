@@ -128,5 +128,5 @@ export async function execute(interaction, config, db) {
 			}
 			interaction.client.removeListener('interactionCreate', button_listener);
 		}, 300000);
-	}	
+	}
 }

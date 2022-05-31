@@ -109,6 +109,14 @@ export const data = new SlashCommandBuilder()
                     .setDescription('L\'utilisateur dont les statistiques doivent être affichées (par defaut vous même)')
                     .setRequired(false)
             )
+            .addStringOption(opt =>
+                opt
+                    .setName('mode')
+                    .setDescription('Le mode d\'affichage des statistiques (par défaut : battons)')
+                    .setRequired(false)
+                    .addChoice('battons', 'bar')
+                    .addChoice('courbes', 'line')
+            )
     )
     .addSubcommand(subcmd =>
         subcmd
@@ -158,7 +166,7 @@ export async function execute(interaction, config, db) {
         subcommand: interaction.options.getSubcommand(),
         category: interaction.options.getString('category') || 'all',
         duration: interaction.options.getString('duration'),
-        user: interaction.options.getUser('user') || interaction.user
+        user: interaction.options.getUser('user') || 'bar'
     };
     let user_hash = createHash('md5').update(opt.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
@@ -273,7 +281,7 @@ export async function execute(interaction, config, db) {
                 });
             }
             chart = await ChartJSImage().chart({
-                type: 'bar',
+                type: opt.mode,
                 data: {
                     datasets: datasets
                 },
