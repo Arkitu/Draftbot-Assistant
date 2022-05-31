@@ -122,7 +122,7 @@ let propo_msg_listener = async msg => {
 			if (!button_interaction.isButton()) return;
 			if (button_interaction.message.id != propo_msg.id) return;
 
-			switch (button_interaction.button.customId) {
+			switch (button_interaction.customId) {
 				case "add":
 					let dead_line = msg.createdAt;
 					switch (reminder.unit) {
