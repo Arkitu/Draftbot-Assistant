@@ -166,7 +166,8 @@ export async function execute(interaction, config, db) {
         subcommand: interaction.options.getSubcommand(),
         category: interaction.options.getString('category') || 'all',
         duration: interaction.options.getString('duration'),
-        user: interaction.options.getUser('user') || 'bar'
+        user: interaction.options.getUser('user') || interaction.user,
+        mode: interaction.options.getString('mode') || 'bar'
     };
     let user_hash = createHash('md5').update(opt.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
