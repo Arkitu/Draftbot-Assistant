@@ -123,6 +123,9 @@ export async function execute(interaction, config, db) {
 		};
 		interaction.client.on('interactionCreate', button_listener);
 		setTimeout(() => {
+			if (msg.editable) {
+				msg.edit({ components: []});
+			}
 			interaction.client.removeListener('interactionCreate', button_listener);
 		}, 300000);
 	}	
