@@ -6,7 +6,6 @@ export const data = new SlashCommandBuilder()
 	.setDescription('Renvoie le classement des guildes');
 export async function execute(interaction, config, db) {
 	await interaction.deferReply();
-
 	let embed = new MessageEmbed()
 		.setTitle("🏆 Classement des guildes")
 		.setColor(config.getData("/main_color"));
@@ -64,6 +63,7 @@ export async function execute(interaction, config, db) {
 		let button_listener = async button_interaction => {
 			if (!button_interaction.isButton()) return;
 			if (button_interaction.message.id != msg.id) return;
+			button_interaction.deferUpdate();
 			switch (button_interaction.customId) {
 				case 'next_page':
 					page++;
