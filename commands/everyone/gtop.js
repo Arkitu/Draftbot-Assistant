@@ -15,7 +15,7 @@ export async function execute(interaction, config, db) {
 	let page = 1;
 	if (guilds.length > 16) {
 		guilds_limited = guilds.slice(0, 15);
-		embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/16)} | ${guilds.length} guildes` });
+		embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/15)} | ${guilds.length} guildes` });
 		components = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
@@ -73,7 +73,7 @@ export async function execute(interaction, config, db) {
 					break;
 			}
 			guilds_limited = guilds.slice((page - 1) * 15, page * 15);
-			embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/16)} | ${guilds.length} guildes` });
+			embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/15)} | ${guilds.length} guildes` });
 			embed.setFields([]);
 			description = "";
 			for (let i = 0; i < guilds_limited.length; i++) {
