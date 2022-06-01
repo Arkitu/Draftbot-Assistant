@@ -63,7 +63,6 @@ export async function execute(interaction, config, db) {
 		let button_listener = async button_interaction => {
 			if (!button_interaction.isButton()) return;
 			if (button_interaction.message.id != msg.id) return;
-			button_interaction.deferUpdate();
 			switch (button_interaction.customId) {
 				case 'next_page':
 					page++;
