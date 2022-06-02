@@ -190,36 +190,26 @@ export async function execute(interaction, config, db) {
     let min_date = new Date();
     let max_date = new Date();
     switch (opt.duration) {
+        default:
         case '1 semaine':
-            min_date = new Date(cur.getTime() - ((cur.getDay() - 1) * 24 * 60 * 60 * 1000));
-            max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
+            min_date = new Date().setDate(cur.getDate() - 7);
+            max_date = cur;
             break;
         case '1 mois':
-            min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000));
-            max_date = new Date(min_date.getTime() + 30 * 24 * 60 * 60 * 1000);
+            min_date = new Date().setMonth(cur.getMonth() - 1);
+            max_date = cur;
             break;
         case '3 mois':
-            min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000) - (2 * 30 * 24 * 60 * 60 * 1000));
-            max_date = new Date(min_date.getTime() + 3 * 30 * 24 * 60 * 60 * 1000);
+            min_date = new Date().setMonth(cur.getMonth() - 3);
+            max_date = cur;
             break;
         case '6 mois':
-            min_date = new Date(cur.getTime() - (cur.getDate() * 24 * 60 * 60 * 1000) - (5 * 30 * 24 * 60 * 60 * 1000));
-            max_date = new Date(min_date.getTime() + 6 * 30 * 24 * 60 * 60 * 1000);
+            min_date = new Date().setMonth(cur.getMonth() - 6);
+            max_date = cur;
             break;
         case '1 an':
-            min_date = new Date(cur.getTime() - (cur.getMonth() * 30 * 24 * 60 * 60 * 1000));
-            max_date = new Date(min_date.getTime() + 365.25 * 24 * 60 * 60 * 1000);
-            break;
-        default:
-            min_date = new Date(cur.getTime() - ((()=>{
-                switch (cur.getDay()) {
-                    case 0:
-                        return 6;
-                    default:
-                        return cur.getDay() - 1;
-                }
-            })() * 24 * 60 * 60 * 1000));
-            max_date = new Date(min_date.getTime() + 6 * 24 * 60 * 60 * 1000);
+            min_date = new Date().setFullYear(cur.getFullYear() - 1);
+            max_date = cur;
             break;
     }
     min_date.setHours(0, 0, 0, 0);
