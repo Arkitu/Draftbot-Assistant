@@ -55,23 +55,23 @@ export async function execute(interaction, config, db) {
         default:
         case '1 semaine':
             min_date = new Date().setDate(cur.getDate() - 7);
-            max_date = cur;
+            max_date = new Date(cur);
             break;
         case '1 mois':
             min_date = new Date().setMonth(cur.getMonth() - 1);
-            max_date = cur;
+            max_date = new Date(cur);
             break;
         case '3 mois':
             min_date = new Date().setMonth(cur.getMonth() - 3);
-            max_date = cur;
+            max_date = new Date(cur);
             break;
         case '6 mois':
             min_date = new Date().setMonth(cur.getMonth() - 6);
-            max_date = cur;
+            max_date = new Date(cur);
             break;
         case '1 an':
             min_date = new Date().setFullYear(cur.getFullYear() - 1);
-            max_date = cur;
+            max_date = new Date(cur);
             break;
     }
     min_date.setHours(0, 0, 0, 0);
