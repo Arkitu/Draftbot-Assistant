@@ -142,9 +142,7 @@ let propo_msg_listener = async msg => {
 					let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author, db, config);
 					await new_reminder.save();
 					await new_reminder.start();
-					if (await button_interaction.isRepliable()) {
-						await button_interaction.update({ content: "Rappel ajouté !", components: [] });
-					}
+					await button_interaction.update({ content: "Rappel ajouté !", components: [] });
 					await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
 					break;
 				case "remove":
