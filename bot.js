@@ -121,6 +121,9 @@ let propo_msg_listener = async msg => {
 		let listener = async button_interaction => {
 			if (!button_interaction.isButton()) return;
 			if (button_interaction.message.id != propo_msg.id) return;
+			if (button_interaction.user.id != msg.author.id) {
+				button_interaction.reply({ content: ":warning: Désolé, vous n'êtes pas la personne à qui est destinée cette proposition", ephemeral: true});
+			}
 
 			switch (button_interaction.customId) {
 				case "add":
