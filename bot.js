@@ -29,13 +29,7 @@ const client = new Client({ intents: [
 // When the client is ready, run this code (only once)
 client.once('ready', async () => {
 	await log('Bot logged !');
-	client.user.setPresence({
-		status: 'online',
-		activity: {
-			name: "/help pour plus d'infos",
-			type: 'PLAYING'
-		}
-	});
+	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
 	for (let reminder of db.getData("/reminders")) {
 		let channel;
