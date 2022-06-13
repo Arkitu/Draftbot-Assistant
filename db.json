@@ -52,7 +52,7 @@
     "guilds": {
         "Exemple de guilde": {
             "name": "Exemple de nom",
-            "level": 42,
+            "level": 16.5,
             "description": "Exemple de description",
             "last_update": 936868140
         }

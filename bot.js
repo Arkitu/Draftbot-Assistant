@@ -76,18 +76,16 @@ let fetch_guild_listener = async msg => {
     if (msg.embeds[0].title.startsWith("Guilde ")) {
         let guild = {
             name: msg.embeds[0].title.substr(7),
-            level: parseInt((await msg.embeds[0].fields[1].name.split(" "))[6]),
+            level: parseInt((await msg.embeds[0].fields[1].name.split(" "))[6]) + (parseInt((await msg.embeds[0].fields[1].name.split(" "))[1]) / parseInt((await msg.embeds[0].fields[1].name.split(" "))[3])),
 			description: "",
 			last_update: Date.now(),
         }
-		if ((!guild.level) && (guild.level != 0)) {
-			guild.level = 100;
-		}
+		if (isNaN(guild.level)) guild.level = 100;
 		if (msg.embeds[0].description) {
 			guild.description = msg.embeds[0].description.split("`")[1];
 		}
         db.push(`/guilds/${guild.name}`, guild);
-		log(`Guild ${guild.name} fetched. Level: ${guild.level}`);
+		log(`Guild ${guild.name} fetched. Level: ${Math.round(guild.level*100)/100}`);
     }
 }
 
