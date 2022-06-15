@@ -1,4 +1,4 @@
-import { Client, Intents, Collection, MessageActionRow, MessageButton, MessageManager } from 'discord.js';
+import { Client, Intents, Collection, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
@@ -334,6 +334,45 @@ let profile_listener = async msg => {
 			timestamp: response.createdTimestamp,
 			data: data
 		});
+		if (db_user.config.goal) {
+			if (db_user.config.goal.end < response.createdTimestamp) {
+				await msg.channel.send({ embeds: [
+					new MessageEmbed()
+						.setColor(config.getData("/main_color"))
+						.setTitle("Expiration de votre objectif")
+						.setDescription(`Votre objectif de ${db_user.config.goal.value} ${
+							{
+								lvl: "niveaux",
+								gold: ":moneybag:",
+								pv: ":heart:",
+								xp: ":star:",
+								gems: ":gem:",
+								quest_missions_percentage: "% de missions de quêtes",
+								rank_points: ":medal:"
+							}[db_user.config.goal.unit]
+						} a expiré, vous pouvez en définir un nouveau avec \`/set_goal\``)
+				]});
+				db.delete(`/users/${user_hash}/config/goal`);
+			} else if (db_user.config.goal.value <= data[db_user.config.goal.unit] ) {
+				await msg.channel.send({ embeds: [
+					new MessageEmbed()
+						.setColor(config.getData("/main_color"))
+						.setTitle("Objectif atteint !")
+						.setDescription(`<@${msg.author.id}>, vous avez atteint votre objectif de ${db_user.config.goal.value} ${
+							{
+								lvl: "niveaux",
+								gold: ":moneybag:",
+								pv: ":heart:",
+								xp: ":star:",
+								gems: ":gem:",
+								quest_missions_percentage: "% de missions de quêtes",
+								rank_points: ":medal:"
+							}[db_user.config.goal.unit]
+						} !`)
+				]});
+				db.delete(`/users/${user_hash}/config/goal`);
+			}
+		}
 	}
 	client.on('messageCreate', response_listener);
 

@@ -44,9 +44,300 @@
                     "reports": true,
                     "public": true,
                     "profile": true
+                },
+                "goal": {
+                    "start": 1655308510482,
+                    "end": 1655394910482,
+                    "value": 10,
+                    "unit": "rank_points",
+                    "init_value": 487449,
+                    "end_value": 487439
                 }
             },
-            "tracking": []
+            "tracking": [
+                {
+                    "type": "profile",
+                    "timestamp": 1655307257283,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2192,
+                        "max_xp": 6429,
+                        "gold": 745,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487069,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏖️ Plage Sentinelle"
+                    }
+                },
+                {
+                    "type": "long_report",
+                    "timestamp": 1655307744548,
+                    "data": {
+                        "points": 0,
+                        "gold": 0,
+                        "xp": 0,
+                        "time": 0,
+                        "pv": 0,
+                        "id": "long_report1655307744548"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655307749611,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655307832092,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655308142520,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655308192666,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655308286498,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655308318400,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655308405488,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655308424453,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                },
+                {
+                    "type": "profile",
+                    "timestamp": 1655308557570,
+                    "data": {
+                        "lvl": 74,
+                        "pv": 229,
+                        "max_pv": 234,
+                        "xp": 2342,
+                        "max_xp": 6429,
+                        "gold": 787,
+                        "energy": 1411,
+                        "max_energy": 1411,
+                        "strenght": 143,
+                        "defense": 349,
+                        "speed": 14,
+                        "gems": 5,
+                        "quest_missions_percentage": 88,
+                        "rank": 174,
+                        "rank_points": 487449,
+                        "class": {
+                            "name": "Tank",
+                            "emoji": ":shield:"
+                        },
+                        "guild_name": "Les Draft Potes",
+                        "destination": "🏘️ Mergagnan"
+                    }
+                }
+            ]
         }
     },
     "guilds": {
@@ -315,6 +606,104 @@
             "perms": "everyone"
         },
         {
+            "name": "set_goal",
+            "description": "Crée un objectif",
+            "options": [
+                {
+                    "min_value": 0,
+                    "type": 4,
+                    "name": "value",
+                    "description": "La valeur de l'objectif",
+                    "required": true
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "level",
+                            "value": "lvl"
+                        },
+                        {
+                            "name": "gold",
+                            "value": "gold"
+                        },
+                        {
+                            "name": "pv",
+                            "value": "pv"
+                        },
+                        {
+                            "name": "xp",
+                            "value": "xp"
+                        },
+                        {
+                            "name": "gems",
+                            "value": "gems"
+                        },
+                        {
+                            "name": "quest_missions",
+                            "value": "quest_missions_percentage"
+                        },
+                        {
+                            "name": "rank_points",
+                            "value": "rank_points"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "unit",
+                    "description": "L'unité de l'objectif (par defaut: rank_points)",
+                    "required": false
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "1 jour",
+                            "value": "86400000"
+                        },
+                        {
+                            "name": "2 jours",
+                            "value": "172800000"
+                        },
+                        {
+                            "name": "3 jours",
+                            "value": "259200000"
+                        },
+                        {
+                            "name": "4 jours",
+                            "value": "345600000"
+                        },
+                        {
+                            "name": "5 jours",
+                            "value": "432000000"
+                        },
+                        {
+                            "name": "6 jours",
+                            "value": "518400000"
+                        },
+                        {
+                            "name": "1 semaine",
+                            "value": "604800000"
+                        },
+                        {
+                            "name": "2 semaines",
+                            "value": "1209600000"
+                        },
+                        {
+                            "name": "3 semaines",
+                            "value": "1814400000"
+                        },
+                        {
+                            "name": "1 mois",
+                            "value": "2678400000"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "duration",
+                    "description": "La durée de l'objectif (par defaut: 1 semaine)",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
             "name": "tracking",
             "description": "Affiche des statistiques sur vous",
             "options": [
@@ -569,5 +958,17 @@
             ],
             "perms": "everyone"
         }
-    ]
+    ],
+    "user": {
+        "6ca26e4a9685fc77648de7aee77767b8": {
+            "goal": {
+                "start": 1655307555660,
+                "end": 1655393955660,
+                "value": 10,
+                "unit": "rank_points",
+                "init_value": 0,
+                "end_value": 10
+            }
+        }
+    }
 }
