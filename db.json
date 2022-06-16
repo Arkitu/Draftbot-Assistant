@@ -351,6 +351,32 @@
     "reminders": [],
     "commands": [
         {
+            "name": "bitfield_to_permissions",
+            "description": "Convertit un bitfield en permissions",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "bitfield",
+                    "description": "Le bitfield à convertir",
+                    "required": true
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "fetch",
+            "description": "Récupère quelque chose avec son id",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "id",
+                    "description": "L'id de l'objet à récupérer",
+                    "required": true
+                }
+            ],
+            "perms": "admin"
+        },
+        {
             "name": "hash",
             "description": "Renvoie le hash de la chaine de caractères passée en paramètre",
             "options": [
@@ -958,17 +984,5 @@
             ],
             "perms": "everyone"
         }
-    ],
-    "user": {
-        "6ca26e4a9685fc77648de7aee77767b8": {
-            "goal": {
-                "start": 1655307555660,
-                "end": 1655393955660,
-                "value": 10,
-                "unit": "rank_points",
-                "init_value": 0,
-                "end_value": 10
-            }
-        }
-    }
+    ]
 }
