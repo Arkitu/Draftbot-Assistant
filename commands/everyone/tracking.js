@@ -339,7 +339,7 @@ export async function execute(interaction, config, db) {
                 }
             }
             while (datasets[0].data.length > 300) {
-                for (let i = 0; i < datasets[0].data.length; i += 9) {
+                for (let i = 0; i < datasets[0].data.length; i++ ) {
                     datasets[0].data.splice(i, 1);
                 }
             }
