@@ -340,6 +340,7 @@
             ]
         }
     },
+    "goal_messages": [],
     "guilds": {
         "Exemple de guilde": {
             "name": "Exemple de nom",

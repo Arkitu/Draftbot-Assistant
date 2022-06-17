@@ -338,6 +338,11 @@ export async function execute(interaction, config, db) {
                     }
                 }
             }
+            while (datasets[0].data.length > 300) {
+                for (let i = 0; i < data.length; i += 9) {
+                    datasets[0].data.splice(i, 1);
+                }
+            }
             if (datasets[0].data.length == 0) {
                 await interaction.editReply(":warning: Je n'ai enregistré aucun évènement de ce type pour cette période.");
                 return;
