@@ -58,7 +58,7 @@ let cmd_listener = async interaction => {
 
 		log(`${interaction.user.username} execute ${commandName}`);
 
-		await command.execute(interaction, config, db);
+		command.execute(interaction, config, db);
 	}
 }
 
