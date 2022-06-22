@@ -15,7 +15,7 @@ export const data = new SlashCommandBuilder()
             .setDescription('La durée avant que le message ne disparaisse (en millisecondes)')
             .setRequired(true)
     )
-    addIntegerOption(opt=>
+    .addIntegerOption(opt=>
         opt
             .setName('start_time')
             .setDescription('L\'heure à laquelle le message sera créé (en millisecondes)')
