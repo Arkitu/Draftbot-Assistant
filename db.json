@@ -12,7 +12,8 @@
             "commands": [
                 "add_reminder",
                 "config",
-                "reminders"
+                "reminders",
+                "remove_reminder"
             ]
         },
         {

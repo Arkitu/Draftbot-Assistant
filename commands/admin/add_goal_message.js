@@ -12,9 +12,24 @@ export const data = new SlashCommandBuilder()
     .addIntegerOption(opt=>
         opt
             .setName('duration')
-            .setDescription('La durée avant que le message ne disparaisse (en millisecondes')
+            .setDescription('La durée avant que le message ne disparaisse (en millisecondes)')
             .setRequired(true)
     )
+    addIntegerOption(opt=>
+        opt
+            .setName('start_time')
+            .setDescription('L\'heure à laquelle le message sera créé (en millisecondes)')
+            .setRequired(false)
+    )
 export async function execute(interaction, config, db) {
-	pass
+    let opts = {
+        channel: interaction.options.getChannel('channel'),
+        start: interaction.options.getInteger('start_time') || Date.now(),
+        duration: interaction.options.getInteger('duration')
+    }
+	db.push("/goal_messages", {
+        channel: opts.channel.id,
+        start: opts.start,
+        end: opts.start + opts.duration
+    });
 }
