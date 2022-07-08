@@ -35,16 +35,16 @@ client.once('ready', async () => {
 		let channel;
 		if (reminder.channel.channel_type) {
 			channel = { 
-				channel: await client.channels.fetch(reminder.channel.channel_id),
+				channel: client.channels.cache.get(reminder.channel.channel_id),
 				channel_type: reminder.channel.channel_type
 			};
 		} else {
 			channel = {
-				channel: await client.users.fetch(reminder.channel.channel_id),
+				channel: client.users.cache.get(reminder.channel.channel_id),
 				channel_type: reminder.channel.channel_type
 			}
 		}
-		new Reminder(client, channel, reminder.dead_line_timestamp, reminder.message, await client.users.fetch(reminder.author_id), db, config).start();
+		new Reminder(client, channel, reminder.dead_line_timestamp, reminder.message, client.users.cache.get(reminder.author_id), db, config).start();
 	}
 });
 
