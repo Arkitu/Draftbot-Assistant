@@ -33,12 +33,24 @@ client.once('ready', async () => {
 	// Relauch the stoped reminders
 	for (let reminder of db.getData("/reminders")) {
 		let channel;
+		if (!client.users.cache.get(reminder.author_id)) {
+			db.delete(`/reminders[${db.getIndex("/reminders", reminder.id, "id")}]`)
+			continue;
+		}
 		if (reminder.channel.channel_type) {
+			if (!client.channels.cache.get(reminder.channel.channel_id)) {
+				db.delete(`/reminders[${db.getIndex("/reminders", reminder.id, "id")}]`)
+				continue;
+			}
 			channel = { 
 				channel: client.channels.cache.get(reminder.channel.channel_id),
 				channel_type: reminder.channel.channel_type
 			};
 		} else {
+			if (!client.users.cache.get(reminder.channel.channel_id)) {
+				db.delete(`/reminders[${db.getIndex("/reminders", reminder.id, "id")}]`)
+				continue;
+			}
 			channel = {
 				channel: client.users.cache.get(reminder.channel.channel_id),
 				channel_type: reminder.channel.channel_type
