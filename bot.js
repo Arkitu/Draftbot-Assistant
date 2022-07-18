@@ -166,18 +166,25 @@ const minieventMsgListener = async (message) => {
 	if (message.embeds.length === 0) return;
 	if(!message.embeds[0].author) return;
 	if (!message.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
-	const userHash = createHash('md5').update(message.interaction.user.id).digest('hex');
+	const userID = message.interaction ? message.interaction.user.id
+		: message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
+	const userHash = createHash('md5').update(userID).digest('hex');
 	if (!(userHash in db.getData("/users"))) return;
 	if (!db.getData(`/users/${userHash}/config/reminders/minievents`)) return;
+	let text = message.embeds[0].description;
+	if (constants.getData("/regex/twoMessagesMinieventsEmojis").some(emoji => text.startsWith(emoji))) return;
+	for (const obj of constants.getData("/regex/possibleTwoMessagesMinievents")) {
+		if (text.startsWith(obj.emoji) && text.endsWith(obj.endsWith)) return;
+	}
 
 	const timeBetweenMinievents = constants.getData("/timeBetweenMinievents");
 	const reminders = [timeBetweenMinievents];
 
-	let text = message.embeds[0].description;
-
-	if (text.includes(constants.getData("/regex/loseTimeEmoji"))) {
-		const loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/loseTimeEmoji"));
-		//Removing the possible '**' in front of the emoji cause they can be placed before or after
+	if (new RegExp(constants.getData("/regex/hasLoseTimeEmoji")).test(text)) {
+		let loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[0]);
+		if (loseTimeEmojiPosition === -1) {
+			loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[1])
+		}
 		reminders.push(timeBetweenMinievents
 			+ getTimeLostByString(text
 				//Between the end of the '**' and the start of the emoji
@@ -195,7 +202,7 @@ const minieventMsgListener = async (message) => {
 			+ constants.getData(`/effectDurations/${splitedMessage[splitedMessage.length - 1]}`));
 	}
 
-	await proposeAutoReminder(message, reminders, message.interaction.user);
+	await proposeAutoReminder(message, reminders, await client.users.fetch(userID));
 };
 
 async function proposeAutoReminder(message, reminders, author) {
