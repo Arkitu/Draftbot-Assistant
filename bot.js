@@ -162,12 +162,13 @@ const eventsMsgListener = async (message) => {
 };
 
 const minieventMsgListener = async (message) => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (message.embeds.length === 0) return;
+	if(!message.embeds[0].author) return;
+	if (!message.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 	const userHash = createHash('md5').update(message.interaction.user.id).digest('hex');
 	if (!(userHash in db.getData("/users"))) return;
 	if (!db.getData(`/users/${userHash}/config/reminders/minievents`)) return;
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (message.embeds.length === 0) return;
-	if (!message.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 
 	const timeBetweenMinievents = constants.getData("/timeBetweenMinievents");
 	const reminders = [timeBetweenMinievents];
