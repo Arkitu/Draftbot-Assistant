@@ -25,5 +25,32 @@
 		":zany_face:": 14400000,
 		":scream:": 600000
     },
-    "timeBetweenMinievents": 600000
+    "timeBetweenMinievents": 600000,
+	"helpCategories": [
+        {
+            "name": "Classiques",
+            "commands": [
+                "ping",
+                "help"
+            ]
+        },
+        {
+            "name": "Reminders",
+            "commands": [
+                "add_reminder",
+                "config",
+                "reminders",
+                "remove_reminder"
+            ]
+        },
+        {
+            "name": "Tracking",
+            "commands": [
+                "gtop",
+                "config",
+                "tracking",
+                "tracking_of_everyone"
+            ]
+        }
+    ]
 }

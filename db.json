@@ -1,31 +1,4 @@
 {
-    "categories": [
-        {
-            "name": "Classiques",
-            "commands": [
-                "ping",
-                "help"
-            ]
-        },
-        {
-            "name": "Reminders",
-            "commands": [
-                "add_reminder",
-                "config",
-                "reminders",
-                "remove_reminder"
-            ]
-        },
-        {
-            "name": "Tracking",
-            "commands": [
-                "gtop",
-                "config",
-                "tracking",
-                "tracking_of_everyone"
-            ]
-        }
-    ],
     "users": {
         "6ca26e4a9685fc77648de7aee77767b8": {
             "config": {
