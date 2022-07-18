@@ -8,6 +8,7 @@ import { createHash } from "crypto";
 // Import config and db
 const config = new JsonDB(new Config("config", true, true, '/'));
 const db = new JsonDB(new Config("db", true, true, '/'));
+const constants = new JsonDB(new Config("constants", false, true, '/'));
 
 // Log with the current date
 export async function log(msg) {
@@ -99,6 +100,152 @@ let fetch_guild_listener = async msg => {
         db.push(`/guilds/${guild.name}`, guild);
 		log(`Guild ${guild.name} fetched. Level: ${Math.round(guild.level*100)/100}`);
     }
+}
+
+
+function generateTimeDisplay(milliseconds) {
+	let minutes = Math.ceil(milliseconds / 60000);
+	const hours = Math.floor(minutes / 60);
+	minutes %= 60;
+
+	if (hours > 0) {
+		return hours + " H " + minutes + " Min";
+	}
+	return minutes + " Min";
+}
+
+function getTimeLostByString(timeLost) {
+		//Triggers only if there is no "hour"
+		if (timeLost.length === 1) {
+			return parseInt(timeLost[0]) * 60000;
+		}
+		return parseInt(timeLost[0]) * 3600000 + parseInt(timeLost[1]) * 60000;
+}
+
+const eventsMsgListener = async (message) => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	//Checks if the message is the second part of a big event
+	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
+
+	const timeBetweenMinievents = constants.getData("/timeBetweenMinievents");
+	//A time for the possibility where 1) no alte/no time lost 2)  the player wants to skip alte / losetime with shop right after
+	const reminders = [timeBetweenMinievents];
+
+	if (message.content.includes(constants.getData("/regex/timeLostBigEvent"))) {
+		const splicedMessage = message.content.split(" | ");
+
+		reminders.push(timeBetweenMinievents
+			+ getTimeLostByString(
+			//The time lost is always just before the text
+			splicedMessage[splicedMessage.length - 2]
+					//:clock10: Temps perdu : hours H minutes Min -> hours H minutes
+					.slice(26, -6)
+					.split(" H ")
+			)
+		);
+	}
+	//If it ends by an emoji, there's an alteration
+	if (message.content.endsWith(constants.getData("/regex/emojiEnd"))) {
+		const splitedMessage = message.content.split(" ");
+		reminders.push(timeBetweenMinievents
+			+ constants.getData(`/effectDurations/${splitedMessage[splitedMessage.length - 1]}`)
+		);
+	}
+		
+	await proposeAutoReminder(message, reminders,
+		//Get user from mention in the text
+		await client.users.fetch(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">")))
+	);
+};
+
+const minieventMsgListener = async (message) => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (message.embeds.length === 0) return;
+	if (!message.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
+
+	const timeBetweenMinievents = constants.getData("/timeBetweenMinievents");
+	const reminders = [timeBetweenMinievents];
+
+	let text = message.embeds[0].description;
+
+	if (text.includes(constants.getData("/regex/loseTimeEmoji"))) {
+		const loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/loseTimeEmoji"));
+		//Removing the possible '**' in front of the emoji cause they can be placed before or after
+		reminders.push(timeBetweenMinievents
+			+ getTimeLostByString(text
+				//Between the end of the '**' and the start of the emoji
+				.slice(text.indexOf("**") + 2, loseTimeEmojiPosition)
+				.replace("**", "")
+				.split(" H ")
+			)
+		);
+	}
+
+	//Remove 2nd text.endsWith for the next draftbot update, for now there's a typo on bigBadEvent's head bandage sentence
+	if (text.endsWith(constants.getData("/regex/emojiEnd") || text.endsWith(":head_bandage:."))) {
+		const splitedMessage = text.split(" ");
+		reminders.push(timeBetweenMinievents
+			+ constants.getData(`/effectDurations/${splitedMessage[splitedMessage.length - 1]}`));
+	}
+
+	await proposeAutoReminder(message, reminders, message.interaction.user);
+};
+
+async function proposeAutoReminder(message, reminders, author) {
+	const components = new MessageActionRow();
+	reminders.forEach((time) => {
+		components.addComponents(
+			new MessageButton()
+				.setCustomId(time.toString())
+				.setLabel(generateTimeDisplay(time))
+				.setStyle("PRIMARY")
+		);
+	});
+	components.addComponents(
+		new MessageButton()
+			.setCustomId("remove")
+			.setLabel("Non")
+			.setStyle("DANGER")
+	);
+
+	await addReminder(await message.reply({content: `Voulez-vous ajouter un rappel ?`, components: [components]}), author);
+}
+
+async function addReminder(propositionMessage, author) {
+	const listener = async (interaction) => {
+		if (!interaction.isButton()) return;
+		if (interaction.message.id != propositionMessage.id) return;
+		if (interaction.user.id != author.id) 
+			interaction.reply({content: ":warning: Désolé, vous n'êtes pas la personne à qui est destinée cette proposition", ephemeral: true});
+		if (interaction.customId === "remove") {
+			interaction.message.delete();
+			return;
+		}
+
+		interaction.update({content: "Rappel ajouté !", components: []});
+		const endDate = interaction.message.createdTimestamp + parseInt(interaction.customId);
+		const reminder = new Reminder(
+			client,
+			{channel: propositionMessage.channel, channel_type: "text"},
+			endDate,
+			`Vous avez ajouté un rappel il y a ${generateTimeDisplay(parseInt(interaction.customId))}`,
+			author,
+			db,
+			config
+		);
+		reminder.save();
+		reminder.start();
+		await log(`${author.username} ajoute un rappel pour dans ${generateTimeDisplay(parseInt(interaction.customId))} suite à une proposition de rappel automatique`);
+	};
+
+	client.on('interactionCreate', listener);
+		setTimeout(() => {
+			client.removeListener('interactionCreate', listener);
+			if (propositionMessage.deletable) {
+				propositionMessage.delete();
+			}
+		}, 60000
+	);
 }
 
 let propo_msg_listener = async msg => {
@@ -395,12 +542,16 @@ let profile_listener = async msg => {
 
 client.setMaxListeners(0);
 client.on('interactionCreate', cmd_listener);
-client.on('messageCreate', help_msg_listener);
-client.on('messageCreate', fetch_guild_listener);
-client.on('messageCreate', propo_msg_listener);
-client.on('messageCreate', long_report_listener);
-client.on('messageCreate', short_report_listener);
-client.on('messageCreate', profile_listener);
+client.on('messageCreate', (message) => {
+	help_msg_listener(message);
+	fetch_guild_listener(message);
+	propo_msg_listener(message);
+	long_report_listener(message);
+	short_report_listener(message);
+	profile_listener(message);
+	eventsMsgListener(message);
+	minieventMsgListener(message);
+});
 
 // Import all the commands from the commands files
 client.commands = new Collection();
