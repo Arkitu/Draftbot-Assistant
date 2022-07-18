@@ -12,7 +12,9 @@
                             "duration": 22,
                             "unit": "heures"
                         }
-                    }
+                    },
+                    "events": false,
+                    "minievents": false
                 },
                 "tracking": {
                     "reports": true,
