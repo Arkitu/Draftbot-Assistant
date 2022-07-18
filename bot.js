@@ -162,7 +162,7 @@ const eventsMsgListener = async (message) => {
 };
 
 const minieventMsgListener = async (message) => {
-	const userHash = createHash('md5').update(message.author.id).digest('hex');
+	const userHash = createHash('md5').update(message.interaction.user.id).digest('hex');
 	if (!(userHash in db.getData("/users"))) return;
 	if (!db.getData(`/users/${userHash}/config/reminders/minievents`)) return;
 	if (message.author.id !== config.getData("/draftbot_id")) return;
@@ -428,122 +428,109 @@ let short_report_listener = async msg => {
 }
 
 let profile_listener = async msg => {
-	if (!msg.content.toLowerCase().replace(" ", "").slice(1) in ["p", "profile", "profil"]) return;
-
-	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
+	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.profile) return;
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (!msg.embeds[0]) return;
+	if (msg.interaction.command.name !== "profile") return;
 
-	let response_listener = async response => {
-		if (response.author.id != "448110812801007618") return;
+	let embed = msg.embeds[0];
 
-		if (response.channel.id != msg.channel.id) return;
-		if (!response.embeds[0]) return;
-		if (!response.embeds[0].title) return;
-		if (response.embeds[0].title.split(" | ")[1]!= msg.author.username) return;
-
-		let embed = response.embeds[0];
-
-		let splited_embed = {
-			"title": embed.title.split(" | "),
-			"fields": embed.fields.map(f => {
-				return f.value.split(" | ").map(e => {
-					return {
-						"full": e,
-						"emoji": e.split(":")[1],
-						"value": (() => {
-							if (!e.split(":")[2]) return undefined;
-							let v = e.split(":")[2].slice(1)
-							if (v.includes("/")) {
-								v = v.split("/").map(int => parseInt(int));
-							} else if (!isNaN(parseInt(v))) {
-								v = parseInt(v);
-							}
-							return v;
-						})()
-					}
-				})
+	let splited_embed = {
+		"title": embed.title.split(" | "),
+		"fields": embed.fields.map(f => {
+			return f.value.split(" | ").map(e => {
+				return {
+					"full": e,
+					"emoji": e.split(":")[1],
+					"value": (() => {
+						if (!e.split(":")[2]) return undefined;
+						let v = e.split(":")[2].slice(1)
+						if (v.includes("/")) {
+							v = v.split("/").map(int => parseInt(int));
+						} else if (!isNaN(parseInt(v))) {
+							v = parseInt(v);
+						}
+						return v;
+					})()
+				}
 			})
-		}
+		})
+	}
 
-		let data = {
-			lvl: parseInt(splited_embed.title[2].split(" ")[1]),
-			pv: splited_embed.fields[0][0].value[0],
-			max_pv: splited_embed.fields[0][0].value[1],
-			xp: splited_embed.fields[0][1].value[0],
-			max_xp: splited_embed.fields[0][1].value[1],
-			gold: splited_embed.fields[0][2].value,
-			energy: splited_embed.fields[1][0].value[0],
-			max_energy: splited_embed.fields[1][0].value[1],
-			strenght: splited_embed.fields[1][1].value,
-			defense: splited_embed.fields[1][2].value,
-			speed: splited_embed.fields[1][3].value,
-			gems: splited_embed.fields[2][0].value,
-			quest_missions_percentage: splited_embed.fields[2][1].value,
-			rank: splited_embed.fields[3][0].value[0],
-			rank_points: splited_embed.fields[3][1].value,
-			class: {
-				name: splited_embed.fields[4][0].value,
-				emoji: `:${splited_embed.fields[4][0].emoji}:`,
-			},
-			guild_name: (()=>{
-				if (embed.fields[5].name != "Guilde :") return undefined;
-				return splited_embed.fields[5][0].value;
-			})(),
-			destination: splited_embed.fields[6][0].full
-		}
+	let data = {
+		lvl: parseInt(splited_embed.title[2].split(" ")[1]),
+		pv: splited_embed.fields[0][0].value[0],
+		max_pv: splited_embed.fields[0][0].value[1],
+		xp: splited_embed.fields[0][1].value[0],
+		max_xp: splited_embed.fields[0][1].value[1],
+		gold: splited_embed.fields[0][2].value,
+		energy: splited_embed.fields[1][0].value[0],
+		max_energy: splited_embed.fields[1][0].value[1],
+		strenght: splited_embed.fields[1][1].value,
+		defense: splited_embed.fields[1][2].value,
+		speed: splited_embed.fields[1][3].value,
+		gems: splited_embed.fields[2][0].value,
+		quest_missions_percentage: splited_embed.fields[2][1].value,
+		rank: splited_embed.fields[3][0].value[0],
+		rank_points: splited_embed.fields[3][1].value,
+		class: {
+			name: splited_embed.fields[4][0].value,
+			emoji: `:${splited_embed.fields[4][0].emoji}:`,
+		},
+		guild_name: (()=>{
+			if (embed.fields[5].name != "Guilde :") return undefined;
+			return splited_embed.fields[5][0].value;
+		})(),
+		destination: splited_embed.fields[6][0].full
+	}
 
-		db.push(`/users/${user_hash}/tracking[]`, {
-			type: "profile",
-			timestamp: response.createdTimestamp,
-			data: data
-		});
-		if (db_user.config.goal) {
-			if (db_user.config.goal.end < response.createdTimestamp) {
-				await msg.channel.send({ embeds: [
-					new MessageEmbed()
-						.setColor(config.getData("/main_color"))
-						.setTitle("Expiration de votre objectif")
-						.setDescription(`Votre objectif de ${db_user.config.goal.value} ${
-							{
-								lvl: "niveaux",
-								gold: ":moneybag:",
-								pv: ":heart:",
-								xp: ":star:",
-								gems: ":gem:",
-								quest_missions_percentage: "% de missions de quêtes",
-								rank_points: ":medal:"
-							}[db_user.config.goal.unit]
-						} a expiré, vous pouvez en définir un nouveau avec \`/set_goal\``)
-				]});
-				db.delete(`/users/${user_hash}/config/goal`);
-			} else if (db_user.config.goal.value <= data[db_user.config.goal.unit] ) {
-				await msg.channel.send({ embeds: [
-					new MessageEmbed()
-						.setColor(config.getData("/main_color"))
-						.setTitle("Objectif atteint !")
-						.setDescription(`<@${msg.author.id}>, vous avez atteint votre objectif de ${db_user.config.goal.value} ${
-							{
-								lvl: "niveaux",
-								gold: ":moneybag:",
-								pv: ":heart:",
-								xp: ":star:",
-								gems: ":gem:",
-								quest_missions_percentage: "% de missions de quêtes",
-								rank_points: ":medal:"
-							}[db_user.config.goal.unit]
-						} !`)
-				]});
-				db.delete(`/users/${user_hash}/config/goal`);
-			}
+	db.push(`/users/${user_hash}/tracking[]`, {
+		type: "profile",
+		timestamp: response.createdTimestamp,
+		data: data
+	});
+	if (db_user.config.goal) {
+		if (db_user.config.goal.end < response.createdTimestamp) {
+			await msg.channel.send({ embeds: [
+				new MessageEmbed()
+					.setColor(config.getData("/main_color"))
+					.setTitle("Expiration de votre objectif")
+					.setDescription(`Votre objectif de ${db_user.config.goal.value} ${
+						{
+							lvl: "niveaux",
+							gold: ":moneybag:",
+							pv: ":heart:",
+							xp: ":star:",
+							gems: ":gem:",
+							quest_missions_percentage: "% de missions de quêtes",
+							rank_points: ":medal:"
+						}[db_user.config.goal.unit]
+					} a expiré, vous pouvez en définir un nouveau avec \`/set_goal\``)
+			]});
+			db.delete(`/users/${user_hash}/config/goal`);
+		} else if (db_user.config.goal.value <= data[db_user.config.goal.unit] ) {
+			await msg.channel.send({ embeds: [
+				new MessageEmbed()
+					.setColor(config.getData("/main_color"))
+					.setTitle("Objectif atteint !")
+					.setDescription(`<@${msg.author.id}>, vous avez atteint votre objectif de ${db_user.config.goal.value} ${
+						{
+							lvl: "niveaux",
+							gold: ":moneybag:",
+							pv: ":heart:",
+							xp: ":star:",
+							gems: ":gem:",
+							quest_missions_percentage: "% de missions de quêtes",
+							rank_points: ":medal:"
+						}[db_user.config.goal.unit]
+					} !`)
+			]});
+			db.delete(`/users/${user_hash}/config/goal`);
 		}
 	}
-	client.on('messageCreate', response_listener);
-
-	setTimeout(() => {
-		client.removeListener('messageCreate', response_listener);
-	}, 10000);
 }
 
 client.setMaxListeners(0);
