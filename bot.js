@@ -123,12 +123,12 @@ function getTimeLostByString(timeLost) {
 }
 
 const eventsMsgListener = async (message) => {
-	const userHash = createHash('md5').update(message.author.id).digest('hex');
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (!message.content) return;
+	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
+	const userHash = createHash('md5').update(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))).digest('hex');
 	if (!(userHash in db.getData("/users"))) return;
 	if (!db.getData(`/users/${userHash}/config/reminders/events`)) return;
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	//Checks if the message is the second part of a big event
-	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
 
 	const timeBetweenMinievents = constants.getData("/timeBetweenMinievents");
 	//A time for the possibility where 1) no alte/no time lost 2)  the player wants to skip alte / losetime with shop right after
