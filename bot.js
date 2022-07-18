@@ -8,6 +8,7 @@ import { createHash } from "crypto";
 // Import config and db
 const config = new JsonDB(new Config("config", true, true, '/'));
 const db = new JsonDB(new Config("db", true, true, '/'));
+const constants = new JsonDB(new Config("constants", false, true, '/'));
 
 // Log with the current date
 export async function log(msg) {
@@ -170,10 +171,9 @@ let propo_msg_listener = async msg => {
 }
 
 let long_report_listener = async msg => {
-	if (msg.author.id != "448110812801007618") return;
+	if (msg.author.id !== config.getData("/draftbot_id")) return;
 	if (!msg.content) return;
-	if (!msg.content.startsWith(":newspaper: ** Journal de ")) return;
-	if (!msg.content.split(":").slice(3).join(":").slice(3).startsWith(":medal: Points gagnés :")) return;
+	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(msg.content))) return;
 
 	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
@@ -242,36 +242,25 @@ let long_report_listener = async msg => {
 		timestamp: msg.createdTimestamp,
 		data: data
 	});
-
 	log("Long repport tracked");
 }
 
 let short_report_listener = async msg => {
-	if (!msg.content.toLowerCase().replace(" ", "").slice(1) in ["r", "report" ]) return;
+	if (msg.author.id !== config.getData("/draftbot_id")) return;
+	if (msg.embeds.length === 0) return;
+	if(!msg.embeds[0].author) return;
+	if (!msg.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 
-	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
+	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.reports) return;
 
-	let response_listener = async response => {
-		if (response.author.id != "448110812801007618") return;
-
-		if (response.channel.id != msg.channel.id) return;
-		if (!response.embeds[0]) return;
-		if (!response.embeds[0].author) return;
-		if (response.embeds[0].author.name != `Journal de ${msg.author.username}`) return;
-		db.push(`/users/${user_hash}/tracking[]`, {
-			type: "short_report",
-			timestamp: response.createdTimestamp
-		});
-		log("Short repport tracked");
-	}
-	client.on('messageCreate', response_listener);
-
-	setTimeout(() => {
-		client.removeListener('messageCreate', response_listener);
-	}, 10000);
+	db.push(`/users/${user_hash}/tracking[]`, {
+		type: "short_report",
+		timestamp: msg.createdTimestamp
+	});
+	log("Short repport tracked");
 }
 
 let profile_listener = async msg => {
@@ -332,7 +321,6 @@ let profile_listener = async msg => {
 		//Bot crashed if the user didn't have a guild while using the command
 		destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
 	}
-	console.log(data);
 
 	db.push(`/users/${user_hash}/tracking[]`, {
 		type: "profile",
