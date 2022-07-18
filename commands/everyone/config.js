@@ -53,6 +53,16 @@ export const data = new SlashCommandBuilder()
                             .setRequired(true)
                     )
             )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("event")
+                    .setDescription("Active/désactive la proposition automatique de rappel après un event")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("minievents")
+                    .setDescription("Active/désactive la proposition automatique de rappel après un minievent")
+            )
     )
     .addSubcommandGroup(subcommandgroup =>
         subcommandgroup
@@ -88,7 +98,7 @@ export async function execute(interaction, config, db) {
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
-        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}}, "tracking": {"reports": false, "public": false, "profile": false}}, "tracking": []});
+        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}, "events": false, "minievents": false}, "tracking": {"reports": false, "public": false, "profile": false}}, "tracking": []});
     }
     let db_user = db.getData(`/users/${user_hash}`);
 
@@ -121,6 +131,14 @@ export async function execute(interaction, config, db) {
             } else {
                 await interaction.editReply("Cette proposition n'existe pas !");
             }
+            break;
+        case "reminders/events":
+            db_user.config.reminders.events = !db_user.config.reminders.events
+            await interaction.editReply("L'option a été modifiée avec succès !");
+            break;
+        case "reminders/minievents":
+            db_user.config.reminders.events = !db_user.config.reminders.minievents
+            await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "tracking/view":
             let tracking_embed = new MessageEmbed()

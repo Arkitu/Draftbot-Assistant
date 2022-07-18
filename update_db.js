@@ -34,6 +34,12 @@ for (let user in db.getData("/users")) {
             db.delete(`/users/${user}/tracking/${event.id}/ranking`);
         }
     }
+    if (!db.getData(`/users/${user}/config/reminders`).hasOwnProperty("events")) {
+        db.push(`/users/${user}/config/reminders/events`, false);
+    }
+    if (!db.getData(`/users/${user}/config/reminders`).hasOwnProperty("minievents")) {
+        db.push(`/users/${user}/config/reminders/minievents`, false);
+    }
 }
 
 console.log("Done");
