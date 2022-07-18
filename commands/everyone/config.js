@@ -133,11 +133,11 @@ export async function execute(interaction, config, db) {
             }
             break;
         case "reminders/events":
-            db_user.config.reminders.events = !db_user.config.reminders.events
+            db.push(`/users/${user_hash}/config/reminders/events`, !db_user.config.reminders.events);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/minievents":
-            db_user.config.reminders.events = !db_user.config.reminders.minievents
+            db.push(`/users/${user_hash}/config/reminders/minievents`, !db_user.config.reminders.minievents);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "tracking/view":
