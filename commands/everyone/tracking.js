@@ -106,7 +106,7 @@ export const data = new SlashCommandBuilder()
             .addUserOption(opt =>
                 opt
                     .setName('user')
-                    .setDescription('L\'utilisateur dont les statistiques doivent être affichées (par defaut vous même)')
+                    .setDescription('L\'utilisateur dont les statistiques doivent être affichées (par defaut vous-même)')
                     .setRequired(false)
             )
             .addStringOption(opt =>
@@ -121,7 +121,7 @@ export const data = new SlashCommandBuilder()
     .addSubcommand(subcmd =>
         subcmd
             .setName('profile')
-            .setDescription('Affiche les statistiques sur les profiles')
+            .setDescription('Affiche les statistiques sur les profils')
             .addStringOption(opt =>
                 opt
                     .setName('category')
