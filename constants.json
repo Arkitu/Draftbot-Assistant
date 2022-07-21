@@ -52,5 +52,21 @@
                 "tracking_of_everyone"
             ]
         }
-    ]
+    ],
+    "dbUserDefault": {
+        "config": {
+            "reminders": {
+                "on": {},
+                "events": true,
+                "minievents": true,
+                "in_dm": true
+            },
+            "tracking": {
+                "reports": true,
+                "public": true,
+                "profile": true
+            }
+        },
+        "tracking": []
+    }
 }

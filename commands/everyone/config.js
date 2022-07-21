@@ -98,7 +98,7 @@ export async function execute(interaction, config, db, constants) {
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
-        db.push("/users/" + user_hash, {"config": {"reminders": {"on": {}, "events": false, "minievents": false}, "tracking": {"reports": false, "public": false, "profile": false}}, "tracking": []});
+        db.push("/users/" + user_hash, constants.getData("/dbUserDefault"));
     }
     let db_user = db.getData(`/users/${user_hash}`);
 
