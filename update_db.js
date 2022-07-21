@@ -40,6 +40,14 @@ for (let user in db.getData("/users")) {
     if (!db.getData(`/users/${user}/config/reminders`).hasOwnProperty("minievents")) {
         db.push(`/users/${user}/config/reminders/minievents`, false);
     }
+    if (!db.getData(`/users/${user}/config/reminders`).hasOwnProperty("in_dm")) {
+        db.push(`/users/${user}/config/reminders/in_dm`, false);
+    }
+    for (const reminder of Object.keys(db.getData(`/users/${user}/config/reminders/on`))) {
+        if (!db.getData(`/users/${user}/config/reminders/on/${reminder}`).hasOwnProperty("in_dm")) {
+            db.push(`/users/${user}/config/reminders/on/${reminder}/in_dm`, false);
+        }
+    }
 }
 
 console.log("Done");

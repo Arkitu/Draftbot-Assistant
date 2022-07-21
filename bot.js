@@ -240,7 +240,11 @@ async function addReminder(propositionMessage, author) {
 		const endDate = interaction.message.createdTimestamp + parseInt(interaction.customId);
 		const reminder = new Reminder(
 			client,
-			{channel: propositionMessage.channel, channel_type: "text"},
+			{
+				channel: db.getData(`/users/${createHash('md5').update(author.id).digest('hex')}/config/reminders/in_dm`)
+					? author : propositionMessage.channel,
+				channel_type: "text"
+			},
 			endDate,
 			`Vous avez ajouté un rappel il y a ${generateTimeDisplay(parseInt(interaction.customId))}`,
 			author,
@@ -309,7 +313,7 @@ let propo_msg_listener = async msg => {
 							dead_line.setDate(dead_line.getDate() + reminder.duration);
 							break;
 					}
-					let new_reminder = new Reminder(client, { channel: msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author, db, config);
+					let new_reminder = new Reminder(client, { channel: reminder.in_dm ? msg.author : msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author, db, config);
 					await new_reminder.save();
 					await new_reminder.start();
 					await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);

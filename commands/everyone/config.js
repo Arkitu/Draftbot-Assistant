@@ -41,6 +41,11 @@ export const data = new SlashCommandBuilder()
                             .addChoice("heures", "heures")
                             .addChoice("jours", "jours")
                     )
+                    .addBooleanOption(option =>
+                        option
+                            .setName("in_dm")
+                            .setDescription("L'endroit où le rappel sera envoyé")
+                    )
             )
             .addSubcommand(subcommand =>
                 subcommand
@@ -62,6 +67,11 @@ export const data = new SlashCommandBuilder()
                 subcommand
                     .setName("minievents")
                     .setDescription("Active/désactive la proposition automatique de rappel après un minievent")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("in_dm")
+                    .setDescription("Active/désactive l'envoi des reminders en DM")
             )
     )
     .addSubcommandGroup(subcommandgroup =>
@@ -110,7 +120,7 @@ export async function execute(interaction, config, db, constants) {
                 .addField("Proposition de reminders :", (()=>{
                     let str_propos = "";
                     for (let propo in db_user.config.reminders.on) {
-                        str_propos += `${propo} : \`${db_user.config.reminders.on[propo].duration} ${db_user.config.reminders.on[propo].unit}\`\n`;
+                        str_propos += `${propo} : \`${db_user.config.reminders.on[propo].duration} ${db_user.config.reminders.on[propo].unit} ${db_user.config.reminders.on[propo].in_dm ? "en DM" : ""}\`\n`;
                     }
                     if (!str_propos) {
                         str_propos = "Aucune proposition de rappel\n";
@@ -121,7 +131,7 @@ export async function execute(interaction, config, db, constants) {
             await interaction.editReply({ embeds: [reminders_embed] });
             break;
         case "reminders/add_propo":
-            db.push(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`, { duration: interaction.options.getInteger("duration"), unit: interaction.options.getString("unit") });
+            db.push(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`, { duration: interaction.options.getInteger("duration"), unit: interaction.options.getString("unit"), in_dm: interaction.options.getString("in_dm")});
             await interaction.editReply("Proposition ajoutée avec succès !");
             break;
         case "reminders/del_propo":
@@ -138,6 +148,10 @@ export async function execute(interaction, config, db, constants) {
             break;
         case "reminders/minievents":
             db.push(`/users/${user_hash}/config/reminders/minievents`, !db_user.config.reminders.minievents);
+            await interaction.editReply("L'option a été modifiée avec succès !");
+            break;
+        case "in_dm":
+            db.push(`/users/${user_hash}/config/reminders/in_dm`, !db_user.config.reminders.in_dm);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "tracking/view":
