@@ -6,15 +6,18 @@
                     "on": {
                         "!gd": {
                             "duration": 22,
-                            "unit": "heures"
+                            "unit": "heures",
+                            "in_dm": false
                         },
                         "!da": {
                             "duration": 22,
-                            "unit": "heures"
+                            "unit": "heures",
+                            "in_dm": false
                         }
                     },
                     "events": false,
-                    "minievents": false
+                    "minievents": false,
+                    "in_dm": false
                 },
                 "tracking": {
                     "reports": true,
