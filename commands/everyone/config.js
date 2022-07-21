@@ -89,7 +89,7 @@ export const data = new SlashCommandBuilder()
             )
     );
 
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
     await interaction.deferReply();
     let opt = {
         subcommandgroup: interaction.options.getSubcommandGroup(),

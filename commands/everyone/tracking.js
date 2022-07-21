@@ -161,7 +161,7 @@ export const data = new SlashCommandBuilder()
                     .setRequired(false)
             )
     )
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
     let opt = {
         subcommand: interaction.options.getSubcommand(),
         category: interaction.options.getString('category') || 'all',

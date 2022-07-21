@@ -71,7 +71,7 @@ let cmd_listener = async interaction => {
 
 		log(`${interaction.user.username} execute ${commandName}`);
 
-		command.execute(interaction, config, db);
+		command.execute(interaction, config, db, constants);
 	}
 }
 
@@ -252,6 +252,7 @@ async function addReminder(propositionMessage, author) {
 		await log(`${author.username} ajoute un rappel pour dans ${generateTimeDisplay(parseInt(interaction.customId))} suite à une proposition de rappel automatique`);
 	};
 
+	propositionMessage
 	client.on('interactionCreate', listener);
 		setTimeout(() => {
 			client.removeListener('interactionCreate', listener);

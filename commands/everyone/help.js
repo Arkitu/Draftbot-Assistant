@@ -13,7 +13,7 @@ export const data = new SlashCommandBuilder()
 		.addChoice("Tracking", "Tracking")
 	);
 
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
 	await interaction.deferReply();
 
 	const opt_categorie = interaction.options.getString("categorie");
