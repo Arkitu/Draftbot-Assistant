@@ -52,12 +52,12 @@ export async function execute(interaction, config, db) {
 
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(await db.getData(`/users`)).hasOwnProperty(user_hash)) {
-        await interaction.editReply(':warning: Veuilez activer le tracking du profile et enregistrer au moins une fois votre profile pour utiliser cette commande.');
+        await interaction.editReply(':warning: Veuillez activer le tracking du profil et enregistrer au moins une fois votre profil pour utiliser cette commande.');
         return;
     }
     let db_user = db.getData(`/users/${user_hash}`);
     if (db_user.tracking.filter(t=>t.type==='profile').length===0) {
-        await interaction.editReply(':warning: Veuilez enregistrer au moins une fois votre profile pour utiliser cette commande.');
+        await interaction.editReply(':warning: Veuillez enregistrer au moins une fois votre profil pour utiliser cette commande.');
         return;
     }
     let init_value = db_user.tracking.filter(t=>t.type==='profile')[db_user.tracking.filter(t=>t.type==='profile').length-1].data[opts.unit];

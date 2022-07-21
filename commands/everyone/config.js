@@ -22,7 +22,7 @@ export const data = new SlashCommandBuilder()
                     .addStringOption(option =>
                         option
                             .setName("trigger")
-                            .setDescription("Le mot clé pour déclencher la proposition de rappel")
+                            .setDescription("Le mot clé déclenchant la proposition de rappel")
                             .setRequired(true)
                     )
                     .addIntegerOption(option =>
@@ -49,7 +49,7 @@ export const data = new SlashCommandBuilder()
                     .addStringOption(option =>
                         option
                             .setName("trigger")
-                            .setDescription("Le mot clé pour déclencher la proposition de rappel")
+                            .setDescription("Le mot clé déclenchant la proposition de rappel")
                             .setRequired(true)
                     )
             )

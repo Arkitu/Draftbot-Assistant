@@ -11,7 +11,7 @@ export const data = new SlashCommandBuilder()
     )
     .addIntegerOption(option => option
 		.setName("time")
-		.setDescription("Le temps avant que le rappel soit envoyé")
+		.setDescription("Le temps avant que le rappel ne soit envoyé")
 		.setRequired(true)
 	)
     .addStringOption(option => option
