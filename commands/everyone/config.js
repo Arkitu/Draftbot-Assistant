@@ -90,6 +90,11 @@ export const data = new SlashCommandBuilder()
             )
             .addSubcommand(subcommand =>
                 subcommand
+                    .setName("vote")
+                    .setDescription("Active/désactive la proposition automatique de rappel après un /vote")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
                     .setName("in_dm")
                     .setDescription("Active/désactive l'envoi des reminders en DM")
             )
@@ -184,6 +189,10 @@ export async function execute(interaction, config, db, constants) {
             break;
         case "reminders/petfeed":
             db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfeed`, !db_user.config.reminders.auto_proposition.petfeed);
+            await interaction.editReply("L'option a été modifiée avec succès !");
+            break;
+        case "reminders/vote":
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/vote`, !db_user.config.reminders.auto_proposition.vote);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/in_dm":

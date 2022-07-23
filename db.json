@@ -22,7 +22,8 @@
                         "in_dm": false,
                         "petfeed": false,
                         "daily": false,
-                        "petfree": false
+                        "petfree": false,
+                        "vote": false
                     }
                 },
                 "tracking": {

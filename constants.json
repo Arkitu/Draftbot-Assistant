@@ -31,7 +31,9 @@
         "betweenMinievents": 600000,
         "betweenDailies": 79200000,
         "betweenBasicPetFeeds": 3600000,
-        "betweenPetFrees": 3600000
+        "betweenPetFrees": 3600000,
+        "betweenVotes": 43200000,
+        "betweenUsefulVotes": 86400000
     },
 	"helpCategories": [
         {
@@ -72,6 +74,7 @@
                         "daily": false,
                         "petfree": false,
                         "petfeed": false,
+                        "vote": false,
                         "in_dm": false
                     }
                 },
