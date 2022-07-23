@@ -269,6 +269,19 @@ const petFreeMessageListener = async message => {
 	await proposeAutoReminder(message, [constants.getData("/times/betweenPetFrees")], await client.users.fetch(userID));
 }
 
+const voteMessageListener = async message => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (!message.interaction) return;
+	if (message.interaction.commandName !== "vote") return;
+
+	let user_hash = createHash('md5').update(message.interaction.user.id).digest('hex');
+	if (!(user_hash in db.getData("/users"))) return;
+	let db_user = db.getData(`/users/${user_hash}`);
+	if (!db_user.config.reminders.auto_proposition.vote) return;
+
+	await proposeAutoReminder(message, [constants.getData("/times/betweenVotes"), constants.getData("/times/betweenUsefulVotes")], message.interaction.user);
+}
+
 async function proposeAutoReminder(message, reminders, author) {
 	const components = new MessageActionRow();
 	reminders.forEach((time) => {
@@ -638,6 +651,7 @@ client.on('messageCreate', (message) => {
 	dailyMessageListener(message);
 	petFeedMessageListener(message);
 	petFreeMessageListener(message);
+	voteMessageListener(message);
 });
 
 // Import all the commands from the commands files
