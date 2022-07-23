@@ -20,7 +20,9 @@
                         "minievents": false,
                         "guilddaily": false,
                         "in_dm": false,
-                        "petfeed": false
+                        "petfeed": false,
+                        "daily": false,
+                        "petfree": false
                     }
                 },
                 "tracking": {

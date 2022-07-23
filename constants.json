@@ -12,7 +12,8 @@
 				"endsWith": ":x: Ne pas lui donner une pièce"
 			}
 		],
-        "petFeedAuthorEnd": ", vous offrez de la nourriture à votre familier."
+        "petFeedAuthorEnd": ", vous offrez de la nourriture à votre familier.",
+        "petFreeAuthorEnd": ", libération d'un familier"
     },
     "effectDurations": {
 		":sick:": 21600000,
@@ -28,8 +29,9 @@
     },
     "times": {
         "betweenMinievents": 600000,
-        "betweenGuildDailies": 79200000,
-        "betweenBasicPetFeeds": 3600000
+        "betweenDailies": 79200000,
+        "betweenBasicPetFeeds": 3600000,
+        "betweenPetFrees": 3600000
     },
 	"helpCategories": [
         {
@@ -67,6 +69,8 @@
                         "events": false,
                         "minievents": false,
                         "guilddaily": false,
+                        "daily": false,
+                        "petfree": false,
                         "petfeed": false,
                         "in_dm": false
                     }

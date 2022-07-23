@@ -218,14 +218,26 @@ const guildDailyMessageListener = async message => {
 	await proposeAutoReminder(message, [constants.getData("/times/betweenGuildDailies")], message.interaction.user);
 }
 
+const dailyMessageListener = async message => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (!message.interaction) return;
+	if (message.interaction.commandName !== "daily") return;
+
+	let user_hash = createHash('md5').update(message.interaction.user.id).digest('hex');
+	if (!(user_hash in db.getData("/users"))) return;
+	let db_user = db.getData(`/users/${user_hash}`);
+	if (!db_user.config.reminders.auto_proposition.daily) return;
+
+	await proposeAutoReminder(message, [constants.getData("/times/betweenDailies")], message.interaction.user);
+}
+
 const petFeedMessageListener = async message => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (message.embeds.length === 0) return;
 	if(!message.embeds[0].author) return;
 	if (!message.embeds[0].author.name.endsWith(constants.getData("/regex/petFeedAuthorEnd"))) return;
 
-	const userID = message.interaction ? message.interaction.user.id
-		: message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
+	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
 	const user_hash = createHash('md5').update(userID).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	const db_user = db.getData(`/users/${user_hash}`);
@@ -238,6 +250,23 @@ const petFeedMessageListener = async message => {
 		});
 
 	await proposeAutoReminder(message, reminders, await client.users.fetch(userID));
+}
+
+const petFreeMessageListener = async message => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (message.embeds.length === 0) return;
+	if(!message.embeds[0].author) return;
+	if (!message.embeds[0].author.name.endsWith(constants.getData("/regex/petFreeAuthorEnd"))) return;
+	// Get rid of first part of /petfree
+	if (message.interaction) return;
+
+	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
+	const user_hash = createHash('md5').update(userID).digest('hex');
+	if (!(user_hash in db.getData("/users"))) return;
+	const db_user = db.getData(`/users/${user_hash}`);
+	if (!db_user.config.reminders.auto_proposition.petfree) return;
+
+	await proposeAutoReminder(message, [constants.getData("/times/betweenPetFrees")], await client.users.fetch(userID));
 }
 
 async function proposeAutoReminder(message, reminders, author) {
@@ -606,7 +635,9 @@ client.on('messageCreate', (message) => {
 	eventsMsgListener(message);
 	minieventMsgListener(message);
 	guildDailyMessageListener(message);
+	dailyMessageListener(message);
 	petFeedMessageListener(message);
+	petFreeMessageListener(message);
 });
 
 // Import all the commands from the commands files

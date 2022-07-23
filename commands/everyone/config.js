@@ -75,8 +75,18 @@ export const data = new SlashCommandBuilder()
             )
             .addSubcommand(subcommand =>
                 subcommand
+                    .setName("daily")
+                    .setDescription("Active/désactive la proposition automatique de rappel après un /daily")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
                     .setName("petfeed")
                     .setDescription("Active/désactive la proposition automatique de rappel après un /petfeed")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("petfree")
+                    .setDescription("Active/désactive la proposition automatique de rappel après un /petfree")
             )
             .addSubcommand(subcommand =>
                 subcommand
@@ -162,6 +172,14 @@ export async function execute(interaction, config, db, constants) {
             break;
         case "reminders/guilddaily":
             db.push(`/users/${user_hash}/config/reminders/auto_proposition/guilddaily`, !db_user.config.reminders.auto_proposition.guilddaily);
+            await interaction.editReply("L'option a été modifiée avec succès !");
+            break;
+        case "reminders/daily":
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/daily`, !db_user.config.reminders.auto_proposition.daily);
+            await interaction.editReply("L'option a été modifiée avec succès !");
+            break;
+        case "reminders/petfree":
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfree`, !db_user.config.reminders.auto_proposition.petfree);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/petfeed":
