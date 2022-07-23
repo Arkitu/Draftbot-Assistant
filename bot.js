@@ -218,6 +218,28 @@ const guildDailyMessageListener = async message => {
 	await proposeAutoReminder(message, [constants.getData("/times/betweenGuildDailies")], message.interaction.user);
 }
 
+const petFeedMessageListener = async message => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (message.embeds.length === 0) return;
+	if(!message.embeds[0].author) return;
+	if (!message.embeds[0].author.name.endsWith(constants.getData("/regex/petFeedAuthorEnd"))) return;
+
+	const userID = message.interaction ? message.interaction.user.id
+		: message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
+	const user_hash = createHash('md5').update(userID).digest('hex');
+	if (!(user_hash in db.getData("/users"))) return;
+	const db_user = db.getData(`/users/${user_hash}`);
+	if (!db_user.config.reminders.auto_proposition.petfeed) return;
+
+	const reminders = [];
+	constants.getData("/pets/" + message.embeds[0].description.replace("**", "").split(" ")[0])
+		.forEach(rarity => {
+			reminders.push(rarity * constants.getData("/times/betweenBasicPetFeeds"))
+		});
+
+	await proposeAutoReminder(message, reminders, await client.users.fetch(userID));
+}
+
 async function proposeAutoReminder(message, reminders, author) {
 	const components = new MessageActionRow();
 	reminders.forEach((time) => {
@@ -584,6 +606,7 @@ client.on('messageCreate', (message) => {
 	eventsMsgListener(message);
 	minieventMsgListener(message);
 	guildDailyMessageListener(message);
+	petFeedMessageListener(message);
 });
 
 // Import all the commands from the commands files
