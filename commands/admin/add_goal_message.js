@@ -21,7 +21,7 @@ export const data = new SlashCommandBuilder()
             .setDescription('L\'heure à laquelle le message sera créé (en millisecondes)')
             .setRequired(false)
     )
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
     let opts = {
         channel: interaction.options.getChannel('channel'),
         start: interaction.options.getInteger('start_time') || Date.now(),

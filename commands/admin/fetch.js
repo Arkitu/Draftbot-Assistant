@@ -9,7 +9,7 @@ export const data = new SlashCommandBuilder()
             .setRequired(true)
             .setDescription('L\'id de l\'objet à récupérer')
     );
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
     let thing;
     let type = "(i don't know)";
 	try {

@@ -14,7 +14,7 @@ export const data = new SlashCommandBuilder()
             .setDescription("Affiche le nombre d'événements trackés")
     );
 
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
     await interaction.deferReply();
 	switch (interaction.options.getSubcommand()) {
         case 'tracked':

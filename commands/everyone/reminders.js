@@ -4,7 +4,7 @@ import { MessageEmbed } from 'discord.js';
 export const data = new SlashCommandBuilder()
 	.setName('reminders')
 	.setDescription('Renvois la liste des rappels');
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
 	await interaction.deferReply();
 
 	let reminders = db.getData('/reminders').filter(reminder => reminder.author_id == interaction.user.id);
