@@ -15,9 +15,13 @@
                             "in_dm": false
                         }
                     },
-                    "events": false,
-                    "minievents": false,
-                    "in_dm": false
+                    "auto_proposition": {
+                        "events": false,
+                        "minievents": false,
+                        "guilddaily": false,
+                        "in_dm": false,
+                        "petfeed": false
+                    }
                 },
                 "tracking": {
                     "reports": true,

@@ -176,7 +176,7 @@ export async function execute(interaction, config, db, constants) {
             return;
         }
         log(`Création de l'utilisateur ${opt.user.username} à partir de /tracking`);
-        db.push("/users/" + user_hash, constants.getData("/dbUserDefault"));
+        db.push("/users/" + user_hash, constants.getData("/databaseDefault/user"));
     }
     let db_user = db.getData(`/users/${user_hash}`);
     if (opt.user.id != interaction.user.id && !db_user.config.tracking.public) {

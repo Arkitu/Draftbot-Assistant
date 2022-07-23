@@ -60,13 +60,23 @@ export const data = new SlashCommandBuilder()
             )
             .addSubcommand(subcommand =>
                 subcommand
-                    .setName("event")
+                    .setName("events")
                     .setDescription("Active/désactive la proposition automatique de rappel après un event")
             )
             .addSubcommand(subcommand =>
                 subcommand
                     .setName("minievents")
                     .setDescription("Active/désactive la proposition automatique de rappel après un minievent")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("guilddaily")
+                    .setDescription("Active/désactive la proposition automatique de rappel après un /guilddaily")
+            )
+            .addSubcommand(subcommand =>
+                subcommand
+                    .setName("petfeed")
+                    .setDescription("Active/désactive la proposition automatique de rappel après un /petfeed")
             )
             .addSubcommand(subcommand =>
                 subcommand
@@ -108,7 +118,7 @@ export async function execute(interaction, config, db, constants) {
     let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
     if (!(user_hash in db.getData("/users"))) {
         log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
-        db.push("/users/" + user_hash, constants.getData("/dbUserDefault"));
+        db.push("/users/" + user_hash, constants.getData("/databaseDefault/user"));
     }
     let db_user = db.getData(`/users/${user_hash}`);
 
@@ -143,15 +153,23 @@ export async function execute(interaction, config, db, constants) {
             }
             break;
         case "reminders/events":
-            db.push(`/users/${user_hash}/config/reminders/events`, !db_user.config.reminders.events);
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/events`, !db_user.config.reminders.auto_proposition.events);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/minievents":
-            db.push(`/users/${user_hash}/config/reminders/minievents`, !db_user.config.reminders.minievents);
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/minievents`, !db_user.config.reminders.auto_proposition.minievents);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
-        case "in_dm":
-            db.push(`/users/${user_hash}/config/reminders/in_dm`, !db_user.config.reminders.in_dm);
+        case "reminders/guilddaily":
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/guilddaily`, !db_user.config.reminders.auto_proposition.guilddaily);
+            await interaction.editReply("L'option a été modifiée avec succès !");
+            break;
+        case "reminders/petfeed":
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfeed`, !db_user.config.reminders.auto_proposition.petfeed);
+            await interaction.editReply("L'option a été modifiée avec succès !");
+            break;
+        case "reminders/in_dm":
+            db.push(`/users/${user_hash}/config/reminders/auto_proposition/in_dm`, !db_user.config.reminders.auto_proposition.in_dm);
             await interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "tracking/view":

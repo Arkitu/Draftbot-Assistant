@@ -177,7 +177,7 @@ const minieventMsgListener = async (message) => {
 		if (text.startsWith(obj.emoji) && text.endsWith(obj.endsWith)) return;
 	}
 
-	const timeBetweenMinievents = constants.getData("/timeBetweenMinievents");
+	const timeBetweenMinievents = constants.getData("/times/betweenMinievents");
 	const reminders = [timeBetweenMinievents];
 
 	if (new RegExp(constants.getData("/regex/hasLoseTimeEmoji")).test(text)) {
@@ -204,6 +204,19 @@ const minieventMsgListener = async (message) => {
 
 	await proposeAutoReminder(message, reminders, await client.users.fetch(userID));
 };
+
+const guildDailyMessageListener = async message => {
+	if (message.author.id !== config.getData("/draftbot_id")) return;
+	if (!message.interaction) return;
+	if (message.interaction.commandName !== "guilddaily") return;
+
+	let user_hash = createHash('md5').update(message.interaction.user.id).digest('hex');
+	if (!(user_hash in db.getData("/users"))) return;
+	let db_user = db.getData(`/users/${user_hash}`);
+	if (!db_user.config.reminders.auto_proposition.guilddaily) return;
+
+	await proposeAutoReminder(message, [constants.getData("/times/betweenGuildDailies")], message.interaction.user);
+}
 
 async function proposeAutoReminder(message, reminders, author) {
 	const components = new MessageActionRow();
@@ -241,7 +254,7 @@ async function addReminder(propositionMessage, author) {
 		const reminder = new Reminder(
 			client,
 			{
-				channel: db.getData(`/users/${createHash('md5').update(author.id).digest('hex')}/config/reminders/in_dm`)
+				channel: db.getData(`/users/${createHash('md5').update(author.id).digest('hex')}/config/reminders/auto_proposition/in_dm`)
 					? author : propositionMessage.channel,
 				channel_type: "text"
 			},
@@ -570,6 +583,7 @@ client.on('messageCreate', (message) => {
 	profile_listener(message);
 	eventsMsgListener(message);
 	minieventMsgListener(message);
+	guildDailyMessageListener(message);
 });
 
 // Import all the commands from the commands files

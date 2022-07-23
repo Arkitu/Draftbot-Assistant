@@ -4,17 +4,28 @@ import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 console.log("Updating database...");
 
 const db = new JsonDB(new Config("db", true, true, '/'));
+const constants = new JsonDB(new Config("constants", false, true, '/'));
+
+/**
+ * 
+ * @param path - position in db of the thing to check 
+ * @param model - the default model for the thing 
+ */
+function verifyEveryPropertyOn(dbPath, model) {
+    const obj = db.getData(dbPath);
+    for (const property of Object.keys(model)) {
+        if (typeof(obj[property]) === "object") {
+            verifyEveryPropertyOn(`${dbPath}/${property}`, model[property]);
+        }
+        if (!obj.hasOwnProperty(property)) {
+            db.push(`${dbPath}/${property}`, model[property])
+        }
+    }
+}
 
 for (let user in db.getData("/users")) {
-    if (!db.getData(`/users/${user}`).hasOwnProperty("tracking")) {
-        db.push(`/users/${user}/tracking`, []);
-    }
-    if (!db.getData(`/users/${user}/config/tracking`).hasOwnProperty("public")) {
-        db.push(`/users/${user}/config/tracking/public`, false);
-    }
-    if (!db.getData(`/users/${user}/config/tracking`).hasOwnProperty("profile")) {
-        db.push(`/users/${user}/config/tracking/profile`, false);
-    }
+    verifyEveryPropertyOn(`/users/${user}`, constants.getData("/databaseDefault/user"));
+
     for (let event of db.getData(`/users/${user}/tracking`)) {
         if (event.type != "profile") continue;
         if (event.hasOwnProperty("vitality")) {
@@ -32,20 +43,6 @@ for (let user in db.getData("/users")) {
         if (event.hasOwnProperty("ranking")) {
             db.push(`/users/${user}/tracking/${event.id}/rank`, event.ranking);
             db.delete(`/users/${user}/tracking/${event.id}/ranking`);
-        }
-    }
-    if (!db.getData(`/users/${user}/config/reminders`).hasOwnProperty("events")) {
-        db.push(`/users/${user}/config/reminders/events`, false);
-    }
-    if (!db.getData(`/users/${user}/config/reminders`).hasOwnProperty("minievents")) {
-        db.push(`/users/${user}/config/reminders/minievents`, false);
-    }
-    if (!db.getData(`/users/${user}/config/reminders`).hasOwnProperty("in_dm")) {
-        db.push(`/users/${user}/config/reminders/in_dm`, false);
-    }
-    for (const reminder of Object.keys(db.getData(`/users/${user}/config/reminders/on`))) {
-        if (!db.getData(`/users/${user}/config/reminders/on/${reminder}`).hasOwnProperty("in_dm")) {
-            db.push(`/users/${user}/config/reminders/on/${reminder}/in_dm`, false);
         }
     }
 }
