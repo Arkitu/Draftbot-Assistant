@@ -10,7 +10,7 @@ export const data = new SlashCommandBuilder()
             .setRequired(true)
             .setDescription('Le bitfield à convertir')
     );
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
     let permissions = bitfieldCalculator.permissions(interaction.options.getString('bitfield'));
     console.log("Permissions :");
     console.log(permissions);
