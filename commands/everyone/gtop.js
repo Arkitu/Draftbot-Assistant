@@ -4,7 +4,7 @@ import { MessageEmbed, MessageActionRow, MessageButton } from 'discord.js';
 export const data = new SlashCommandBuilder()
 	.setName('gtop')
 	.setDescription('Renvoie le classement des guildes');
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
 	await interaction.deferReply();
 	let embed = new MessageEmbed()
 		.setTitle("🏆 Classement des guildes")

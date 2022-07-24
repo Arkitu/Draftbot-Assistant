@@ -20,9 +20,7 @@ export class Reminder {
                     .setColor(this.config.getData("/main_color"))
                     .setTitle("Reminder")
                     .setDescription(this.message)
-                if (this.channel.channel.permissionsFor(this.client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
-                    await this.channel.channel.send({ content: `${this.author}`, embeds: [embed] });
-                }
+                await this.sendReminderMessage(embed);
                 this.delete();
             }
         }, (this.dead_line_timestamp - Date.now()));
@@ -47,5 +45,15 @@ export class Reminder {
             id: this.id
         });
         return this;
+    }
+
+    async sendReminderMessage(embed) {
+        if (this.channel.channel.id === this.author.id) {
+            await this.channel.channel.send({embeds: [embed]});
+            return;
+        }
+        if (this.channel.channel.permissionsFor(this.client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
+            await this.channel.channel.send({content: this.author.toString(), embeds: [embed]});
+        }
     }
 }

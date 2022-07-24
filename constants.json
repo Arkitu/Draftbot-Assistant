@@ -3,15 +3,23 @@
         "bigEventIssueStart": ":newspaper: \\*\\* Journal de <@.?[0-9]*?>  :\\*\\* :medal: Points gagnés :",
         "timeLostBigEvent": ":clock10: Temps perdu :",
         "minieventAuthorStart": "Journal de ",
-        "loseTimeEmoji": ":clock2:",
-        "emojiEnd": ":"
+        "hasLoseTimeEmoji": ":clock2:|🕑",
+        "emojiEnd": ":",
+		"twoMessagesMinieventsEmojis": [":milk:", ":slot_machine:"],
+		"possibleTwoMessagesMinievents": [
+			{
+				"emoji": ":speech_balloon:",
+				"endsWith": ":x: Ne pas lui donner une pièce"
+			}
+		],
+        "petFeedAuthorEnd": ", vous offrez de la nourriture à votre familier.",
+        "petFreeAuthorEnd": ", libération d'un familier"
     },
     "effectDurations": {
 		":sick:": 21600000,
 		":head_bandage:": 21600000,
 		":dizzy_face:": 43200000,
 		":drooling_face:": 4800000,
-		":skull:": 999999999999,
 		":lock:": 86400000,
 		":sleeping:": 10800000,
 		":cold_face:": 3600000,
@@ -19,5 +27,137 @@
 		":zany_face:": 14400000,
 		":scream:": 600000
     },
-    "timeBetweenMinievents": 600000
+    "times": {
+        "betweenMinievents": 600000,
+        "betweenDailies": 79200000,
+        "betweenBasicPetFeeds": 3600000,
+        "betweenPetFrees": 3600000,
+        "betweenVotes": 43200000,
+        "betweenUsefulVotes": 86400000
+    },
+	  "helpCategories": [
+        {
+            "name": "Classiques",
+            "commands": [
+                "ping",
+                "help"
+            ]
+        },
+        {
+            "name": "Reminders",
+            "commands": [
+                "add_reminder",
+                "config",
+                "reminders",
+                "remove_reminder"
+            ]
+        },
+        {
+            "name": "Tracking",
+            "commands": [
+                "gtop",
+                "config",
+                "tracking",
+                "tracking_of_everyone"
+            ]
+        }
+    ],
+    "databaseDefault": {
+        "user": {
+            "config": {
+                "reminders": {
+                    "on": {},
+                    "auto_proposition": {
+                        "events": false,
+                        "minievents": false,
+                        "guilddaily": false,
+                        "daily": false,
+                        "petfree": false,
+                        "petfeed": false,
+                        "vote": false,
+                        "in_dm": false
+                    }
+                },
+                "tracking": {
+                    "reports": false,
+                    "public": false,
+                    "profile": false
+                }
+            },
+            "tracking": []
+        }
+    },
+    "pets": {
+        "❌": [0],
+        "🐕": [1],
+        "🐓": [1],
+        "🐦": [1],
+        "🐎": [1],
+        "🐢": [1],
+        "🐍": [1],
+        "🦎": [1],
+        "🐏": [1],
+        "🐐": [1],
+        "🦃": [1],
+        "🐩": [1],
+        "🦊": [2],
+        "🐻": [2],
+        "🐨": [2],
+        "🐸": [2],
+        "🐒": [2],
+        "🦉": [2],
+        "🦇": [2],
+        "🐺": [2],
+        "🐗": [2],
+        "🐈": [1],
+        "🦭": [2],
+        "🦛": [2],
+        "🦙": [2],
+        "🦢": [2],
+        "🦩": [2],
+        "🦝": [2],
+        "🦨": [2],
+        "🦡": [2],
+        "🦫": [2],
+        "🦥": [2],
+        "🐈‍⬛": [1],
+        "🐿️": [2],
+        "🦔": [2],
+        "🐻‍❄️": [3],
+        "🐼": [3],
+        "🦂": [3],
+        "🐊": [3],
+        "🐘": [3],
+        "🦓": [3],
+        "🦏": [3],
+        "🐪": [3],
+        "🐁": [1],
+        "🐫": [3],
+        "🦒": [3],
+        "🦘": [3],
+        "🦚": [3],
+        "🦜": [3],
+        "🦦": [3],
+        "🐅": [4],
+        "🦁": [4],
+        "🦅": [4],
+        "🦤": [4],
+        "🐹": [1],
+        "🐆": [4],
+        "🦣": [4],
+        "🕊️": [4],
+        "🦄️": [5],
+        "🐉️": [5],
+        "🦖️": [5],
+        "🔵": [5],
+        "⛄": [1],
+        "☃️": [4],
+        "🐇": [1],
+        "👽": [5],
+        "🐙": [3],
+        "🐂": [1],
+        "🐖": [1],
+        "🐧": [2, 4],
+        "🦆": [1, 5]
+    }
 }
