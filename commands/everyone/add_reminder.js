@@ -23,7 +23,7 @@ export const data = new SlashCommandBuilder()
         .addChoice("heures", "heures")
         .addChoice("jours", "jours")
     );
-export async function execute(interaction, config, db) {
+export async function execute(interaction, config, db, constants) {
     await interaction.deferReply();
     let args = {
         time: interaction.options.getInteger("time"),
