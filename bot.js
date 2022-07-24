@@ -413,10 +413,9 @@ let propo_msg_listener = async msg => {
 }
 
 let long_report_listener = async msg => {
-	if (msg.author.id != "448110812801007618") return;
+	if (msg.author.id !== config.getData("/draftbot_id")) return;
 	if (!msg.content) return;
-	if (!msg.content.startsWith(":newspaper: ** Journal de ")) return;
-	if (!msg.content.split(":").slice(3).join(":").slice(3).startsWith(":medal: Points gagnés :")) return;
+	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(msg.content))) return;
 
 	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
@@ -485,58 +484,42 @@ let long_report_listener = async msg => {
 		timestamp: msg.createdTimestamp,
 		data: data
 	});
-
 	log("Long repport tracked");
 }
 
 let short_report_listener = async msg => {
-	if (!msg.content.toLowerCase().replace(" ", "").slice(1) in ["r", "report" ]) return;
+	if (msg.author.id !== config.getData("/draftbot_id")) return;
+	if (msg.embeds.length === 0) return;
+	if(!msg.embeds[0].author) return;
+	if (!msg.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 
-	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
+	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.reports) return;
 
-	let response_listener = async response => {
-		if (response.author.id != "448110812801007618") return;
-
-		if (response.channel.id != msg.channel.id) return;
-		if (!response.embeds[0]) return;
-		if (!response.embeds[0].author) return;
-		if (response.embeds[0].author.name != `Journal de ${msg.author.username}`) return;
-		db.push(`/users/${user_hash}/tracking[]`, {
-			type: "short_report",
-			timestamp: response.createdTimestamp
-		});
-		log("Short repport tracked");
-	}
-	client.on('messageCreate', response_listener);
-
-	setTimeout(() => {
-		client.removeListener('messageCreate', response_listener);
-	}, 10000);
+	db.push(`/users/${user_hash}/tracking[]`, {
+		type: "short_report",
+		timestamp: msg.createdTimestamp
+	});
+	log("Short repport tracked");
 }
 
 let profile_listener = async msg => {
-	if (!msg.content.toLowerCase().replace(" ", "").slice(1) in ["p", "profile", "profil"]) return;
+	if (msg.author.id !== config.getData("/draftbot_id")) return;
+	if (!msg.interaction) return;
+	if (msg.interaction.commandName !== "profile") return;
+	if (msg.interaction.user.username !== msg.embeds[0].title.split(" | ")[1]) return;
 
-	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
+	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.profile) return;
 
-	let response_listener = async response => {
-		if (response.author.id != "448110812801007618") return;
+	let embed = msg.embeds[0];
 
-		if (response.channel.id != msg.channel.id) return;
-		if (!response.embeds[0]) return;
-		if (!response.embeds[0].title) return;
-		if (response.embeds[0].title.split(" | ")[1]!= msg.author.username) return;
-
-		let embed = response.embeds[0];
-
-		let splited_embed = {
-			"title": embed.title.split(" | "),
+	let splited_embed = {
+		"title": embed.title.split(" | "),
 		"fields": embed.fields.map(f => {
 			return f.value.split(" | ").map(e => {
 				return {
@@ -577,20 +560,18 @@ let profile_listener = async msg => {
 			name: splited_embed.fields[4][0].value,
 			emoji: `:${splited_embed.fields[4][0].emoji}:`,
 		},
-		guild_name: (()=>{
-			if (embed.fields[5].name != "Guilde :") return undefined;
-			return splited_embed.fields[5][0].value;
-		})(),
-		destination: splited_embed.fields[6][0].full
+		guild_name: embed.fields[5].name === "Guilde :" ? splited_embed.fields[5][0].value : undefined,
+		//Bot crashed if the user didn't have a guild while using the command
+		destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
 	}
 
 	db.push(`/users/${user_hash}/tracking[]`, {
 		type: "profile",
-		timestamp: response.createdTimestamp,
+		timestamp: msg.createdTimestamp,
 		data: data
 	});
 	if (db_user.config.goal) {
-		if (db_user.config.goal.end < response.createdTimestamp) {
+		if (db_user.config.goal.end < msg.createdTimestamp) {
 			await msg.channel.send({ embeds: [
 				new MessageEmbed()
 					.setColor(config.getData("/main_color"))
@@ -625,15 +606,9 @@ let profile_listener = async msg => {
 						}[db_user.config.goal.unit]
 					} !`)
 			]});
-				db.delete(`/users/${user_hash}/config/goal`);
-			}
+			db.delete(`/users/${user_hash}/config/goal`);
 		}
 	}
-	client.on('messageCreate', response_listener);
-
-	setTimeout(() => {
-		client.removeListener('messageCreate', response_listener);
-	}, 10000);
 }
 
 client.setMaxListeners(0);

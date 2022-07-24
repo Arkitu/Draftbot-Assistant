@@ -35,7 +35,7 @@
         "betweenVotes": 43200000,
         "betweenUsefulVotes": 86400000
     },
-	"helpCategories": [
+	  "helpCategories": [
         {
             "name": "Classiques",
             "commands": [
