@@ -267,11 +267,12 @@ let profile_listener = async msg => {
 	if (msg.author.id !== config.getData("/draftbot_id")) return;
 	if (!msg.interaction) return;
 	if (msg.interaction.commandName !== "profile") return;
+	if (msg.interaction.user.username !== msg.embeds[0].title.split(" | ")[1]) return;
+
 	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
 	let db_user = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.tracking.profile) return;
-	if (!msg.embeds[0]) return;
 
 	let embed = msg.embeds[0];
 
