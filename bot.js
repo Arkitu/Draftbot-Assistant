@@ -6,7 +6,7 @@ import { Reminder } from './libs/Reminder.js';
 import { createHash } from "crypto";
 
 // Import config and db
-const config = new JsonDB(new Config("config", true, true, '/'));
+const config = new JsonDB(new Config("config", false, true, '/'));
 const db = new JsonDB(new Config("db", true, true, '/'));
 const constants = new JsonDB(new Config("constants", false, true, '/'));
 
@@ -492,6 +492,7 @@ let short_report_listener = async msg => {
 	if (msg.embeds.length === 0) return;
 	if(!msg.embeds[0].author) return;
 	if (!msg.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
+	if (!msg.interaction) return;
 
 	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
