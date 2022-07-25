@@ -3,10 +3,10 @@ import { MessageEmbed } from "discord.js";
 
 export const data = new SlashCommandBuilder()
 	.setName("help")
-	.setDescription("Renvoie la liste des commandes")
+	.setDescription("Affiche la liste des commandes")
 	.addStringOption(option => option
 		.setName("categorie")
-		.setDescription("La categorie sur laquelle vous voulez des précisions")
+		.setDescription("La categorie sur laquelle vous souhaitez des précisions")
 		.setRequired(false)
 		.addChoice("Classiques", "Classiques")
 		.addChoice("Reminders", "Reminders")
