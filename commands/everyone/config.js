@@ -145,6 +145,10 @@ export async function execute(interaction, config, db, constants) {
                 .addField("Proposition de reminders :", (()=>{
                     let str_propos = "";
                     for (let propo in db_user.config.reminders.on) {
+                        if (str_propos.length > 800) {
+                            str_propos += "…\n";
+                            break;
+                        }
                         str_propos += `${propo} : \`${db_user.config.reminders.on[propo].duration} ${db_user.config.reminders.on[propo].unit} ${db_user.config.reminders.on[propo].in_dm ? "en DM" : ""}\`\n`;
                     }
                     if (!str_propos) {
