@@ -1,0 +1,10 @@
+{
+    "token": "REPLACE_WITH_TOKEN",
+    "app_id": "REPLACE_WITH_APP_ID",
+    "creator_id": "REPLACE_WITH_CREATOR_ID",
+    "admin_server_id": "REPLACE_WITH_ADMIN_SERVER_ID",
+    "main_color": "#2C806B",
+    "secondary_color": "#4F545C",
+    "help_link": "https://www.sanfransentinel.com/draftbot_gtop_help.html",
+    "draftbot_id": "448110812801007618"
+}
