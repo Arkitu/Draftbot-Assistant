@@ -156,7 +156,7 @@ export async function execute(interaction, config, db, constants) {
             await interaction.editReply({ embeds: [reminders_embed] });
             break;
         case "reminders/add_propo":
-            db.push(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`, { duration: interaction.options.getInteger("duration"), unit: interaction.options.getString("unit"), in_dm: interaction.options.getString("in_dm")});
+            db.push(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`, { duration: interaction.options.getInteger("duration"), unit: interaction.options.getString("unit"), in_dm: interaction.options.getBoolean("in_dm")});
             await interaction.editReply("Proposition ajoutée avec succès !");
             break;
         case "reminders/del_propo":

@@ -128,9 +128,9 @@ const eventsMsgListener = async (message) => {
 	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
 	const userHash = createHash('md5').update(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))).digest('hex');
 	if (!(userHash in db.getData("/users"))) return;
-	if (!db.getData(`/users/${userHash}/config/reminders/events`)) return;
+	if (!db.getData(`/users/${userHash}/config/reminders/auto_proposition/events`)) return;
 
-	const timeBetweenMinievents = constants.getData("/timeBetweenMinievents");
+	const timeBetweenMinievents = constants.getData("/times/betweenMinievents");
 	//A time for the possibility where 1) no alte/no time lost 2)  the player wants to skip alte / losetime with shop right after
 	const reminders = [timeBetweenMinievents];
 
@@ -170,7 +170,7 @@ const minieventMsgListener = async (message) => {
 		: message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
 	const userHash = createHash('md5').update(userID).digest('hex');
 	if (!(userHash in db.getData("/users"))) return;
-	if (!db.getData(`/users/${userHash}/config/reminders/minievents`)) return;
+	if (!db.getData(`/users/${userHash}/config/reminders/auto_proposition/minievents`)) return;
 	let text = message.embeds[0].description;
 	if (constants.getData("/regex/twoMessagesMinieventsEmojis").some(emoji => text.startsWith(emoji))) return;
 	for (const obj of constants.getData("/regex/possibleTwoMessagesMinievents")) {
