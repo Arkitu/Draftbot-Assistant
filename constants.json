@@ -33,7 +33,8 @@
         "betweenBasicPetFeeds": 3600000,
         "betweenPetFrees": 3600000,
         "betweenVotes": 43200000,
-        "betweenUsefulVotes": 86400000
+        "betweenUsefulVotes": 86400000,
+        "betweenGuildDailies": 79200000
     },
 	  "helpCategories": [
         {

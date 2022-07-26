@@ -24,7 +24,7 @@ export async function execute(interaction, config, db, constants) {
 	
 	if (opt_categorie) {
 		help_embed.setAuthor({ name: opt_categorie, iconURL: interaction.client.user.avatarURL(), url: config.getData("/help_link") });
-		for (let cmd of constants.getData(`helpCategories[${constants.getIndex("/helpCategories", opt_categorie, "name")}]/commands`)) {
+		for (let cmd of constants.getData(`/helpCategories[${constants.getIndex("/helpCategories", opt_categorie, "name")}]/commands`)) {
 			help_embed.addField(`\`/${cmd}\``, db.getData(`/commands[${db.getIndex("/commands", cmd, "name")}]/description`));
 		}
 		if (help_embed.fields.length === 0) {
@@ -32,7 +32,7 @@ export async function execute(interaction, config, db, constants) {
 		}
 	} else {
 		help_embed.setAuthor({ name: `Aide de ${interaction.client.user.username}`, iconURL: interaction.client.user.avatarURL(), url: config.getData("/help_link") });
-		for (let categorie of constants.getData("helpCategories")) {
+		for (let categorie of constants.getData("/helpCategories")) {
 			help_embed.addField(categorie.name, `\`/help ${categorie.name}\``, true);
 		}
 	}
