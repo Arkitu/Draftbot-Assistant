@@ -2,7 +2,7 @@ import { Client, Intents, Collection, MessageActionRow, MessageButton, MessageEm
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
-import { Reminder } from './src/libs/Reminder.js';
+import { Reminder } from './libs/Reminder.js';
 import { createHash } from "crypto";
 
 // Import config and db

@@ -405,7 +405,7 @@ export async function execute(interaction, config, db, constants) {
             .setImage(url_chart);
         await interaction.editReply({ embeds: [embed] });
     } else {
-        await chart.toFile(`./temporary_files/${interaction.user.id}_chart.png`);
+        await chart.toFile(`./temp/${interaction.user.id}_chart.png`);
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
                 switch (opt.subcommand) {
@@ -416,7 +416,7 @@ export async function execute(interaction, config, db, constants) {
                 }
             })()} de ${opt.user.username}`)
             .setImage(`attachment://${interaction.user.id}_chart.png`);
-        await interaction.editReply({ embeds: [embed], files: [`./temporary_files/${interaction.user.id}_chart.png`] });
-        unlink(`./temporary_files/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err); });
+        await interaction.editReply({ embeds: [embed], files: [`./temp/${interaction.user.id}_chart.png`] });
+        unlink(`./temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err); });
     }
 }

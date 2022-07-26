@@ -1,0 +1,11 @@
+#!/bin/bash
+echo "Creating missing directories…"
+mkdir temp
+echo "Installing dependencies…"
+npm install --silent
+echo "Installing dependencies done."
+echo "Compiling typescript…"
+npx tsc
+echo "Compiling typescript done."
+echo "
+Project inited !"
