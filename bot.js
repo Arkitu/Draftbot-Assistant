@@ -194,7 +194,7 @@ const minieventMsgListener = async (message) => {
 	//Remove 2nd text.endsWith for the next draftbot update, for now there's a typo on bigBadEvent's head bandage sentence
 	if (text.endsWith(constants.getData("/regex/emojiEnd") || text.endsWith(":head_bandage:."))) {
 		const splitedMessage = text.split(" ");
-		if (constants.getData("/effectDurations").includes(splitedMessage[splitedMessage.length - 1])) {
+		if (constants.getData("/effectDurations").hasOwnProperty(splitedMessage[splitedMessage.length - 1])) {
 			reminders.push(timeBetweenMinievents
 				+ constants.getData(`/effectDurations/${splitedMessage[splitedMessage.length - 1]}`));
 		}
