@@ -1,4 +1,5 @@
-import { Client, Intents, Collection, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { Intents, Collection, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import * as Discord from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
@@ -6,23 +7,55 @@ import { Reminder } from './libs/Reminder.js';
 import { createHash } from "crypto";
 
 // Import config and db
-const config = new JsonDB(new Config("config", false, true, '/'));
-const db = new JsonDB(new Config("db", true, true, '/'));
-const constants = new JsonDB(new Config("constants", false, true, '/'));
+const config: JsonDB = new JsonDB(new Config("config", false, true, '/'));
+const db: JsonDB = new JsonDB(new Config("db", true, true, '/'));
+const constants: JsonDB = new JsonDB(new Config("constants", false, true, '/'));
 
 // Log with the current date
-export async function log(msg) {
-	var datetime = new Date().toLocaleString();
+export async function log(msg: string) {
+	var datetime: string = new Date().toLocaleString();
 	console.log(`[${datetime}] ${msg}`);
 };
 
-export async function log_error(msg) {
+export async function log_error(msg: string) {
 	log(`ERROR: ${msg}`);
 	await (await client.users.fetch(config.getData("/creator_id"))).send(`:warning: ERROR: ${msg}`);
 }
 
+class Client extends Discord.Client {
+	public commands: Collection<string, any> = new Collection();
+}
+
+interface DB_User {
+	config: {
+		reminders: {
+			on: Object,
+			auto_proposition: {
+				events: boolean,
+				minievents: boolean,
+				guilddaily: boolean,
+				daily: boolean,
+				petfree: boolean,
+				petfeed: boolean,
+				vote: boolean,
+				in_dm: boolean
+			}
+		},
+		tracking: {
+			reports: boolean,
+			public: boolean,
+			profile: boolean
+		}
+	},
+	tracking: {
+		type: string,
+		timestamp: number,
+		data: object
+	}[]
+}
+
 // Create a new client instance
-const client = new Client({ intents: [
+const client: Client = new Client({ intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES
 ] });
@@ -33,13 +66,9 @@ client.once('ready', async () => {
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
 	for (let reminder of db.getData("/reminders")) {
-		let channel;
+		let channel: { channel?: Discord.User | Discord.AnyChannel, channel_type: boolean } = { channel_type: true };
 		try {
 			if (reminder.channel.channel_type) {
-				if (!client.channels.cache.get(reminder.channel.channel_id)) {
-					
-					continue;
-				}
 				channel = { 
 					channel: await client.channels.fetch(reminder.channel.channel_id),
 					channel_type: reminder.channel.channel_type
@@ -58,50 +87,48 @@ client.once('ready', async () => {
 });
 
 // Set listeners
-let cmd_listener = async interaction => {
-	if (interaction.isCommand()) {
-		const { commandName } = interaction;
-		const command = client.commands.get(commandName);
+let cmd_listener = async (interaction: Discord.Interaction) => {
+	if (!interaction.isCommand()) return;
 
-		if (!command) return;
+	const { commandName } = interaction;
+	const command: any = client.commands.get(commandName);
 
-		log(`${interaction.user.username} execute ${commandName}`);
+	if (!command) return;
 
-		command.execute(interaction, config, db, constants);
-	}
+	log(`${interaction.user.username} execute ${commandName}`);
+
+	command.execute(interaction, config, db, constants);
 }
 
-let help_msg_listener = async msg => {
+let help_msg_listener = async (msg: Discord.Message) => {
 	if (["help", "$help", "!help", "?help", `<@${client.user.id}>`, `<@${client.user.id}> help`].includes(msg.content.toLowerCase())) {
 		await msg.channel.send("Si vous voulez la liste des commandes, utilisez la commande `/help`");
 	}
 }
 
-let fetch_guild_listener = async msg => {
+let fetch_guild_listener = async (msg: Discord.Message) => {
 	if (msg.author.id != "448110812801007618") return;
-    if (await msg.embeds.lenght == 0) return;
-	if (!await msg.embeds.length) return;
+	if (!msg.embeds.length) return;
 	if (!msg.embeds[0].title) return;
-    if (msg.embeds[0].title.startsWith("Guilde ")) {
-        let guild = {
-            name: msg.embeds[0].title.substr(7),
-            level: parseInt((await msg.embeds[0].fields[1].name.split(" "))[6]) + (parseInt((await msg.embeds[0].fields[1].name.split(" "))[1]) / parseInt((await msg.embeds[0].fields[1].name.split(" "))[3])),
-			description: "",
-			last_update: Date.now(),
-        }
-		if (isNaN(guild.level)) guild.level = 100;
-		if (msg.embeds[0].description) {
-			guild.description = msg.embeds[0].description.split("`")[1];
-		}
-        db.push(`/guilds/${guild.name}`, guild);
-		log(`Guild ${guild.name} fetched. Level: ${Math.round(guild.level*100)/100}`);
-    }
+    if (!msg.embeds[0].title.startsWith("Guilde ")) return;
+	let guild = {
+		name: msg.embeds[0].title.substring(7),
+		level: parseInt((msg.embeds[0].fields[1].name.split(" "))[6]) + (parseInt((msg.embeds[0].fields[1].name.split(" "))[1]) / parseInt((msg.embeds[0].fields[1].name.split(" "))[3])),
+		description: "",
+		last_update: Date.now(),
+	}
+	if (isNaN(guild.level)) guild.level = 100;
+	if (msg.embeds[0].description) {
+		guild.description = msg.embeds[0].description.split("`")[1];
+	}
+	db.push(`/guilds/${guild.name}`, guild);
+	log(`Guild ${guild.name} fetched. Level: ${Math.round(guild.level*100)/100}`);
 }
 
 
-function generateTimeDisplay(milliseconds) {
-	let minutes = Math.ceil(milliseconds / 60000);
-	const hours = Math.floor(minutes / 60);
+function generateTimeDisplay(milliseconds: number) {
+	let minutes: number = Math.ceil(milliseconds / 60000);
+	const hours: number = Math.floor(minutes / 60);
 	minutes %= 60;
 
 	if (hours > 0) {
@@ -110,7 +137,7 @@ function generateTimeDisplay(milliseconds) {
 	return minutes + " Min";
 }
 
-function getTimeLostByString(timeLost) {
+function getTimeLostByString(timeLost: string[]) {
 		//Triggers only if there is no "hour"
 		if (timeLost.length === 1) {
 			return parseInt(timeLost[0]) * 60000;
@@ -118,15 +145,15 @@ function getTimeLostByString(timeLost) {
 		return parseInt(timeLost[0]) * 3600000 + parseInt(timeLost[1]) * 60000;
 }
 
-const eventsMsgListener = async (message) => {
+const eventsMsgListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (!message.content) return;
 	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
-	const userHash = createHash('md5').update(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))).digest('hex');
+	const userHash: string = createHash('md5').update(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))).digest('hex');
 	if (!(userHash in db.getData("/users"))) return;
 	if (!db.getData(`/users/${userHash}/config/reminders/auto_proposition/events`)) return;
 
-	const timeBetweenMinievents = constants.getData("/times/betweenMinievents");
+	const timeBetweenMinievents: number = constants.getData("/times/betweenMinievents");
 	//A time for the possibility where 1) no alte/no time lost 2)  the player wants to skip alte / losetime with shop right after
 	const reminders = [timeBetweenMinievents];
 
@@ -157,7 +184,7 @@ const eventsMsgListener = async (message) => {
 	);
 };
 
-const minieventMsgListener = async (message) => {
+const minieventMsgListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (message.embeds.length === 0) return;
 	if(!message.embeds[0].author) return;
@@ -173,7 +200,7 @@ const minieventMsgListener = async (message) => {
 		if (text.startsWith(obj.emoji) && text.endsWith(obj.endsWith)) return;
 	}
 
-	const timeBetweenMinievents = constants.getData("/times/betweenMinievents");
+	const timeBetweenMinievents: number = constants.getData("/times/betweenMinievents");
 	const reminders = [timeBetweenMinievents];
 
 	if (new RegExp(constants.getData("/regex/hasLoseTimeEmoji")).test(text)) {
@@ -203,7 +230,7 @@ const minieventMsgListener = async (message) => {
 	await proposeAutoReminder(message, reminders, await client.users.fetch(userID));
 };
 
-const guildDailyMessageListener = async message => {
+const guildDailyMessageListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (!message.interaction) return;
 	if (message.interaction.commandName !== "guilddaily") return;
@@ -238,7 +265,7 @@ const petFeedMessageListener = async message => {
 	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
 	const user_hash = createHash('md5').update(userID).digest('hex');
 	if (!(user_hash in db.getData("/users"))) return;
-	const db_user = db.getData(`/users/${user_hash}`);
+	const db_user: DB_User = db.getData(`/users/${user_hash}`);
 	if (!db_user.config.reminders.auto_proposition.petfeed) return;
 
 	const reminders = [];

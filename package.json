@@ -11,19 +11,22 @@
     "moment": "^2.29.4",
     "node-json-db": "^1.4.1"
   },
+  "_moduleAliases": {
+    "@libs": "./dist/libs"
+  },
   "name": "drafbot-assistant",
   "version": "1.0.0",
   "description": "",
   "type": "module",
   "exports": "./bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "init": "./init",
+    "start": "node dist/start_bot_forever.js"
   },
   "author": "Arkitu",
   "license": "ISC",
   "devDependencies": {
     "@types/forever-monitor": "^1.7.6",
-    "eslint": "^8.9.0",
     "typescript": "^4.7.4"
   },
   "engines": {
