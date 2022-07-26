@@ -1,11 +1,14 @@
 #!/bin/bash
 echo "Creating missing directories…"
 mkdir temp
+echo "Missing directories created.
+"
 echo "Installing dependencies…"
 npm install --silent
-echo "Installing dependencies done."
+echo "Dependencies installed.
+"
 echo "Compiling typescript…"
 npx tsc
-echo "Compiling typescript done."
-echo "
-Project inited !"
+echo "Typescript compiled.
+"
+echo "Project inited !"
