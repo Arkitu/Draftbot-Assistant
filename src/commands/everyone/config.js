@@ -234,8 +234,11 @@ export async function execute(interaction, config, db, constants) {
                     db.push(`/users/${user_hash}/config/tracking/reports`, !db_user.config.tracking.reports);
                     if (!db_user.config.tracking.reports) {
                         // Delete all tracked reports
-                        for (let report in db.getData(`/users/${user_hash}/tracking`).filter(e=>["long_report", "short_report"].includes(e.type))) {
-                            db.delete(`/users/${user_hash}/tracking[${report}]`);
+                        for (let i=0; i < db_user.tracking.length; i++) {
+                            if (["long_report", "short_report"].includes(db_user.tracking[i].type)) {
+                                db.delete(`/users/${user_hash}/tracking[${i}]`);
+                                i--;
+                            }
                         }
                     }
                     await interaction.editReply("L'option a été modifiée avec succès !");
@@ -247,9 +250,12 @@ export async function execute(interaction, config, db, constants) {
                 case "profile":
                     db.push(`/users/${user_hash}/config/tracking/profile`, !db_user.config.tracking.profile);
                     if (!db_user.config.tracking.profile) {
-                        // Delete all tracked reports
-                        for (let profile in db.getData(`/users/${user_hash}/tracking`).filter(e=>["profile"].includes(e.type))) {
-                            db.delete(`/users/${user_hash}/tracking[${profile}]`);
+                        // Delete all tracked profiles
+                        for (let i=0; i < db_user.tracking.length; i++) {
+                            if (db_user.tracking[i].type === "profile") {
+                                db.delete(`/users/${user_hash}/tracking[${i}]`);
+                                i--;
+                            }
                         }
                     }
                     await interaction.editReply("L'option a été modifiée avec succès !");
