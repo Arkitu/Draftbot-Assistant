@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { Context } from '../../libs/Context.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('add_goal_message')
@@ -21,13 +22,13 @@ export const data = new SlashCommandBuilder()
             .setDescription('L\'heure à laquelle le message sera créé (en millisecondes)')
             .setRequired(false)
     )
-export async function execute(interaction, config, db, constants) {
+export async function execute(ctx: Context) {
     let opts = {
-        channel: interaction.options.getChannel('channel'),
-        start: interaction.options.getInteger('start_time') || Date.now(),
-        duration: interaction.options.getInteger('duration')
+        channel: ctx.interaction.options.getChannel('channel'),
+        start: ctx.interaction.options.getInteger('start_time') || Date.now(),
+        duration: ctx.interaction.options.getInteger('duration')
     }
-	db.push("/goal_messages", {
+	ctx.db.push("/goal_messages", {
         channel: opts.channel.id,
         start: opts.start,
         end: opts.start + opts.duration

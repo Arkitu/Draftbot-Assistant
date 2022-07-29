@@ -12,12 +12,11 @@ export class Context {
     Iclient: Discord.Client;
     Idb: JsonDB;
     Iconfig: JsonDB;
-    Iinteraction: Discord.Interaction;
+    Iinteraction: Discord.CommandInteraction;
     Imessage: Discord.Message;
     Iconstants: JsonDB;
 
-
-    constructor (opts: { client?: Discord.Client, db?: JsonDB, config?: JsonDB, constants?: JsonDB, interaction?: Discord.Interaction, message?: Discord.Message } = {}) {
+    constructor (opts: { client?: Discord.Client, db?: JsonDB, config?: JsonDB, constants?: JsonDB, interaction?: Discord.CommandInteraction, message?: Discord.Message } = {}) {
         this.setClient(opts.client)
             .setDb(opts.db)
             .setConfig(opts.config)
@@ -109,7 +108,7 @@ export class Context {
         return this;
     }
 
-    setInteraction (interaction: Discord.Interaction) {
+    setInteraction (interaction: Discord.CommandInteraction) {
         this.interaction = interaction;
         this.haveInteraction = !!interaction;
         return this;
@@ -133,7 +132,7 @@ export class Context {
             db?: JsonDB,
             config?: JsonDB,
             constants?: JsonDB,
-            interaction?: Discord.Interaction,
+            interaction?: Discord.CommandInteraction,
             message?: Discord.Message
         } = {};
         if (this.haveClient) opts.client = this.client;

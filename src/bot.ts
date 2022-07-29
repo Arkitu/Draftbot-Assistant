@@ -4,12 +4,18 @@ import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Reminder } from './libs/Reminder.js';
+import { Context } from './libs/Context.js';
 import { createHash } from "crypto";
 
 // Import config and db
 const config: JsonDB = new JsonDB(new Config("config", false, true, '/'));
 const db: JsonDB = new JsonDB(new Config("db", true, true, '/'));
 const constants: JsonDB = new JsonDB(new Config("constants", false, true, '/'));
+const ctx: Context = new Context({
+	config: config,
+	db: db,
+	constants: constants
+});
 
 // Log with the current date
 export async function log(msg: string): Promise<void> {
@@ -72,6 +78,7 @@ const client: Client = new Client({ intents: [
 // When the client is ready, run this code (only once)
 client.once('ready', async (): Promise<void> => {
 	await log('Bot logged !');
+	ctx.setClient(client);
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
 	for (let reminder of db.getData("/reminders")) {
@@ -106,7 +113,7 @@ let cmd_listener = async (interaction: Discord.Interaction): Promise<void> => {
 
 	log(`${interaction.user.username} execute ${commandName}`);
 
-	command.execute(interaction, config, db, constants);
+	command.execute(ctx);
 }
 
 let help_msg_listener = async (msg: Discord.Message): Promise<void> => {
