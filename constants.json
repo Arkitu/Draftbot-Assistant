@@ -83,6 +83,15 @@
                     "reports": false,
                     "public": false,
                     "profile": false
+                },
+                "goal": {
+                    "start": 0,
+                    "end": 0,
+                    "value": 0,
+                    "unit": "rank_points",
+                    "init_value": 0,
+                    "end_value": 0,
+                    "active": false
                 }
             },
             "tracking": []

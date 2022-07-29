@@ -45,6 +45,15 @@ interface DB_User {
 			reports: boolean,
 			public: boolean,
 			profile: boolean
+		},
+		goal: {
+			start: number,
+			end: number,
+			value: number,
+			unit: "lvl" | "gold" | "pv" | "xp" | "gems" | "quest_missions_percentage" | "rank_points",
+			init_value: number,
+			end_value: number,
+			active: boolean
 		}
 	},
 	tracking: {
@@ -194,7 +203,7 @@ const minieventMsgListener = async (message: Discord.Message): Promise<void> => 
 	if (!(userHash in db.getData("/users"))) return;
 	if (!db.getData(`/users/${userHash}/config/reminders/auto_proposition/minievents`)) return;
 	let text = message.embeds[0].description;
-	if (constants.getData("/regex/twoMessagesMinieventsEmojis").some(emoji => text.startsWith(emoji))) return;
+	if (constants.getData("/regex/twoMessagesMinieventsEmojis").some((emoji: string) => text.startsWith(emoji))) return;
 	for (const obj of constants.getData("/regex/possibleTwoMessagesMinievents")) {
 		if (text.startsWith(obj.emoji) && text.endsWith(obj.endsWith)) return;
 	}
@@ -560,12 +569,7 @@ let profile_listener = async (msg: Discord.Message): Promise<void> => {
 					emoji: e.split(":")[1],
 					value: (() => {
 						if (!e.split(":")[2]) return undefined;
-						let v = e.split(":")[2].slice(1)
-						if (v.includes("/")) {
-							v = v.split("/").map(int => parseInt(int));
-						} else if (!isNaN(parseInt(v))) {
-							v = parseInt(v);
-						}
+						let v: string = e.split(":")[2].slice(1)
 						return v;
 					})()
 				}
@@ -575,20 +579,20 @@ let profile_listener = async (msg: Discord.Message): Promise<void> => {
 
 	let data = {
 		lvl: parseInt(splited_embed.title[2].split(" ")[1]),
-		pv: splited_embed.fields[0][0].value[0],
-		max_pv: splited_embed.fields[0][0].value[1],
-		xp: splited_embed.fields[0][1].value[0],
-		max_xp: splited_embed.fields[0][1].value[1],
-		gold: splited_embed.fields[0][2].value,
-		energy: splited_embed.fields[1][0].value[0],
-		max_energy: splited_embed.fields[1][0].value[1],
-		strenght: splited_embed.fields[1][1].value,
-		defense: splited_embed.fields[1][2].value,
-		speed: splited_embed.fields[1][3].value,
-		gems: splited_embed.fields[2][0].value,
-		quest_missions_percentage: splited_embed.fields[2][1].value,
-		rank: splited_embed.fields[3][0].value[0],
-		rank_points: splited_embed.fields[3][1].value,
+		pv: parseInt(splited_embed.fields[0][0].value.split("/")[0]),
+		max_pv: parseInt(splited_embed.fields[0][0].value.split("/")[1]),
+		xp: parseInt(splited_embed.fields[0][1].value.split("/")[0]),
+		max_xp: parseInt(splited_embed.fields[0][1].value.split("/")[1]),
+		gold: parseInt(splited_embed.fields[0][2].value),
+		energy: parseInt(splited_embed.fields[1][0].value.split("/")[0]),
+		max_energy: parseInt(splited_embed.fields[1][0].value.split("/")[1]),
+		strenght: parseInt(splited_embed.fields[1][1].value),
+		defense: parseInt(splited_embed.fields[1][2].value),
+		speed: parseInt(splited_embed.fields[1][3].value),
+		gems: parseInt(splited_embed.fields[2][0].value),
+		quest_missions_percentage: parseInt(splited_embed.fields[2][1].value),
+		rank: parseInt(splited_embed.fields[3][0].value.split("/")[0]),
+		rank_points: parseInt(splited_embed.fields[3][1].value),
 		class: {
 			name: splited_embed.fields[4][0].value,
 			emoji: `:${splited_embed.fields[4][0].emoji}:`,

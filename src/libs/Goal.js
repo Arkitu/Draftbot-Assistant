@@ -22,7 +22,8 @@ export class Goal {
             value: this.value,
             unit: this.unit,
             init_value: this.init_value,
-            end_value: this.end_value
+            end_value: this.end_value,
+            active: true
         });
         return this;
     }
