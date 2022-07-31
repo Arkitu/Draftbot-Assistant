@@ -1,4 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { GuildChannel } from 'discord.js';
+import { Context } from '../../libs/Context.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('fetch')
@@ -9,51 +11,50 @@ export const data = new SlashCommandBuilder()
             .setRequired(true)
             .setDescription('L\'id de l\'objet à récupérer')
     );
-export async function execute(interaction, config, db, constants) {
+export async function execute(ctx: Context) {
     let thing;
-    let type = "(i don't know)";
+    let id = ctx.interaction.options.getString('id');
 	try {
-        thing = await interaction.client.users.fetch(interaction.options.getString('id'));
-        type = "user";
+        thing = ctx.client.users.resolve(id);
     } catch {
         console.log("Not a user");
     }
     try {
-        thing = await interaction.client.channels.fetch(interaction.options.getString('id'));
-        type = "channel";
+        thing = ctx.client.channels.resolve(id);
     } catch {
         console.log("Not a channel");
     }
     try {
-        thing = await interaction.client.guilds.fetch(interaction.options.getString('id'));
-        type = "guild";
+        thing = ctx.client.guilds.resolve(id);
     } catch {
         console.log("Not a guild");
     }
     try {
-        thing = await interaction.client.emojis.fetch(interaction.options.getString('id'));
-        type = "emoji";
+        thing = ctx.client.emojis.resolve(id);
     } catch {
         console.log("Not an emoji");
     }
     try {
-        thing = await interaction.client.webhooks.fetch(interaction.options.getString('id'));
-        type = "webhook";
+        thing = await ctx.client.fetchWebhook(id);
     } catch {
         console.log("Not a webhook");
     }
     try {
-        thing = await interaction.client.invites.fetch(interaction.options.getString('id'));
-        type = "invite";
+        thing = await ctx.client.fetchInvite(id);
     } catch {
         console.log("Not an invite");
     }
-    console.log("This is a" + type)
+    try {
+        thing = await ctx.client.fetchSticker(id);
+    } catch {
+        console.log("Not a sticker");
+    }
+    console.log("This is a" + typeof thing);
     console.log("The thing :");
     console.log(thing);
-    if (type == "channel") {
+    if (thing instanceof GuildChannel) {
         console.log("Permissions :");
         console.log(thing.permissionOverwrites.cache);
     }
-    await interaction.reply(`${thing}`);
+    await ctx.interaction.reply(`${thing}`);
 }
