@@ -9,12 +9,12 @@ export class Context {
     haveMessage: boolean;
     haveConstants: boolean;
 
-    Iclient: Discord.Client;
-    Idb: JsonDB;
-    Iconfig: JsonDB;
-    Iinteraction: Discord.CommandInteraction;
-    Imessage: Discord.Message;
-    Iconstants: JsonDB;
+    private Iclient: Discord.Client;
+    private Idb: JsonDB;
+    private Iconfig: JsonDB;
+    private Iinteraction: Discord.CommandInteraction;
+    private Imessage: Discord.Message;
+    private Iconstants: JsonDB;
 
     constructor (opts: { client?: Discord.Client, db?: JsonDB, config?: JsonDB, constants?: JsonDB, interaction?: Discord.CommandInteraction, message?: Discord.Message } = {}) {
         this.setClient(opts.client)

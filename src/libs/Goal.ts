@@ -1,7 +1,17 @@
 import { createHash } from "crypto";
+import { Context } from "./Context.js";
 
 export class Goal {
-    constructor(client, db, config, user_id, start=new Date(), end=new Date(), value=0, unit="rank_points", init_value=0, end_value=init_value+value) {
+    constructor(opts: {
+        ctx: Context,
+        user_id: any,
+        start: Date,
+        end: Date,
+        value: number,
+        unit: string,
+        init_value: number,
+        end_value: number
+    }) {
         this.client = client;
         this.db = db;
         this.config = config;
@@ -10,7 +20,7 @@ export class Goal {
         this.start = start;
         this.end = end;
         this.value = value;
-        this.unit = unit;
+        this.unit = unit || "rank_points";
         this.init_value = init_value;
         this.end_value = end_value;
     }
