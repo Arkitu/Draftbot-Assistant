@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { createHash } from "crypto";
+import { Context } from "../../libs/Context.js";
 
 export const data = new SlashCommandBuilder()
 	.setName("hash")
@@ -10,10 +11,10 @@ export const data = new SlashCommandBuilder()
 		.setRequired(true)
 	);
 
-export async function execute(interaction, config, db, constants) {
-	await interaction.deferReply();
-	const opt_string = interaction.options.getString("string");
+export async function execute(ctx: Context) {
+	await ctx.interaction.deferReply();
+	const opt_string = ctx.interaction.options.getString("string");
 
-	var hash = createHash('md5').update(opt_string).digest('hex');
-	await interaction.editReply(hash);
+	const hash = createHash('md5').update(opt_string).digest('hex');
+	await ctx.interaction.editReply(hash);
 }
