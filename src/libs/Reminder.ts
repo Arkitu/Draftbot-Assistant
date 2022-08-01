@@ -1,4 +1,3 @@
-import { Embed } from '@discordjs/builders';
 import { MessageEmbed, User, TextBasedChannel, DMChannel } from 'discord.js';
 import { Context } from './Context.js';
 
@@ -6,10 +5,7 @@ export class Reminder {
 
     ctx: Context;
     deleted: boolean;
-    channel: {
-        channel: TextBasedChannel,
-        channel_type: boolean
-    };
+    channel: TextBasedChannel | User;
     dead_line_timestamp: number;
     message: string;
     id: string;
@@ -17,10 +13,7 @@ export class Reminder {
 
     constructor(opts: {
         ctx: Context,
-        channel : {
-            channel: TextBasedChannel,
-            channel_type: boolean
-        },
+        channel: TextBasedChannel | User,
         dead_line_timestamp: number,
         message: string,
         author: User
@@ -31,7 +24,7 @@ export class Reminder {
         this.message = opts.message;
         this.author = opts.author;
         this.deleted = false;
-        this.id = this.channel.channel.id + this.dead_line_timestamp + this.message + this.author.id;
+        this.id = this.channel.id + this.dead_line_timestamp + this.message + this.author.id;
     }
 
     async start() {
@@ -57,8 +50,8 @@ export class Reminder {
     async save() {
         this.ctx.db.push("/reminders[]", {
             channel: {
-                channel_id: this.channel.channel.id,
-                channel_type: this.channel.channel_type
+                id: this.channel.id,
+                isUser: this.channel instanceof User
             },
             dead_line_timestamp: this.dead_line_timestamp,
             message: this.message,
@@ -69,13 +62,13 @@ export class Reminder {
     }
 
     async sendReminderMessage(embed: MessageEmbed) {
-        if (this.channel.channel instanceof DMChannel) {
-            await this.channel.channel.send({embeds: [embed]});
+        if (this.channel instanceof DMChannel) {
+            await this.channel.send({embeds: [embed]});
             return;
         }
-        if (!("permissionsFor" in this.channel.channel)) return;
-        if (this.channel.channel.permissionsFor(this.ctx.client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
-            await this.channel.channel.send({content: this.author.toString(), embeds: [embed]});
+        if (!("permissionsFor" in this.channel)) return;
+        if (this.channel.permissionsFor(this.ctx.client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
+            await this.channel.send({content: this.author.toString(), embeds: [embed]});
         }
     }
 }

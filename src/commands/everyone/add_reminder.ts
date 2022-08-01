@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { User, GuildTextBasedChannel } from 'discord.js';
+import { User, TextBasedChannel } from 'discord.js';
 import { Reminder } from '../../libs/Reminder.js';
 import { Context } from '../../libs/Context.js';
 
@@ -50,25 +50,22 @@ export async function execute(ctx: Context) {
             break;
     }
     
-    let channel: {
-        channel_type: boolean,
-        channel: User | GuildTextBasedChannel
-    };
+    let channel: User | TextBasedChannel
     if (ctx.interaction.channel) {
-        channel = {
-            channel: ctx.interaction.channel,
-            channel_type: true
-        }
+        channel = ctx.interaction.channel
     } else {
-        channel = {
-            channel: ctx.interaction.user,
-            channel_type: false
-        }
+        channel = ctx.interaction.user
     }
 
-    let reminder = new Reminder(ctx.client, channel, dead_line.getTime(), args.message, ctx.interaction.user, ctx.db, ctx.config);
-    await reminder.save();
-    await reminder.start();
+    let reminder = new Reminder({
+        ctx: ctx,
+        channel: channel,
+        dead_line_timestamp: dead_line.getTime(),
+        message: args.message,
+        author: ctx.interaction.user
+    })
+    reminder.save();
+    reminder.start();
 
     await ctx.interaction.editReply("Le rappel a été ajouté !");
 }

@@ -82,23 +82,27 @@ client.once('ready', async (): Promise<void> => {
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
 	for (let reminder of db.getData("/reminders")) {
-		let channel: { channel?: Discord.User | Discord.AnyChannel, channel_type: boolean } = { channel_type: true };
+		let channel: Discord.User | Discord.TextBasedChannel;
+		
 		try {
-			if (reminder.channel.channel_type) {
-				channel = { 
-					channel: await client.channels.fetch(reminder.channel.channel_id),
-					channel_type: reminder.channel.channel_type
-				};
+			if (reminder.channel.isUser) {
+				channel = await client.users.fetch(reminder.channel.id);
 			} else {
-				channel = {
-					channel: await client.users.fetch(reminder.channel.channel_id),
-					channel_type: reminder.channel.channel_type
-				}
+				const fetched = await client.channels.fetch(reminder.channel.id);
+				if (!fetched.isText()) continue;
+				channel = fetched;
 			}
 		} catch {
 			db.delete(`/reminders[${db.getIndex("/reminders", reminder.id, "id")}]`)
+			continue;
 		}
-		new Reminder(client, channel, reminder.dead_line_timestamp, reminder.message, await client.users.fetch(reminder.author_id), db, config).start();
+		await new Reminder({
+			ctx: ctx,
+			channel: channel,
+			dead_line_timestamp: reminder.dead_line_timestamp,
+			message: reminder.message,
+			author: await client.users.fetch(reminder.author_id)
+		}).start();
 	}
 });
 
@@ -358,19 +362,14 @@ async function addReminder(propositionMessage: Discord.Message, author: Discord.
 
 		interaction.update({content: "Rappel ajouté !", components: []});
 		const endDate = interaction.message.createdTimestamp + parseInt(interaction.customId);
-		const reminder = new Reminder(
-			client,
-			{
-				channel: db.getData(`/users/${createHash('md5').update(author.id).digest('hex')}/config/reminders/auto_proposition/in_dm`)
-					? author : propositionMessage.channel,
-				channel_type: "text"
-			},
-			endDate,
-			`Vous avez ajouté un rappel il y a ${generateTimeDisplay(parseInt(interaction.customId))}`,
-			author,
-			db,
-			config
-		);
+		const reminder = new Reminder({
+			ctx: ctx,
+			channel: db.getData(`/users/${createHash('md5').update(author.id).digest('hex')}/config/reminders/auto_proposition/in_dm`)
+				? author : propositionMessage.channel,
+			dead_line_timestamp: endDate,
+			message: `Vous avez ajouté un rappel il y a ${generateTimeDisplay(parseInt(interaction.customId))}`,
+			author: author
+		})
 		reminder.save();
 		reminder.start();
 		await log(`${author.username} ajoute un rappel pour dans ${generateTimeDisplay(parseInt(interaction.customId))} suite à une proposition de rappel automatique`);
@@ -438,9 +437,15 @@ let propo_msg_listener = async (msg: Discord.Message): Promise<void> => {
 							dead_line.setDate(dead_line.getDate() + reminder.duration);
 							break;
 					}
-					let new_reminder = new Reminder(client, { channel: reminder.in_dm ? msg.author : msg.channel, channel_type: "text" }, dead_line.getTime(), `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``, msg.author, db, config);
-					await new_reminder.save();
-					await new_reminder.start();
+					let new_reminder = new Reminder({
+						ctx: ctx,
+						channel: reminder.in_dm ? msg.author : msg.channel,
+						dead_line_timestamp: dead_line.getTime(),
+						message: `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``,
+						author: msg.author
+					})
+					new_reminder.save();
+					new_reminder.start();
 					await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
 					break;
 				case "remove":
