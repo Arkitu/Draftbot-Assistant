@@ -1,16 +1,18 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed, MessageActionRow, MessageButton } from 'discord.js';
+import { MessageEmbed, MessageActionRow, MessageButton, Interaction } from 'discord.js';
+import { Context } from '../../libs/Context.js';
+import { Guild } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('gtop')
 	.setDescription('Affiche le classement des guildes');
-export async function execute(interaction, config, db) {
-	await interaction.deferReply();
+export async function execute(ctx: Context) {
+	await ctx.interaction.deferReply();
 	let embed = new MessageEmbed()
 		.setTitle("🏆 Classement des guildes")
-		.setColor(config.getData("/main_color"));
-	let components;
-	let guilds = Object.values(await db.getData("/guilds")).sort((a, b) => {return b.level - a.level;});
+		.setColor(ctx.config.getData("/main_color"));
+	let components : MessageActionRow;
+	let guilds = Object.values(await ctx.db.getData("/guilds") as Guild).sort((a, b) => {return b.level - a.level;});
 	let guilds_limited;
 	let page = 1;
 	if (guilds.length > 16) {
@@ -53,14 +55,14 @@ export async function execute(interaction, config, db) {
 	}
 	embed.setDescription(description);
 	if (components) {
-		await interaction.editReply({ embeds: [embed], components: [components] });
+		await ctx.interaction.editReply({ embeds: [embed], components: [components] });
 	} else {
-		await interaction.editReply({ embeds: [embed] });
+		await ctx.interaction.editReply({ embeds: [embed] });
 	}
 
 	if (components) {
-		let msg = await interaction.fetchReply();
-		let button_listener = async button_interaction => {
+		let msg = await ctx.interaction.fetchReply();
+		let button_listener = async (button_interaction: Interaction) => {
 			if (!button_interaction.isButton()) return;
 			if (button_interaction.message.id != msg.id) return;
 			switch (button_interaction.customId) {
@@ -120,10 +122,11 @@ export async function execute(interaction, config, db) {
 			}
 			await button_interaction.update({ embeds: [embed], components: [components] });
 		};
-		interaction.client.on('interactionCreate', button_listener);
+		ctx.interaction.client.on('interactionCreate', button_listener);
 		setTimeout(() => {
+			if (!("edit" in msg)) return;
 			msg.edit({ components: []});
-			interaction.client.removeListener('interactionCreate', button_listener);
+			ctx.interaction.client.removeListener('interactionCreate', button_listener);
 		}, 300000);
 	}
 }

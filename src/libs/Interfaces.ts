@@ -40,3 +40,10 @@ export interface DB_User {
 		data: object
 	}[]
 }
+
+export interface Guild {
+	name: string,
+	level: number,
+	description: string,
+	last_update: number
+}
