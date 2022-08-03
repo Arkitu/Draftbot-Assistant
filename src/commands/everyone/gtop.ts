@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbed, MessageActionRow, MessageButton, Interaction } from 'discord.js';
 import { Context } from '../../libs/Context.js';
-import { Guild } from '../../libs/Interfaces.js';
+import { DB_Guild } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('gtop')
@@ -12,7 +12,7 @@ export async function execute(ctx: Context) {
 		.setTitle("🏆 Classement des guildes")
 		.setColor(ctx.config.getData("/main_color"));
 	let components : MessageActionRow;
-	let guilds = Object.values(await ctx.db.getData("/guilds") as Guild).sort((a, b) => {return b.level - a.level;});
+	let guilds = Object.values(await ctx.db.getData("/guilds") as DB_Guild).sort((a, b) => {return b.level - a.level;});
 	let guilds_limited;
 	let page = 1;
 	if (guilds.length > 16) {

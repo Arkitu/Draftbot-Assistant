@@ -41,9 +41,20 @@ export interface DB_User {
 	}[]
 }
 
-export interface Guild {
+export interface DB_Guild {
 	name: string,
 	level: number,
 	description: string,
 	last_update: number
+}
+
+export interface DB_Reminder {
+	channel: {
+		id: string,
+		isUser: boolean
+	},
+	dead_line_timestamp: number,
+	message: string,
+	author_id: string,
+	id: string
 }

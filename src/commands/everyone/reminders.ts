@@ -1,13 +1,15 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbed } from 'discord.js';
+import { Context } from '../../libs/Context.js';
+import { DB_Reminder } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('reminders')
 	.setDescription('Renvois la liste des rappels');
-export async function execute(interaction, config, db, constants) {
-	await interaction.deferReply();
+export async function execute(ctx: Context) {
+	await ctx.interaction.deferReply();
 
-	let reminders = db.getData('/reminders').filter(reminder => reminder.author_id == interaction.user.id);
+	let reminders = ctx.db.getData('/reminders').filter((reminder: DB_Reminder) => reminder.author_id == ctx.interaction.user.id);
 
 	let str_reminders = "";
 	if (reminders.length > 0) {
@@ -34,9 +36,9 @@ export async function execute(interaction, config, db, constants) {
 	}
 
 	let embed = new MessageEmbed()
-		.setColor(config.getData("/main_color"))
-		.setTitle(`Rappels de ${interaction.user.username}`)
+		.setColor(ctx.config.getData("/main_color"))
+		.setTitle(`Rappels de ${ctx.interaction.user.username}`)
 		.setDescription(str_reminders);
 	
-	interaction.editReply({ embeds: [embed] });
+	ctx.interaction.editReply({ embeds: [embed] });
 }
