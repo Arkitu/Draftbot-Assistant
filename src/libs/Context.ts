@@ -111,6 +111,7 @@ export class Context {
     setInteraction (interaction: Discord.CommandInteraction) {
         this.interaction = interaction;
         this.haveInteraction = !!interaction;
+        this.setClient(this.interaction.client);
         return this;
     }
 
@@ -138,6 +139,7 @@ export class Context {
         if (this.haveClient) opts.client = this.client;
         if (this.haveDb) opts.db = this.db;
         if (this.haveConfig) opts.config = this.config;
+        if (this.haveConstants) opts.constants = this.constants;
         if (this.haveInteraction) opts.interaction = this.interaction;
         if (this.haveMessage) opts.message = this.message;
         return new Context(opts);

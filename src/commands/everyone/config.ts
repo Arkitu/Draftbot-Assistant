@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed, Options } from "discord.js";
 import { createHash } from "crypto";
 import { log, log_error } from "../../bot.js";
+import { Context } from "../../libs/Context.js";
+import { DB_User } from "../../libs/Interfaces.js";
 
 export const data = new SlashCommandBuilder()
 	.setName("config")
@@ -124,24 +126,29 @@ export const data = new SlashCommandBuilder()
             )
     );
 
-export async function execute(interaction, config, db, constants) {
-    await interaction.deferReply();
+export async function execute(ctx: Context) {
+    await ctx.interaction.deferReply();
     let opt = {
-        subcommandgroup: interaction.options.getSubcommandGroup(),
-        subcommand: interaction.options.getSubcommand()
+        subcommandgroup: ctx.interaction.options.getSubcommandGroup(),
+        subcommand: ctx.interaction.options.getSubcommand(),
+        trigger: ctx.interaction.options.getString("trigger"),
+        duration: ctx.interaction.options.getInteger("duration"),
+        unit: ctx.interaction.options.getString("unit"),
+        in_dm: ctx.interaction.options.getBoolean("in_dm"),
+        
     };
-    let user_hash = createHash('md5').update(interaction.user.id).digest('hex');
-    if (!(user_hash in db.getData("/users"))) {
-        log(`Création de l'utilisateur ${interaction.user.username} à partir de /config`);
-        db.push("/users/" + user_hash, constants.getData("/databaseDefault/user"));
+    let user_hash = createHash('md5').update(ctx.interaction.user.id).digest('hex');
+    if (!(user_hash in ctx.db.getData("/users"))) {
+        log(`Création de l'utilisateur ${ctx.interaction.user.username} à partir de /config`);
+        ctx.db.push("/users/" + user_hash, ctx.constants.getData("/databaseDefault/user"));
     }
-    let db_user = db.getData(`/users/${user_hash}`);
+    let db_user: DB_User = ctx.db.getData(`/users/${user_hash}`);
 
     switch (`${opt.subcommandgroup}/${opt.subcommand}`) {
         case "reminders/view":
             let reminders_embed = new MessageEmbed()
-                .setColor(config.getData("/main_color"))
-                .setAuthor({ name: `Paramètres des reminders de ${interaction.user.username}`, iconURL: interaction.client.user.avatarURL() })
+                .setColor(ctx.config.getData("/main_color"))
+                .setAuthor({ name: `Paramètres des reminders de ${ctx.interaction.user.username}`, iconURL: ctx.client.user.avatarURL() })
                 .addField("Proposition de reminders :", (()=>{
                     let str_propos = "";
                     for (let propo in db_user.config.reminders.on) {
@@ -157,56 +164,60 @@ export async function execute(interaction, config, db, constants) {
                     str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <durée> <unité>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
                     return str_propos;
                 })());
-            await interaction.editReply({ embeds: [reminders_embed] });
+            await ctx.interaction.editReply({ embeds: [reminders_embed] });
             break;
         case "reminders/add_propo":
-            db.push(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`, { duration: interaction.options.getInteger("duration"), unit: interaction.options.getString("unit"), in_dm: interaction.options.getBoolean("in_dm")});
-            await interaction.editReply("Proposition ajoutée avec succès !");
+            if (opt.trigger.includes("/")) {
+                await ctx.interaction.editReply("Vous ne pouvez pas utiliser le caractère `/` dans le message déclencheur");
+                return;
+            }
+            ctx.db.push(`/users/${user_hash}/config/reminders/on/${opt.trigger}`, { duration: opt.duration, unit: opt.unit, in_dm: opt.in_dm });
+            await ctx.interaction.editReply("Proposition ajoutée avec succès !");
             break;
         case "reminders/del_propo":
-            if (interaction.options.getString("trigger") in db_user.config.reminders.on) {
-                db.delete(`/users/${user_hash}/config/reminders/on/${interaction.options.getString("trigger")}`);
-                await interaction.editReply("Proposition supprimée avec succès !");
+            if (opt.trigger in db_user.config.reminders.on) {
+                ctx.db.delete(`/users/${user_hash}/config/reminders/on/${opt.trigger}`);
+                await ctx.interaction.editReply("Proposition supprimée avec succès !");
             } else {
-                await interaction.editReply("Cette proposition n'existe pas !");
+                await ctx.interaction.editReply("Cette proposition n'existe pas !");
             }
             break;
         case "reminders/events":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/events`, !db_user.config.reminders.auto_proposition.events);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/events`, !db_user.config.reminders.auto_proposition.events);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/minievents":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/minievents`, !db_user.config.reminders.auto_proposition.minievents);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/minievents`, !db_user.config.reminders.auto_proposition.minievents);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/guilddaily":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/guilddaily`, !db_user.config.reminders.auto_proposition.guilddaily);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/guilddaily`, !db_user.config.reminders.auto_proposition.guilddaily);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/daily":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/daily`, !db_user.config.reminders.auto_proposition.daily);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/daily`, !db_user.config.reminders.auto_proposition.daily);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/petfree":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfree`, !db_user.config.reminders.auto_proposition.petfree);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfree`, !db_user.config.reminders.auto_proposition.petfree);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/petfeed":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfeed`, !db_user.config.reminders.auto_proposition.petfeed);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfeed`, !db_user.config.reminders.auto_proposition.petfeed);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/vote":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/vote`, !db_user.config.reminders.auto_proposition.vote);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/vote`, !db_user.config.reminders.auto_proposition.vote);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "reminders/in_dm":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/in_dm`, !db_user.config.reminders.auto_proposition.in_dm);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+            ctx.db.push(`/users/${user_hash}/config/reminders/auto_proposition/in_dm`, !db_user.config.reminders.auto_proposition.in_dm);
+            await ctx.interaction.editReply("L'option a été modifiée avec succès !");
             break;
         case "tracking/view":
             let tracking_embed = new MessageEmbed()
-                .setColor(config.getData("/main_color"))
-                .setAuthor({ name: `Paramètres de suivi de ${interaction.user.username}`, iconURL: interaction.client.user.avatarURL() })
+                .setColor(ctx.config.getData("/main_color"))
+                .setAuthor({ name: `Paramètres de suivi de ${ctx.interaction.user.username}`, iconURL: ctx.interaction.client.user.avatarURL() })
                 .setDescription(`Suivi des reports : ${(()=>{
                     if (db_user.config.tracking.reports) {
                         return "🟢";
@@ -226,43 +237,44 @@ export async function execute(interaction, config, db, constants) {
                         return "🔴";
                     }
                 })()}`);
-            await interaction.editReply({ embeds: [tracking_embed] });
+            await ctx.interaction.editReply({ embeds: [tracking_embed] });
             break;
         case "tracking/switch_option":
-            switch (interaction.options.getString("option")) {
+            switch (ctx.interaction.options.getString("option")) {
                 case "reports":
-                    db.push(`/users/${user_hash}/config/tracking/reports`, !db_user.config.tracking.reports);
+                    ctx.db.push(`/users/${user_hash}/config/tracking/reports`, !db_user.config.tracking.reports);
                     if (!db_user.config.tracking.reports) {
                         // Delete all tracked reports
                         for (let i=0; i < db_user.tracking.length; i++) {
                             if (["long_report", "short_report"].includes(db_user.tracking[i].type)) {
-                                db.delete(`/users/${user_hash}/tracking[${i}]`);
+                                ctx.db.delete(`/users/${user_hash}/tracking[${i}]`);
                                 i--;
                             }
                         }
                     }
-                    await interaction.editReply("L'option a été modifiée avec succès !");
+                    await ctx.interaction.editReply("L'option a été modifiée avec succès !");
                     break;
                 case "public":
-                    db.push(`/users/${user_hash}/config/tracking/public`, !db_user.config.tracking.public);
-                    await interaction.editReply("L'option a été modifiée avec succès !");
+                    ctx.db.push(`/users/${user_hash}/config/tracking/public`, !db_user.config.tracking.public);
+                    await ctx.interaction.editReply("L'option a été modifiée avec succès !");
                     break;
                 case "profile":
-                    db.push(`/users/${user_hash}/config/tracking/profile`, !db_user.config.tracking.profile);
+                    ctx.db.push(`/users/${user_hash}/config/tracking/profile`, !db_user.config.tracking.profile);
                     if (!db_user.config.tracking.profile) {
                         // Delete all tracked profiles
                         for (let i=0; i < db_user.tracking.length; i++) {
                             if (db_user.tracking[i].type === "profile") {
-                                db.delete(`/users/${user_hash}/tracking[${i}]`);
+                                ctx.db.delete(`/users/${user_hash}/tracking[${i}]`);
                                 i--;
                             }
                         }
                     }
-                    await interaction.editReply("L'option a été modifiée avec succès !");
+                    await ctx.interaction.editReply("L'option a été modifiée avec succès !");
                     break;
             }
             break;
         default:
-            log_error(`${interaction.user.username} a utilisé une commande inconnue ("/config ${opt.subcommandgroup} ${opt.subcommand}")`);
+            log_error(`${ctx.interaction.user.username} a utilisé une commande inconnue ("/config ${opt.subcommandgroup} ${opt.subcommand}")`);
+            await ctx.interaction.editReply(":warning: Cette commande n'existe pas ! Le propriétaire du bot en a été informé.");
     }
 }

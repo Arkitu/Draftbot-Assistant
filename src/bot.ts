@@ -5,6 +5,7 @@ import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Reminder } from './libs/Reminder.js';
 import { Context } from './libs/Context.js';
+import { DB_User } from './libs/Interfaces.js';
 import { createHash } from "crypto";
 
 // Import config and db
@@ -30,43 +31,6 @@ export async function log_error(msg: string): Promise<void> {
 
 class Client extends Discord.Client {
 	public commands: Collection<string, any> = new Collection();
-}
-
-interface DB_User {
-	config: {
-		reminders: {
-			on: Object,
-			auto_proposition: {
-				events: boolean,
-				minievents: boolean,
-				guilddaily: boolean,
-				daily: boolean,
-				petfree: boolean,
-				petfeed: boolean,
-				vote: boolean,
-				in_dm: boolean
-			}
-		},
-		tracking: {
-			reports: boolean,
-			public: boolean,
-			profile: boolean
-		},
-		goal: {
-			start: number,
-			end: number,
-			value: number,
-			unit: "lvl" | "gold" | "pv" | "xp" | "gems" | "quest_missions_percentage" | "rank_points",
-			init_value: number,
-			end_value: number,
-			active: boolean
-		}
-	},
-	tracking: {
-		type: string,
-		timestamp: number,
-		data: object
-	}[]
 }
 
 // Create a new client instance
@@ -96,7 +60,7 @@ client.once('ready', async (): Promise<void> => {
 			db.delete(`/reminders[${db.getIndex("/reminders", reminder.id, "id")}]`)
 			continue;
 		}
-		await new Reminder({
+		new Reminder({
 			ctx: ctx,
 			channel: channel,
 			dead_line_timestamp: reminder.dead_line_timestamp,
@@ -117,7 +81,7 @@ let cmd_listener = async (interaction: Discord.Interaction): Promise<void> => {
 
 	log(`${interaction.user.username} execute ${commandName}`);
 
-	command.execute(ctx);
+	command.execute(ctx.clone().setInteraction(interaction));
 }
 
 let help_msg_listener = async (msg: Discord.Message): Promise<void> => {
