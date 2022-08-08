@@ -338,6 +338,31 @@
     "reminders": [],
     "commands": [
         {
+            "name": "add_goal_message",
+            "description": "Ajoute un messaeg sur lequel les utilisateurs peuvent cliquer pour ajouter un objectif",
+            "options": [
+                {
+                    "name": "channel",
+                    "description": "Le channel dans lequel le message sera créé",
+                    "required": true,
+                    "type": 7
+                },
+                {
+                    "type": 4,
+                    "name": "duration",
+                    "description": "La durée avant que le message ne disparaisse (en millisecondes)",
+                    "required": true
+                },
+                {
+                    "type": 4,
+                    "name": "start_time",
+                    "description": "L'heure à laquelle le message sera créé (en millisecondes)",
+                    "required": false
+                }
+            ],
+            "perms": "admin"
+        },
+        {
             "name": "bitfield_to_permissions",
             "description": "Convertit un bitfield en permissions",
             "options": [
@@ -499,6 +524,12 @@
                                     "name": "unit",
                                     "description": "L'unité de temps",
                                     "required": true
+                                },
+                                {
+                                    "name": "in_dm",
+                                    "description": "L'endroit où le rappel sera envoyé",
+                                    "required": false,
+                                    "type": 5
                                 }
                             ]
                         },
@@ -514,6 +545,54 @@
                                     "required": true
                                 }
                             ]
+                        },
+                        {
+                            "type": 1,
+                            "name": "events",
+                            "description": "Active/désactive la proposition automatique de rappel après un event",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "minievents",
+                            "description": "Active/désactive la proposition automatique de rappel après un minievent",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "guilddaily",
+                            "description": "Active/désactive la proposition automatique de rappel après un /guilddaily",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "daily",
+                            "description": "Active/désactive la proposition automatique de rappel après un /daily",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "petfeed",
+                            "description": "Active/désactive la proposition automatique de rappel après un /petfeed",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "petfree",
+                            "description": "Active/désactive la proposition automatique de rappel après un /petfree",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "vote",
+                            "description": "Active/désactive la proposition automatique de rappel après un /vote",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "in_dm",
+                            "description": "Active/désactive l'envoi des reminders en DM",
+                            "options": []
                         }
                     ]
                 },
