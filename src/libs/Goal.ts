@@ -22,7 +22,7 @@ export class Goal {
         value: number,
         unit: string,
         init_value: number,
-        end_value: number
+        end_value?: number
     }) {
         this.ctx = opts.ctx;
         this.user_id = opts.user_id;
@@ -31,7 +31,7 @@ export class Goal {
         this.value = opts.value;
         this.unit = opts.unit || "rank_points";
         this.init_value = opts.init_value;
-        this.end_value = opts.end_value;
+        this.end_value = opts.end_value | opts.value + opts.init_value;
     }
 
     async init () {

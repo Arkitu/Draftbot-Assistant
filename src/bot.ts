@@ -573,7 +573,7 @@ let profile_listener = async (msg: Discord.Message): Promise<void> => {
 			name: splited_embed.fields[4][0].value,
 			emoji: `:${splited_embed.fields[4][0].emoji}:`,
 		},
-		guild_name: embed.fields[5].name === "Guilde :" ? splited_embed.fields[5][0].value : undefined,
+		guild_name: embed.fields[5].name === "Guilde :" ? splited_embed.fields[5][0].value : null,
 		//Bot crashed if the user didn't have a guild while using the command
 		destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
 	}
