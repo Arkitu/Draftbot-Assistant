@@ -12,21 +12,22 @@
     "node-json-db": "^1.4.1"
   },
   "_moduleAliases": {
-    "@libs": "./dist/libs"
+    "@root": "dist"
   },
   "name": "drafbot-assistant",
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "exports": "./bot.js",
   "scripts": {
-    "init": "./init",
-    "start": "node dist/start_bot_forever.js"
+    "postinstall": "link-module-alias",
+    "install": "./init",
+    "start": "./start"
   },
   "author": "Arkitu",
   "license": "ISC",
   "devDependencies": {
     "@types/forever-monitor": "^1.7.6",
+    "link-module-alias": "^1.2.0",
     "typescript": "^4.7.4"
   },
   "engines": {

@@ -9,9 +9,9 @@ import { DB_User } from './libs/Interfaces.js';
 import { createHash } from "crypto";
 
 // Import config and db
-const config: JsonDB = new JsonDB(new Config("config", false, true, '/'));
-const db: JsonDB = new JsonDB(new Config("db", true, true, '/'));
-const constants: JsonDB = new JsonDB(new Config("constants", false, true, '/'));
+const config: JsonDB = new JsonDB(new Config("../config", false, true, '/'));
+const db: JsonDB = new JsonDB(new Config("../db", true, true, '/'));
+const constants: JsonDB = new JsonDB(new Config("../constants", false, true, '/'));
 const ctx: Context = new Context({
 	config: config,
 	db: db,
@@ -42,7 +42,7 @@ const client: Client = new Client({ intents: [
 // When the client is ready, run this code (only once)
 client.once('ready', async (): Promise<void> => {
 	await log('Bot logged !');
-	ctx.setClient(client);
+	ctx.client = client;
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
 	for (let reminder of db.getData("/reminders")) {
@@ -81,7 +81,7 @@ let cmd_listener = async (interaction: Discord.Interaction): Promise<void> => {
 
 	log(`${interaction.user.username} execute ${commandName}`);
 
-	command.execute(ctx.clone().setInteraction(interaction));
+	command.execute(ctx.clone({interaction: interaction}));
 }
 
 let help_msg_listener = async (msg: Discord.Message): Promise<void> => {

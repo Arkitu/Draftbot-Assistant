@@ -1,0 +1,3 @@
+#!/bin/bash
+cd dist
+node start_bot_forever.js

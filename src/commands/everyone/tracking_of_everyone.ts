@@ -4,6 +4,8 @@ import { MessageEmbed } from 'discord.js';
 import { unlink } from 'fs';
 import { log_error } from "../../bot.js";
 import { property_data } from './tracking.js';
+import { Context } from '../../libs/Context.js';
+import { DB_Tracking } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('tracking_of_everyone')
@@ -33,17 +35,17 @@ export const data = new SlashCommandBuilder()
                     .addChoice('1 an', '1 an')
             )
     )
-export async function execute(interaction, config, db) {
-    await interaction.deferReply();
+export async function execute(ctx: Context) {
+    await ctx.interaction.deferReply();
     let opt = {
-        subcommand: interaction.options.getSubcommand(),
-        category: interaction.options.getString('category') || 'all',
-        duration: interaction.options.getString('duration')
+        subcommand: ctx.interaction.options.getSubcommand(),
+        category: ctx.interaction.options.getString('category') || 'all',
+        duration: ctx.interaction.options.getString('duration')
     };
-    let all_users_tracking = [];
-    for (let user_hash in db.getData("/users")) {
-        for (let event of db.getData(`/users/${user_hash}/tracking`)) {
-            all_users_tracking.push(event);
+    let all_users_tracking: DB_Tracking[] = [];
+    for (let user_hash in ctx.db.getData("/users")) {
+        for (let event of ctx.db.getData(`/users/${user_hash}/tracking`)) {
+            all_users_tracking.push(event as DB_Tracking);
         }
     }
 
@@ -78,10 +80,15 @@ export async function execute(interaction, config, db) {
     max_date.setHours(23, 59, 59, 999);
 
     // Get data and create the chart
-    let chart;
+    let chart: ChartJSImage;
     switch (opt.subcommand) {
         case 'reports': {
-            let events = {};
+            let events: {
+                [key: string]: {
+                    long: number,
+                    short: number
+                }
+            } = {};
             for (let i = new Date(min_date.getTime()); i.getTime() <= max_date.getTime(); i.setDate(i.getDate() + 1)) {
                 events[i.getTime()] = {long: 0, short: 0};
             }
@@ -133,7 +140,7 @@ export async function execute(interaction, config, db) {
                     data: data,
                 });
             }
-            chart = await ChartJSImage().chart({
+            let chart_opts = {
                 type: 'bar',
                 data: {
                     datasets: datasets
@@ -176,15 +183,18 @@ export async function execute(interaction, config, db) {
                         }]
                     }
                 }
-            }) // Bar chart
+            }
+
+            chart = new ChartJSImage()
+                .chart(chart_opts.toString()) // Bar chart
                 .backgroundColor("#2F3135") // Color of embed background
-                .width(500) // 500px
-                .height(300); // 300px
+                .width("500") // 500px
+                .height("300"); // 300px
             break;
         }
     }
     
-    let url_chart = await chart.toURL();
+    let url_chart = chart.toURL();
     if (url_chart.length < 2048) {
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
@@ -196,9 +206,9 @@ export async function execute(interaction, config, db) {
                 }
             })()} de tout le monde`)
             .setImage(url_chart);
-        await interaction.editReply({ embeds: [embed] });
+        await ctx.interaction.editReply({ embeds: [embed] });
     } else {
-        await chart.toFile(`./temp/${interaction.user.id}_chart.png`);
+        await chart.toFile(`./temp/${ctx.interaction.user.id}_chart.png`);
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
                 switch (opt.subcommand) {
@@ -208,8 +218,8 @@ export async function execute(interaction, config, db) {
                         return "du profil";
                 }
             })()} de tout le monde`)
-            .setImage(`attachment://${interaction.user.id}_chart.png`);
-        await interaction.editReply({ embeds: [embed], files: [`./temp/${interaction.user.id}_chart.png`] });
-        unlink(`./temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err); });
+            .setImage(`attachment://${ctx.interaction.user.id}_chart.png`);
+        await ctx.interaction.editReply({ embeds: [embed], files: [`./temp/${ctx.interaction.user.id}_chart.png`] });
+        unlink(`./temp/${ctx.interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
     }
 }
