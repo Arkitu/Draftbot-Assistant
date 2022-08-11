@@ -120,12 +120,14 @@ function generateTimeDisplay(milliseconds: number): string {
 	return minutes + " Min";
 }
 
-function getTimeLostByString(timeLost: string[]): number {
-		//Triggers only if there is no "hour"
-		if (timeLost.length === 1) {
-			return parseInt(timeLost[0]) * 60000;
-		}
-		return parseInt(timeLost[0]) * 3600000 + parseInt(timeLost[1]) * 60000;
+function getTimeLostByString(timeDisplayed: string): number {
+	const splitedDisplay = timeDisplayed.split(" H");
+	const lastElement = splitedDisplay[splitedDisplay.length - 1].replace(" Min", "");
+
+	const hours = splitedDisplay.length > 1 ? parseInt(splitedDisplay[0]) : 0;
+	// If there are only hours, the list is ["number", ""]
+	const minutes = lastElement !== "" ? parseInt(lastElement) : 0;
+	return hours * 3600000 + minutes * 60000;
 }
 
 const eventsMsgListener = async (message: Discord.Message): Promise<void> => {
@@ -145,11 +147,9 @@ const eventsMsgListener = async (message: Discord.Message): Promise<void> => {
 
 		reminders.push(timeBetweenMinievents
 			+ getTimeLostByString(
-			//The time lost is always just before the text
-			splicedMessage[splicedMessage.length - 2]
-					//:clock10: Temps perdu : hours H minutes Min -> hours H minutes
-					.slice(26, -6)
-					.split(" H ")
+				//The time lost is always just before the text
+				splicedMessage[splicedMessage.length - 2]
+					.slice(26, -2)
 			)
 		);
 	}
@@ -196,7 +196,6 @@ const minieventMsgListener = async (message: Discord.Message): Promise<void> => 
 				//Between the end of the '**' and the start of the emoji
 				.slice(text.indexOf("**") + 2, loseTimeEmojiPosition)
 				.replace("**", "")
-				.split(" H ")
 			)
 		);
 	}
