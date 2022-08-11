@@ -11,23 +11,19 @@
     "moment": "^2.29.4",
     "node-json-db": "^1.4.1"
   },
-  "_moduleAliases": {
-    "@root": "dist"
-  },
   "name": "drafbot-assistant",
   "version": "1.0.0",
   "description": "",
   "type": "module",
   "scripts": {
-    "postinstall": "link-module-alias",
-    "install": "./init",
-    "start": "./start"
+    "postinstall": "./init",
+    "start": "./start",
+    "deploy_cmds": "node ./deploy_cmds.js"
   },
   "author": "Arkitu",
   "license": "ISC",
   "devDependencies": {
     "@types/forever-monitor": "^1.7.6",
-    "link-module-alias": "^1.2.0",
     "typescript": "^4.7.4"
   },
   "engines": {
