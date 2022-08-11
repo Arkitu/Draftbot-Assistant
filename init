@@ -3,10 +3,6 @@ echo "Creating missing directories…"
 mkdir temp
 echo "Missing directories created.
 "
-echo "Installing dependencies…"
-npm install --silent
-echo "Dependencies installed.
-"
 echo "Compiling typescript…"
 npx tsc
 echo "Typescript compiled.
