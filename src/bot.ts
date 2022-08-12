@@ -53,7 +53,6 @@ client.once('ready', async (): Promise<void> => {
 				channel = await client.users.fetch(reminder.channel.id);
 			} else {
 				const fetched = await client.channels.fetch(reminder.channel.id);
-				console.debug(fetched.type, fetched.isText())
 				if (!fetched.isText()) continue;
 				channel = fetched;
 			}
