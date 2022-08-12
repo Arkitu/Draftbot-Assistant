@@ -185,8 +185,8 @@ export async function execute(ctx: Context) {
                 }
             }
 
-            chart = new ChartJSImage()
-                .chart(chart_opts.toString()) // Bar chart
+            chart = ChartJSImage()
+                .chart(chart_opts) // Bar chart
                 .backgroundColor("#2F3135") // Color of embed background
                 .width("500") // 500px
                 .height("300"); // 300px
