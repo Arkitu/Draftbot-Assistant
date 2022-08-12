@@ -9,7 +9,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(ctx: Context) {
 	await ctx.interaction.deferReply();
 
-	let reminders = ctx.db.getData('/reminders').filter((reminder: DB_Reminder) => reminder.author_id == ctx.interaction.user.id);
+	let reminders = ctx.db.getData('/reminders').filter((reminder: DB_Reminder) => reminder.author_id == ctx.interaction.user.id) as DB_Reminder[];
 
 	let str_reminders = "";
 	if (reminders.length > 0) {
@@ -29,7 +29,7 @@ export async function execute(ctx: Context) {
 			} else {
 				str_date = "maintenant";
 			}
-			str_reminders += `• **message :** ${reminder.message} - **temps restant :** ${str_date} - **salon :** <#${reminder.channel.channel_id}>\n\n`;
+			str_reminders += `• **message :** ${reminder.message} - **temps restant :** ${str_date} - **salon :** <${["#", "@"][+reminder.channel.isUser]}${reminder.channel.id}>\n\n`;
 		}
 	} else {
 		str_reminders = "Vous n'avez aucun rappel";
