@@ -1,11 +1,18 @@
 import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, Options } from 'discord.js';
 import { createHash } from "crypto";
 import { unlink } from 'fs';
 import { log, log_error } from "../../bot.js";
+import { Context } from '../../libs/Context.js';
+import { DB_User } from '../../libs/Interfaces.js';
 
-export var property_data = {
+export var property_data: {
+    [key: string]: {
+        "label": string,
+        "color": string
+    }
+} = {
     "reports/long": {
         "label": "Nbr Events",
         "color": "54,162,235"
@@ -161,29 +168,29 @@ export const data = new SlashCommandBuilder()
                     .setRequired(false)
             )
     )
-export async function execute(interaction, config, db, constants) {
+export async function execute(ctx: Context) {
     let opt = {
-        subcommand: interaction.options.getSubcommand(),
-        category: interaction.options.getString('category') || 'all',
-        duration: interaction.options.getString('duration'),
-        user: interaction.options.getUser('user') || interaction.user,
-        mode: interaction.options.getString('mode') || 'bar'
+        subcommand: ctx.interaction.options.getSubcommand() as "reports" | "profile",
+        category: (ctx.interaction.options.getString('category') || 'all') as "all" | "events" | "mini-events" | "lvl" | "gold" | "pv" | "max_pv" | "xp" | "max_xp" | "energy" | "max_energy" | "strenght" | "defense" | "speed" | "gems" | "quest_missions_percentage" | "rank" | "rank_points",
+        duration: ctx.interaction.options.getString('duration') as "1 semaine" | "1 mois" | "3 mois" | "6 mois" | "1 an",
+        user: ctx.interaction.options.getUser('user') || ctx.interaction.user,
+        mode: (ctx.interaction.options.getString('mode') || 'bar') as "bar" | "line"
     };
     let user_hash = createHash('md5').update(opt.user.id).digest('hex');
-    if (!(user_hash in db.getData("/users"))) {
-        if (opt.user.id != interaction.user.id) {
-            await interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
+    if (!(user_hash in ctx.db.getData("/users"))) {
+        if (opt.user.id != ctx.interaction.user.id) {
+            await ctx.interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
             return;
         }
         log(`Création de l'utilisateur ${opt.user.username} à partir de /tracking`);
-        db.push("/users/" + user_hash, constants.getData("/databaseDefault/user"));
+        ctx.db.push("/users/" + user_hash, ctx.constants.getData("/databaseDefault/user"));
     }
-    let db_user = db.getData(`/users/${user_hash}`);
-    if (opt.user.id != interaction.user.id && !db_user.config.tracking.public) {
-        await interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
+    let db_user: DB_User = ctx.db.getData(`/users/${user_hash}`);
+    if (opt.user.id != ctx.interaction.user.id && !db_user.config.tracking.public) {
+        await ctx.interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
         return;
     }
-    await interaction.deferReply({ ephemeral: !db_user.config.tracking.public });
+    await ctx.interaction.deferReply({ ephemeral: !db_user.config.tracking.public });
 
     // Get min_date and max_date
     let cur = new Date();
@@ -216,10 +223,15 @@ export async function execute(interaction, config, db, constants) {
     max_date.setHours(23, 59, 59, 999);
 
     // Get data and create the chart
-    let chart;
+    let chart: ChartJSImage;
     switch (opt.subcommand) {
         case 'reports': {
-            let events = {};
+            let events: {
+                [key: string]: {
+                    long: number,
+                    short: number
+                }
+            } = {};
             for (let i = new Date(min_date.getTime()); i.getTime() <= max_date.getTime(); i.setDate(i.getDate() + 1)) {
                 events[i.getTime()] = {long: 0, short: 0};
             }
@@ -238,7 +250,10 @@ export async function execute(interaction, config, db, constants) {
             }
             let datasets = [];
             if (opt.category == "all" || opt.category == "events") {
-                let data = [];
+                let data: {
+                    x: number,
+                    y: number
+                }[] = [];
                 for (let event in events) {
                     if (events[event].long == 0 && events[event].short == 0) continue;
                     data.push({
@@ -255,7 +270,10 @@ export async function execute(interaction, config, db, constants) {
                 });
             }
             if (opt.category == "all" || opt.category == "mini-events") {
-                let data = [];
+                let data: {
+                    x: number,
+                    y: number
+                }[] = [];
                 for (let event in events) {
                     if (events[event].long == 0 && events[event].short == 0 && parseInt(event) != min_date.getTime() && parseInt(event) != max_date.getTime()) continue;
                     data.push({
@@ -321,14 +339,23 @@ export async function execute(interaction, config, db, constants) {
             break;
         }
         case 'profile': {
-            let datasets = [{
+            opt.category = opt.category as "lvl" | "gold" | "pv" | "max_pv" | "xp" | "max_xp" | "energy" | "max_energy" | "strenght" | "defense" | "speed" | "gems" | "quest_missions_percentage" | "rank" | "rank_points";
+            let datasets: {
+                label: string,
+                borderColor: string,
+                backgroundColor: string,
+                data: {
+                    x: number,
+                    y: number
+                }[]
+            }[] = [{
                 label: property_data["profile/" + opt.category].label,
                 borderColor: `rgba(${property_data["profile/" + opt.category].color}, 1)`,
                 backgroundColor: `rgba(${property_data["profile/" + opt.category].color}, 0.2)`,
                 data: [],
             }];
             for (let event of db_user.tracking) {
-                if (event.type == "profile") {
+                if (event.type === "profile") {
                     let event_date = new Date(event.timestamp);
                     if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
                         datasets[0].data.push({
@@ -344,7 +371,7 @@ export async function execute(interaction, config, db, constants) {
                 }
             }
             if (datasets[0].data.length == 0) {
-                await interaction.editReply(":warning: Je n'ai enregistré aucun évènement de ce type pour cette période.");
+                await ctx.interaction.editReply(":warning: Je n'ai enregistré aucun évènement de ce type pour cette période.");
                 return;
             }
             chart = await ChartJSImage().chart({
@@ -403,9 +430,9 @@ export async function execute(interaction, config, db, constants) {
                 }
             })()} de ${opt.user.username}`)
             .setImage(url_chart);
-        await interaction.editReply({ embeds: [embed] });
+        await ctx.interaction.editReply({ embeds: [embed] });
     } else {
-        await chart.toFile(`./temp/${interaction.user.id}_chart.png`);
+        await chart.toFile(`./temp/${ctx.interaction.user.id}_chart.png`);
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
                 switch (opt.subcommand) {
@@ -415,8 +442,8 @@ export async function execute(interaction, config, db, constants) {
                         return "du profil";
                 }
             })()} de ${opt.user.username}`)
-            .setImage(`attachment://${interaction.user.id}_chart.png`);
-        await interaction.editReply({ embeds: [embed], files: [`./temp/${interaction.user.id}_chart.png`] });
-        unlink(`./temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err); });
+            .setImage(`attachment://${ctx.interaction.user.id}_chart.png`);
+        await ctx.interaction.editReply({ embeds: [embed], files: [`./temp/${ctx.interaction.user.id}_chart.png`] });
+        unlink(`./temp/${ctx.interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
     }
 }
