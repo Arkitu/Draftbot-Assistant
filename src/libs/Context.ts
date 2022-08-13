@@ -1,5 +1,6 @@
 import * as Discord from 'discord.js';
 import { JsonDB } from 'node-json-db';
+import { Sequelize } from 'sequelize/types';
 
 export class Context {
     client: Discord.Client | null;
@@ -8,6 +9,7 @@ export class Context {
     interaction: Discord.CommandInteraction | null;
     message: Discord.Message | null;
     constants: JsonDB | null;
+    sequelize: Sequelize | null;
 
     constructor (opts: {
         client?: Discord.Client | null,
@@ -15,7 +17,8 @@ export class Context {
         config?: JsonDB | null,
         constants?: JsonDB | null,
         interaction?: Discord.CommandInteraction | null,
-        message?: Discord.Message | null
+        message?: Discord.Message | null,
+        sequelize?: Sequelize | null
     } = {}) {
         this.client = opts.client || null;
         this.db = opts.db || null;
@@ -23,6 +26,7 @@ export class Context {
         this.interaction = opts.interaction || null;
         this.message = opts.message || null;
         this.constants = opts.constants || null;
+        this.sequelize = opts.sequelize || null;
     }
 
     clone (opts: {
@@ -31,7 +35,8 @@ export class Context {
         config?: JsonDB | null,
         constants?: JsonDB | null,
         interaction?: Discord.CommandInteraction | null,
-        message?: Discord.Message | null
+        message?: Discord.Message | null,
+        sequelize?: Sequelize | null
     } = {}) {
         return new Context({
             client: opts.client || this.client,
@@ -39,7 +44,8 @@ export class Context {
             config: opts.config || this.config,
             constants: opts.constants || this.constants,
             interaction: opts.interaction || this.interaction,
-            message: opts.message || this.message
+            message: opts.message || this.message,
+            sequelize: opts.sequelize || this.sequelize
         });
     }
 }

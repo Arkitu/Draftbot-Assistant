@@ -7,11 +7,13 @@ import { Reminder } from './libs/Reminder.js';
 import { Context } from './libs/Context.js';
 import { DB_User } from './libs/Interfaces.js';
 import { createHash } from "crypto";
+import { Sequelize } from 'sequelize'
 
 // Import config and db
 const config: JsonDB = new JsonDB(new Config("../config", false, true, '/'));
 const db: JsonDB = new JsonDB(new Config("../db", true, true, '/'));
 const constants: JsonDB = new JsonDB(new Config("../constants", false, true, '/'));
+const sequelize = new Sequelize("sqlite::memory");
 const ctx: Context = new Context({
 	config: config,
 	db: db,
