@@ -7,17 +7,27 @@ import { Reminder } from './libs/Reminder.js';
 import { Context } from './libs/Context.js';
 import { DB_User } from './libs/Interfaces.js';
 import { createHash } from "crypto";
-import { Sequelize } from 'sequelize'
+import { Sequelize } from 'sequelize';
+import { User, user_init_args } from "./models/User.js";
 
-// Import config and db
+// Import config, db and constants
 const config: JsonDB = new JsonDB(new Config("../config", false, true, '/'));
 const db: JsonDB = new JsonDB(new Config("../db", true, true, '/'));
 const constants: JsonDB = new JsonDB(new Config("../constants", false, true, '/'));
+
+// Instance sequelize and the models
 const sequelize = new Sequelize("sqlite::memory");
+
+User.init(user_init_args, {sequelize});
+
+sequelize.sync({ alter: true });
+
+// Create constext
 const ctx: Context = new Context({
 	config: config,
 	db: db,
-	constants: constants
+	constants: constants,
+	sequelize: sequelize
 });
 
 // Log with the current date

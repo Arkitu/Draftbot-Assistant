@@ -14,7 +14,7 @@
     "noEmitOnError": false,
     "moduleResolution": "node",
     "skipLibCheck": true,
-    "target": "es2016"
+    "target": "ESNext"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
