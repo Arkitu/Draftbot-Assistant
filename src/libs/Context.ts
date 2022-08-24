@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js';
 import { JsonDB } from 'node-json-db';
-import { Sequelize } from 'sequelize/types';
+import { Sequelize } from 'sequelize-typescript';
 
 export class Context {
     client: Discord.Client | null;

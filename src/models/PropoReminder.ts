@@ -1,31 +1,23 @@
-import { Model, DataTypes, ModelAttributes, Sequelize } from 'sequelize';
+import { Table, Column, Model, DataType, BelongsTo } from 'sequelize-typescript';
+import { User } from '.';
 
-export class PropoReminder extends Model {
-    declare trigger: string;
-    declare duration: number;
-    declare unit: string;
-    declare in_dm: boolean;
-}
+@Table
+export default class PropoReminder extends Model {
+    @Column({
+        allowNull: false
+    })
+    trigger: string;
 
-export const PropoReminder_init_opts: ModelAttributes = {
-    trigger: {
-        type: DataTypes.TEXT,
+    @Column({
         allowNull: false
-    },
-    duration: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    unit: {
-        type: DataTypes.TEXT,
-        allowNull: false
-    },
-    in_dm: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false
-    }
-}
+    })
+    durationTimestamp: number;
 
-export async function define_propo_reminder_model (sequelize: Sequelize) {
-    PropoReminder.init(PropoReminder_init_opts, {sequelize})
+    @Column({
+        defaultValue: false
+    })
+    inDm: boolean;
+
+    @BelongsTo(()=>User)
+    user: User
 }
