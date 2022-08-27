@@ -3,13 +3,15 @@ import Reminder from './Reminder';
 import Tracking from './Tracking';
 import PropoReminder from './PropoReminder';
 import Guild from './Guild';
+import Goal from './Goal';
 
-const models = [
+const sequelizeModels = {
     User,
     Reminder,
     Tracking,
     PropoReminder,
-    Guild
-];
+    Guild,
+    Goal
+};
 
-export { User, Reminder, Tracking, PropoReminder, Guild, models };
+export { User, Reminder, Tracking, PropoReminder, Guild, Goal, sequelizeModels };

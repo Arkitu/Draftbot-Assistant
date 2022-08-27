@@ -4,7 +4,7 @@ import { MessageEmbed } from 'discord.js';
 import { unlink } from 'fs';
 import { log_error } from "../../bot.js";
 import { property_data } from './tracking.js';
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 import { DB_Tracking } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
@@ -35,7 +35,7 @@ export const data = new SlashCommandBuilder()
                     .addChoice('1 an', '1 an')
             )
     )
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
     await ctx.interaction.deferReply();
     let opt = {
         subcommand: ctx.interaction.options.getSubcommand(),

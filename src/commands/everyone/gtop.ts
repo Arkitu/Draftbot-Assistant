@@ -1,12 +1,12 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbed, MessageActionRow, MessageButton, Interaction } from 'discord.js';
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 import { DB_Guild } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('gtop')
 	.setDescription('Affiche le classement des guildes');
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
 	await ctx.interaction.deferReply();
 	let embed = new MessageEmbed()
 		.setTitle("🏆 Classement des guildes")

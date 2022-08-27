@@ -1,7 +1,7 @@
 import { MessageEmbed, User, TextBasedChannel, DMChannel } from 'discord.js';
-import { Context } from './Context.js';
+import Context from './Context.js';
 
-export class Reminder {
+export default class Reminder {
 
     ctx: Context;
     deleted: boolean;

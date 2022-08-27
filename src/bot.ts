@@ -3,87 +3,80 @@ import * as Discord from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
-import { Reminder } from './libs/Reminder.js';
-import { Context } from './libs/Context.js';
-import { DB_User } from './libs/Interfaces.js';
 import { createHash } from "crypto";
 import { Sequelize } from 'sequelize-typescript';
-import { models } from './models';
+import { PropoReminder, sequelizeModels, User } from './models';
 
-// Import config, db and constants
-const config: JsonDB = new JsonDB(new Config("../config", false, true, '/'));
-const db: JsonDB = new JsonDB(new Config("../db", true, true, '/'));
-const constants: JsonDB = new JsonDB(new Config("../constants", false, true, '/'));
+// Import config, constants, sequelize, models
+config = new JsonDB(new Config("../config", false, true, '/'));
+constants = new JsonDB(new Config("../constants", false, true, '/'));
+models = sequelizeModels;
 
-// Instance sequelize and the models
 const sequelize = new Sequelize("sqlite::memory", {
-	models: models
+	models: Object.values(models)
 });
 
 sequelize.sync({ alter: true });
 
-// Create context
-const ctx: Context = new Context({
-	config: config,
-	db: db,
-	constants: constants,
-	sequelize: sequelize
-});
-
-// Log with the current date
-export async function log(msg: string): Promise<void> {
+// Some utils functions
+export function log(msg: string) {
 	var datetime: string = new Date().toLocaleString();
 	console.log(`[${datetime}] ${msg}`);
 };
 
-export async function log_error(msg: string): Promise<void> {
+export async function log_error(msg: string) {
 	log(`ERROR: ${msg}`);
 	await (await client.users.fetch(config.getData("/creator_id"))).send(`:warning: ERROR: ${msg}`);
 }
 
-class Client extends Discord.Client {
+export function generateTimeDisplay(milliseconds: number): string {
+	let seconds = Math.ceil(milliseconds / 1000);
+	let minutes = Math.floor(seconds / 60);
+	let hours = Math.floor(minutes / 60);
+	const days = Math.floor(hours / 24);
+	seconds %= 60;
+	minutes %= 60;
+	hours %= 24;
+
+	let arrayTime: string[] = [];
+	if (days > 0) {
+		arrayTime.push(days + "j");
+	}
+	if (hours > 0) {
+		arrayTime.push(hours + "h");
+	}
+	if (minutes > 0) {
+		arrayTime.push(minutes + "min");
+	}
+	if (seconds > 0) {
+		arrayTime.push(seconds + "s");
+	}
+
+	return arrayTime.join(" ");
+}
+
+export class Client extends Discord.Client {
 	public commands: Collection<string, any> = new Collection();
 }
 
 // Create a new client instance
-const client: Client = new Client({ intents: [
+client = new Client({ intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES
 ] });
 
 // When the client is ready, run this code (only once)
-client.once('ready', async (): Promise<void> => {
-	await log('Bot logged !');
-	ctx.client = client;
+client.once('ready', async () => {
+	log('Bot logged !');
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
-	for (let reminder of db.getData("/reminders")) {
-		let channel: Discord.User | Discord.TextBasedChannel;
-		
-		try {
-			if (reminder.channel.isUser) {
-				channel = await client.users.fetch(reminder.channel.id);
-			} else {
-				const fetched = await client.channels.fetch(reminder.channel.id);
-				if (!fetched.isText()) continue;
-				channel = fetched;
-			}
-		} catch {
-			db.delete(`/reminders[${db.getIndex("/reminders", reminder.id, "id")}]`)
-			continue;
-		}
-		new Reminder({
-			ctx: ctx,
-			channel: channel,
-			dead_line_timestamp: reminder.dead_line_timestamp,
-			message: reminder.message,
-			author: await client.users.fetch(reminder.author_id)
-		}).start();
+	for (let reminder of await models.Reminder.findAll()) {
+		reminder.start()
 	}
 });
 
 // Set listeners
-let cmd_listener = async (interaction: Discord.Interaction): Promise<void> => {
+let cmdListener = async (interaction: Discord.Interaction) => {
 	if (!interaction.isCommand()) return;
 
 	const { commandName } = interaction;
@@ -93,43 +86,31 @@ let cmd_listener = async (interaction: Discord.Interaction): Promise<void> => {
 
 	log(`${interaction.user.username} execute ${commandName}`);
 
-	command.execute(ctx.clone({interaction: interaction}));
+	command.execute(interaction);
 }
 
-let help_msg_listener = async (msg: Discord.Message): Promise<void> => {
+let helpMsgListener = async (msg: Discord.Message) => {
 	if (["help", "$help", "!help", "?help", `<@${client.user.id}>`, `<@${client.user.id}> help`].includes(msg.content.toLowerCase())) {
 		await msg.channel.send("Si vous voulez la liste des commandes, utilisez la commande `/help`");
 	}
 }
 
-let fetch_guild_listener = async (msg: Discord.Message): Promise<void> => {
+let fetchGuildListener = async (msg: Discord.Message) => {
 	if (msg.author.id != "448110812801007618") return;
 	if (!msg.embeds.length) return;
 	if (!msg.embeds[0].title) return;
     if (!msg.embeds[0].title.startsWith("Guilde ")) return;
-	let guild = {
+	let guild = new models.Guild({
 		name: msg.embeds[0].title.substring(7),
 		level: parseInt((msg.embeds[0].fields[1].name.split(" "))[6]) + (parseInt((msg.embeds[0].fields[1].name.split(" "))[1]) / parseInt((msg.embeds[0].fields[1].name.split(" "))[3])),
 		description: "",
-		last_update: Date.now(),
-	}
+	})
 	if (isNaN(guild.level)) guild.level = 100;
 	if (msg.embeds[0].description) {
 		guild.description = msg.embeds[0].description.split("`")[1];
 	}
-	db.push(`/guilds/${guild.name}`, guild);
+	guild.save();
 	log(`Guild ${guild.name} fetched. Level: ${Math.round(guild.level*100)/100}`);
-}
-
-function generateTimeDisplay(milliseconds: number): string {
-	let minutes: number = Math.ceil(milliseconds / 60000);
-	const hours: number = Math.floor(minutes / 60);
-	minutes %= 60;
-
-	if (hours > 0) {
-		return hours + " H " + minutes + " Min";
-	}
-	return minutes + " Min";
 }
 
 function getTimeLostByString(timeDisplayed: string): number {
@@ -142,13 +123,13 @@ function getTimeLostByString(timeDisplayed: string): number {
 	return hours * 3600000 + minutes * 60000;
 }
 
-const eventsMsgListener = async (message: Discord.Message): Promise<void> => {
+const eventsMsgListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (!message.content) return;
 	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
-	const userHash: string = createHash('md5').update(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))).digest('hex');
-	if (!(userHash in db.getData("/users"))) return;
-	if (!db.getData(`/users/${userHash}/config/reminders/auto_proposition/events`)) return;
+	const user = await models.User.findByPk(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))) // get the user
+	if (!user) return;
+	if (!user.config.reminders.auto_proposition.events) return;
 
 	const timeBetweenMinievents: number = constants.getData("/times/betweenMinievents");
 	//A time for the possibility where 1) no alte/no time lost 2)  the player wants to skip alte / losetime with shop right after
@@ -173,22 +154,19 @@ const eventsMsgListener = async (message: Discord.Message): Promise<void> => {
 		);
 	}
 		
-	await proposeAutoReminder(message, reminders,
-		//Get user from mention in the text
-		await client.users.fetch(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">")))
-	);
+	await proposeAutoReminder(message, reminders, user);
 };
 
-const minieventMsgListener = async (message: Discord.Message): Promise<void> => {
+const minieventMsgListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (message.embeds.length === 0) return;
 	if(!message.embeds[0].author) return;
 	if (!message.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 	const userID = message.interaction ? message.interaction.user.id
 		: message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const userHash = createHash('md5').update(userID).digest('hex');
-	if (!(userHash in db.getData("/users"))) return;
-	if (!db.getData(`/users/${userHash}/config/reminders/auto_proposition/minievents`)) return;
+	const user = await models.User.findByPk(userID);
+	if (!user) return;
+	if (!user.config.reminders.auto_proposition.minievents) return;
 	let text = message.embeds[0].description;
 	if (constants.getData("/regex/twoMessagesMinieventsEmojis").some((emoji: string) => text.startsWith(emoji))) return;
 	for (const obj of constants.getData("/regex/possibleTwoMessagesMinievents")) {
@@ -221,46 +199,44 @@ const minieventMsgListener = async (message: Discord.Message): Promise<void> => 
 		}
 	}
 
-	await proposeAutoReminder(message, reminders, await client.users.fetch(userID));
+	await proposeAutoReminder(message, reminders, user);
 };
 
-const guildDailyMessageListener = async (message: Discord.Message): Promise<void> => {
+const guildDailyMessageListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (!message.interaction) return;
 	if (message.interaction.commandName !== "guilddaily") return;
 
-	let user_hash = createHash('md5').update(message.interaction.user.id).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	let db_user = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.reminders.auto_proposition.guilddaily) return;
+	const user = await models.User.findByPk(message.interaction.user.id);
+	if (!user) return;
+	if (!user.config.reminders.auto_proposition.guilddaily) return;
 
-	await proposeAutoReminder(message, [constants.getData("/times/betweenGuildDailies")], message.interaction.user);
+
+	await proposeAutoReminder(message, [constants.getData("/times/betweenGuildDailies")], user);
 }
 
-const dailyMessageListener = async (message: Discord.Message): Promise<void> => {
+const dailyMessageListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (!message.interaction) return;
 	if (message.interaction.commandName !== "daily") return;
 
-	let user_hash = createHash('md5').update(message.interaction.user.id).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	let db_user: DB_User = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.reminders.auto_proposition.daily) return;
+	const user = await models.User.findByPk(message.interaction.user.id);
+	if (!user) return;
+	if (!user.config.reminders.auto_proposition.daily) return;
 
-	await proposeAutoReminder(message, [constants.getData("/times/betweenDailies")], message.interaction.user);
+	await proposeAutoReminder(message, [constants.getData("/times/betweenDailies")], user);
 }
 
-const petFeedMessageListener = async (message: Discord.Message): Promise<void> => {
+const petFeedMessageListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (message.embeds.length === 0) return;
 	if(!message.embeds[0].author) return;
 	if (!message.embeds[0].author.name.endsWith(constants.getData("/regex/petFeedAuthorEnd"))) return;
 
 	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user_hash = createHash('md5').update(userID).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	const db_user: DB_User = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.reminders.auto_proposition.petfeed) return;
+	const user = await models.User.findByPk(userID);
+	if (!user) return;
+	if (!user.config.reminders.auto_proposition.petfeed) return;
 
 	const reminders: number[] = [];
 	constants.getData("/pets/" + message.embeds[0].description.replace("**", "").split(" ")[0])
@@ -268,10 +244,10 @@ const petFeedMessageListener = async (message: Discord.Message): Promise<void> =
 			reminders.push(rarity * constants.getData("/times/betweenBasicPetFeeds"))
 		});
 
-	await proposeAutoReminder(message, reminders, await client.users.fetch(userID));
+	await proposeAutoReminder(message, reminders, user);
 }
 
-const petFreeMessageListener = async (message: Discord.Message): Promise<void> => {
+const petFreeMessageListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (message.embeds.length === 0) return;
 	if(!message.embeds[0].author) return;
@@ -280,28 +256,41 @@ const petFreeMessageListener = async (message: Discord.Message): Promise<void> =
 	if (message.interaction) return;
 
 	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user_hash = createHash('md5').update(userID).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	const db_user: DB_User = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.reminders.auto_proposition.petfree) return;
+	const user = await models.User.findByPk(userID);
+	if (!user) return;
+	if (!user.config.reminders.auto_proposition.petfree) return;
 
-	await proposeAutoReminder(message, [constants.getData("/times/betweenPetFrees")], await client.users.fetch(userID));
+	await proposeAutoReminder(message, [constants.getData("/times/betweenPetFrees")], user);
 }
 
-const voteMessageListener = async (message: Discord.Message): Promise<void> => {
+const voteMessageListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (!message.interaction) return;
 	if (message.interaction.commandName !== "vote") return;
 
-	let user_hash = createHash('md5').update(message.interaction.user.id).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	let db_user: DB_User = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.reminders.auto_proposition.vote) return;
+	const user = await models.User.findByPk(message.interaction.user.id);
+	if (!user) return;
+	if (!user.config.reminders.auto_proposition.vote) return;
 
-	await proposeAutoReminder(message, [constants.getData("/times/betweenVotes"), constants.getData("/times/betweenUsefulVotes")], message.interaction.user);
+	await proposeAutoReminder(message, [constants.getData("/times/betweenVotes"), constants.getData("/times/betweenUsefulVotes")], user);
 }
 
-async function proposeAutoReminder(message: Discord.Message, reminders: number[], author: Discord.User): Promise<void> {
+let propoMsgListener = async (message: Discord.Message) => {
+	if (!message.content) return;
+	const user = await models.User.findByPk(message.author.id)
+	if (!user) return;
+	const reminders = await user.$get('propoReminders', {
+		where: {
+			trigger: message.content
+		}
+	})
+	if (!reminders.length) return;
+	const reminder = reminders[0];
+
+	await proposeAutoReminder(message, [reminder.duration], user)
+}
+
+async function proposeAutoReminder(message: Discord.Message, reminders: number[], author: User) {
 	const components = new MessageActionRow();
 	reminders.forEach((time: number) => {
 		components.addComponents(
@@ -321,137 +310,55 @@ async function proposeAutoReminder(message: Discord.Message, reminders: number[]
 	await addReminder(await message.reply({content: `Voulez-vous ajouter un rappel ?`, components: [components]}), author);
 }
 
-async function addReminder(propositionMessage: Discord.Message, author: Discord.User): Promise<void> {
-	const listener = async (interaction: Discord.Interaction): Promise<void> => {
+async function addReminder(propositionMessage: Discord.Message, author: User) {
+	const listener = async (interaction: Discord.Interaction) => {
 		if (!interaction.isButton()) return;
 		if (!(interaction.message instanceof Discord.Message)) return;
 		if (interaction.message.id != propositionMessage.id) return;
-		if (interaction.user.id != author.id) {
+		if (interaction.user.id != author.discordId) {
 			interaction.reply({content: ":warning: Désolé, vous n'êtes pas la personne à qui est destinée cette proposition", ephemeral: true});
 			return;
 		}
 		if (interaction.customId === "remove") {
 			interaction.message.delete();
+			propositionMessage = interaction.message;
 			return;
 		}
 
 		interaction.update({content: "Rappel ajouté !", components: []});
 		const endDate = interaction.message.createdTimestamp + parseInt(interaction.customId);
-		const reminder = new Reminder({
-			ctx: ctx,
-			channel: db.getData(`/users/${createHash('md5').update(author.id).digest('hex')}/config/reminders/auto_proposition/in_dm`)
-				? author : propositionMessage.channel,
-			dead_line_timestamp: endDate,
+		models.Reminder.create({
+			channelId: author.config.reminders.auto_proposition.in_dm
+				? author.discordId : propositionMessage.channel.id,
+			channelIsUser: author.config.reminders.auto_proposition.in_dm,
+			deadLineTimestamp: endDate,
 			message: `Vous avez ajouté un rappel il y a ${generateTimeDisplay(parseInt(interaction.customId))}`,
 			author: author
-		})
-		reminder.save();
-		reminder.start();
-		await log(`${author.username} ajoute un rappel pour dans ${generateTimeDisplay(parseInt(interaction.customId))} suite à une proposition de rappel automatique`);
+		}).then((r)=>r.start())
+		propositionMessage = interaction.message;
+		log(`${author.discordUser.toString()} ajoute un rappel pour dans ${generateTimeDisplay(parseInt(interaction.customId))} suite à une proposition de rappel automatique`);
 	};
 
 	client.on('interactionCreate', listener);
-		setTimeout(() => {
-			client.removeListener('interactionCreate', listener);
-			if (propositionMessage.deletable) {
-				propositionMessage.delete();
-			}
-		}, 60000
-	);
-}
-
-let propo_msg_listener = async (msg: Discord.Message): Promise<void> => {
-	if (!msg.content) return;
-	let user_hash = createHash('md5').update(msg.author.id).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	let reminder_on: {
-		[propName: string]: {
-			duration: number,
-			unit: string,
-			in_dm: boolean
-	}} = db.getData(`/users/${user_hash}/config/reminders/on`);
-	let reminder = reminder_on[msg.content];
-	if (reminder) {
-		let components = new MessageActionRow()
-			.addComponents(
-				new MessageButton()
-					.setCustomId("add")
-					.setLabel("Ajouter")
-					.setStyle("PRIMARY")
-			)
-			.addComponents(
-				new MessageButton()
-					.setCustomId("remove")
-					.setLabel("Non")
-					.setStyle("DANGER")
-			);
-		let propo_msg = await msg.channel.send({ content: `Voulez vous ajouter un rappel dans ${reminder.duration} ${reminder.unit} ?`, components: [components] });
-		let listener = async (button_interaction: Discord.Interaction) => {
-			if (!button_interaction.isButton()) return;
-			if (!(button_interaction.message instanceof Discord.Message)) return;
-			if (button_interaction.message.id != propo_msg.id) return;
-			if (button_interaction.user.id != msg.author.id) {
-				button_interaction.reply({ content: ":warning: Désolé, vous n'êtes pas la personne à qui est destinée cette proposition", ephemeral: true});
-			}
-
-			switch (button_interaction.customId) {
-				case "add":
-					button_interaction.update({ content: "Rappel ajouté !", components: [] });
-					let dead_line = msg.createdAt;
-					switch (reminder.unit) {
-						case "secondes":
-							dead_line.setSeconds(dead_line.getSeconds() + reminder.duration);
-							break;
-						case "minutes":
-							dead_line.setMinutes(dead_line.getMinutes() + reminder.duration);
-							break;
-						case "heures":
-							dead_line.setHours(dead_line.getHours() + reminder.duration);
-							break;
-						case "jours":
-							dead_line.setDate(dead_line.getDate() + reminder.duration);
-							break;
-					}
-					let new_reminder = new Reminder({
-						ctx: ctx,
-						channel: reminder.in_dm ? msg.author : msg.channel,
-						dead_line_timestamp: dead_line.getTime(),
-						message: `Vous avez ajouté un rappel il y a ${reminder.duration} ${reminder.unit} après le message \`${msg.content}\``,
-						author: msg.author
-					})
-					new_reminder.save();
-					new_reminder.start();
-					await log(`${msg.author.username} ajoute un rappel pour dans ${reminder.duration} ${reminder.unit} suite à une proposition de rappel`);
-					break;
-				case "remove":
-					if (button_interaction.message.deletable) {
-						button_interaction.message.delete();
-					}
-					break;
-			}
+	setTimeout(() => {
+		client.removeListener('interactionCreate', listener);
+		if (propositionMessage.deletable && propositionMessage.components.length>0) {
+			propositionMessage.delete();
 		}
-		client.on('interactionCreate', listener);
-		setTimeout(() => {
-			client.removeListener('interactionCreate', listener);
-			if (propo_msg.deletable) {
-				propo_msg.delete();
-			}
-		}, 60000);
-	}
+	}, 60000);
 }
 
-let long_report_listener = async (msg: Discord.Message): Promise<void> => {
+let longReportListener = async (msg: Discord.Message) => {
 	if (msg.author.id !== config.getData("/draftbot_id")) return;
 	if (!msg.content) return;
 	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(msg.content))) return;
 
-	let user_hash = createHash('md5').update(msg.content.split("<@")[1].split(">")[0]).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	let db_user: DB_User = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.tracking.reports) return;
+	const user = await models.User.findByPk(msg.content.split("<@")[1].split(">")[0])
+	if (!user) return;
+	if (!user.config.tracking.reports) return;
 
 	// Training message : :newspaper: ** Journal de @Arkitu  :** :medal: Points gagnés : ** 358** | :moneybag: Argent gagné : ** 24** | :star: XP gagné : ** 25** | :clock10: Temps perdu : ** 45 Min ** | ⛓️ Vous grimpez jusqu'en haut des échafaudages, mais à l'exception d'un magnifique paysage, vous ne trouvez rien. Après avoir passé quelques minutes à l'admirer, vous repartez.
-	let data = {
+	const data = {
 		points: 0,
 		gold: 0,
 		xp: 0,
@@ -507,43 +414,45 @@ let long_report_listener = async (msg: Discord.Message): Promise<void> => {
 		}
 	}
 
-	db.push(`/users/${user_hash}/tracking[]`, {
+	const tracking = new models.Tracking({
 		type: "long_report",
-		timestamp: msg.createdTimestamp,
 		data: data
 	});
+	user.$add('tracking', tracking);
+	tracking.save()
+
 	log("Long repport tracked");
 }
 
-let short_report_listener = async (msg: Discord.Message): Promise<void> => {
+let shortReportListener = async (msg: Discord.Message): Promise<void> => {
 	if (msg.author.id !== config.getData("/draftbot_id")) return;
 	if (msg.embeds.length === 0) return;
 	if(!msg.embeds[0].author) return;
 	if (!msg.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 	if (!msg.interaction) return;
 
-	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	let db_user: DB_User = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.tracking.reports) return;
+	const user = await models.User.findByPk(msg.interaction.user.id)
+	if (!user) return;
+	if (!user.config.tracking.reports) return;
 
-	db.push(`/users/${user_hash}/tracking[]`, {
-		type: "short_report",
-		timestamp: msg.createdTimestamp
+	const tracking = new models.Tracking({
+		type: "short_report"
 	});
+	user.$add('tracking', tracking);
+	tracking.save()
+
 	log("Short repport tracked");
 }
 
-let profile_listener = async (msg: Discord.Message): Promise<void> => {
+let profileListener = async (msg: Discord.Message): Promise<void> => {
 	if (msg.author.id !== config.getData("/draftbot_id")) return;
 	if (!msg.interaction) return;
 	if (msg.interaction.commandName !== "profile") return;
 	if (msg.interaction.user.username !== msg.embeds[0].title.split(" | ")[1]) return;
 
-	let user_hash = createHash('md5').update(msg.interaction.user.id).digest('hex');
-	if (!(user_hash in db.getData("/users"))) return;
-	let db_user: DB_User = db.getData(`/users/${user_hash}`);
-	if (!db_user.config.tracking.profile) return;
+	const user = await models.User.findByPk(msg.interaction.user.id, {include:[models.Goal]})
+	if (!user) return;
+	if (!user.config.tracking.reports) return;
 
 	let embed = msg.embeds[0];
 
@@ -589,18 +498,20 @@ let profile_listener = async (msg: Discord.Message): Promise<void> => {
 		destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
 	}
 
-	db.push(`/users/${user_hash}/tracking[]`, {
+	const tracking = new models.Tracking({
 		type: "profile",
-		timestamp: msg.createdTimestamp,
 		data: data
 	});
-	if (db_user.config.goal) {
-		if (db_user.config.goal.end < msg.createdTimestamp) {
+	user.$add('trackings', tracking);
+	tracking.save();
+
+	for (let goal of user.goals) {
+		if (goal.end < msg.createdTimestamp) {
 			await msg.channel.send({ embeds: [
 				new MessageEmbed()
 					.setColor(config.getData("/main_color"))
 					.setTitle("Expiration de votre objectif")
-					.setDescription(`Votre objectif de ${db_user.config.goal.value} ${
+					.setDescription(`Votre objectif de ${goal.value} ${
 						{
 							lvl: "niveaux",
 							gold: ":moneybag:",
@@ -609,16 +520,16 @@ let profile_listener = async (msg: Discord.Message): Promise<void> => {
 							gems: ":gem:",
 							quest_missions_percentage: "% de missions de quêtes",
 							rank_points: ":medal:"
-						}[db_user.config.goal.unit]
+						}[goal.unit]
 					} a expiré, vous pouvez en définir un nouveau avec \`/set_goal\``)
 			]});
-			db.delete(`/users/${user_hash}/config/goal`);
-		} else if (db_user.config.goal.value <= data[db_user.config.goal.unit] ) {
+			goal.destroy();
+		} else if (goal.endValue <= data[goal.unit] ) {
 			await msg.channel.send({ embeds: [
 				new MessageEmbed()
 					.setColor(config.getData("/main_color"))
 					.setTitle("Objectif atteint !")
-					.setDescription(`<@${msg.author.id}>, vous avez atteint votre objectif de ${db_user.config.goal.value} ${
+					.setDescription(`<@${msg.author.id}>, vous avez atteint votre objectif de ${goal.value} ${
 						{
 							lvl: "niveaux",
 							gold: ":moneybag:",
@@ -627,23 +538,23 @@ let profile_listener = async (msg: Discord.Message): Promise<void> => {
 							gems: ":gem:",
 							quest_missions_percentage: "% de missions de quêtes",
 							rank_points: ":medal:"
-						}[db_user.config.goal.unit]
+						}[goal.unit]
 					} !`)
 			]});
-			db.delete(`/users/${user_hash}/config/goal`);
+			goal.destroy();
 		}
 	}
 }
 
 client.setMaxListeners(0);
-client.on('interactionCreate', cmd_listener);
+client.on('interactionCreate', cmdListener);
 client.on('messageCreate', (message) => {
-	help_msg_listener(message);
-	fetch_guild_listener(message);
-	propo_msg_listener(message);
-	long_report_listener(message);
-	short_report_listener(message);
-	profile_listener(message);
+	helpMsgListener(message);
+	fetchGuildListener(message);
+	propoMsgListener(message);
+	longReportListener(message);
+	shortReportListener(message);
+	profileListener(message);
 	eventsMsgListener(message);
 	minieventMsgListener(message);
 	guildDailyMessageListener(message);

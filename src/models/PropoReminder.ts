@@ -11,7 +11,7 @@ export default class PropoReminder extends Model {
     @Column({
         allowNull: false
     })
-    durationTimestamp: number;
+    duration: number;
 
     @Column({
         defaultValue: false

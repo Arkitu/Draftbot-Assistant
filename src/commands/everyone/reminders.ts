@@ -1,12 +1,12 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbed } from 'discord.js';
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 import { DB_Reminder } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('reminders')
 	.setDescription('Renvois la liste des rappels');
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
 	await ctx.interaction.deferReply();
 
 	let reminders = ctx.db.getData('/reminders').filter((reminder: DB_Reminder) => reminder.author_id == ctx.interaction.user.id) as DB_Reminder[];

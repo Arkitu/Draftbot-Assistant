@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Goal } from '../../libs/Goal.js';
+import Goal from '../../libs/Goal.js';
 import { createHash } from "crypto";
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 import { DB_Tracking, DB_Tracking_Profile, DB_User, Profile_Property } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
@@ -43,7 +43,7 @@ export const data = new SlashCommandBuilder()
             .addChoice('3 semaines', '1814400000')
             .addChoice('1 mois', '2678400000')
     )
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
 	await ctx.interaction.deferReply();
 
     let opts = {

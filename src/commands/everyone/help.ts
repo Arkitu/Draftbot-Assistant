@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
-import { Context } from "../../libs/Context.js";
+import { CommandInteraction, MessageEmbed } from "discord.js";
 
 export const data = new SlashCommandBuilder()
 	.setName("help")
@@ -14,7 +13,7 @@ export const data = new SlashCommandBuilder()
 		.addChoice("Tracking", "Tracking")
 	);
 
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
 	await ctx.interaction.deferReply();
 
 	const opt_categorie = ctx.interaction.options.getString("categorie");

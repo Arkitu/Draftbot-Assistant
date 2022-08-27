@@ -1,5 +1,5 @@
 import { MessageEmbed, User as DiscordUser, TextBasedChannel, DMChannel } from 'discord.js';
-import { Context } from '../libs/Context.js';
+import Context from '../libs/Context.js';
 import { User } from '.';
 import { Table, Column, Model, DataType, BelongsTo } from 'sequelize-typescript';
 
@@ -31,6 +31,8 @@ export default class Reminder extends Model {
     })
     message: string;
 
+    @BelongsTo(() => User)
+    author: User;
     
     // Not saved in database
     @Column(DataType.VIRTUAL)
@@ -46,57 +48,46 @@ export default class Reminder extends Model {
         type: DataType.VIRTUAL,
         allowNull: false
     })
-    ctx: Context;
-
-    @Column({
-        type: DataType.VIRTUAL,
-        allowNull: false
-    })
     private channel: TextBasedChannel | DiscordUser;
 
     async getChannel() {
         if (this.channel) return this.channel;
         if (this.channelIsUser) {
-            this.channel = await this.ctx.client.users.fetch(this.channelId);
+            this.channel = await client.users.fetch(this.channelId);
+            return this.channel as DiscordUser;
         } else {
-            let fetched = await this.ctx.client.channels.fetch(this.channelId);
+            let fetched = await client.channels.fetch(this.channelId);
             if (!fetched.isText()) throw new Error("Channel is not a text channel");
             this.channel = fetched;
+            return this.channel as TextBasedChannel;
         }
-        return this.channel;
     }
-
-    @Column({
-        type: DataType.VIRTUAL,
-        allowNull: false
-    })
-
-    @BelongsTo(() => User)
-    author: User;
 
     // Methods
     async start() {
         setTimeout(async () => {
-            if (await this.ctx.sequelize.models.reminder.findOne({ where: { id: this.id } })) {
+            if (await models.Reminder.findOne({ where: { id: this.id } })) {
                 let embed = new MessageEmbed()
-                    .setColor(this.ctx.config.getData("/main_color"))
+                    .setColor(config.getData("/main_color"))
                     .setTitle("Reminder")
                     .setDescription(this.message)
-                this.sendReminderMessage(embed);
+                this.sendReminderMessage({ embed: embed });
                 this.destroy()
             }
         }, (this.deadLine.getTime() - Date.now()));
         return this;
     }
 
-    async sendReminderMessage(embed: MessageEmbed) {
+    async sendReminderMessage(opts: {embed: MessageEmbed}) {
+        await this.getChannel();
+        await this.author.fetchDiscordUser();
         if (this.channel instanceof DMChannel) {
-            this.channel.send({embeds: [embed]});
+            this.channel.send({embeds: [opts.embed]});
             return;
         }
         if (!("permissionsFor" in this.channel)) return;
-        if (this.channel.permissionsFor(this.ctx.client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
-            this.channel.send({content: this.author.toString(), embeds: [embed]});
+        if (this.channel.permissionsFor(client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
+            this.channel.send({content: this.author.discordUser.toString(), embeds: [opts.embed]});
         }
     }
 }

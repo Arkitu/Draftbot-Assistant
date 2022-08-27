@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('infos')
@@ -15,24 +15,17 @@ export const data = new SlashCommandBuilder()
             .setDescription("Affiche le nombre d'événements trackés")
     );
 
-export async function execute(ctx: Context) {
-    await ctx.interaction.deferReply();
-	switch (ctx.interaction.options.getSubcommand()) {
+export async function execute(interaction: CommandInteraction) {
+    await interaction.deferReply();
+	switch (interaction.options.getSubcommand()) {
         case 'tracked':
-            let tracked = 0;
-            for (let user in ctx.db.getData("/users")) {
-                if (ctx.db.getData(`/users/${user}/tracking`).length > 0) {
-                    tracked++;
-                }
-            }
-            await ctx.interaction.editReply(`${tracked} utilisateurs suivis`);
+            interaction.editReply(`${await models.Tracking.count({
+                distinct: true,
+                col: "userId"
+            })} utilisateurs suivis`);
             break;
         case 'tracked_events':
-            let tracked_events = 0;
-            for (let user in ctx.db.getData("/users")) {
-                tracked_events += ctx.db.getData(`/users/${user}/tracking`).length;
-            }
-            await ctx.interaction.editReply(`${tracked_events} événements trackés`);
+            interaction.editReply(`${await models.Tracking.count()} événements trackés`);
             break;
     }
 }

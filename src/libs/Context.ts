@@ -1,8 +1,9 @@
 import * as Discord from 'discord.js';
 import { JsonDB } from 'node-json-db';
 import { Sequelize } from 'sequelize-typescript';
+import { models } from '../models';
 
-export class Context {
+export default class Context {
     client: Discord.Client | null;
     db: JsonDB | null;
     config: JsonDB | null;
@@ -10,6 +11,7 @@ export class Context {
     message: Discord.Message | null;
     constants: JsonDB | null;
     sequelize: Sequelize | null;
+    models: typeof models | null;
 
     constructor (opts: {
         client?: Discord.Client | null,
@@ -18,7 +20,8 @@ export class Context {
         constants?: JsonDB | null,
         interaction?: Discord.CommandInteraction | null,
         message?: Discord.Message | null,
-        sequelize?: Sequelize | null
+        sequelize?: Sequelize | null,
+        models?: typeof models | null
     } = {}) {
         this.client = opts.client || null;
         this.db = opts.db || null;
@@ -27,6 +30,7 @@ export class Context {
         this.message = opts.message || null;
         this.constants = opts.constants || null;
         this.sequelize = opts.sequelize || null;
+        this.models = opts.models || null;
     }
 
     clone (opts: {
@@ -36,7 +40,8 @@ export class Context {
         constants?: JsonDB | null,
         interaction?: Discord.CommandInteraction | null,
         message?: Discord.Message | null,
-        sequelize?: Sequelize | null
+        sequelize?: Sequelize | null,
+        models?: typeof models | null
     } = {}) {
         return new Context({
             client: opts.client || this.client,
@@ -45,7 +50,8 @@ export class Context {
             constants: opts.constants || this.constants,
             interaction: opts.interaction || this.interaction,
             message: opts.message || this.message,
-            sequelize: opts.sequelize || this.sequelize
+            sequelize: opts.sequelize || this.sequelize,
+            models: opts.models || this.models
         });
     }
 }

@@ -4,7 +4,7 @@ import { MessageEmbed, Options } from 'discord.js';
 import { createHash } from "crypto";
 import { unlink } from 'fs';
 import { log, log_error } from "../../bot.js";
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 import { DB_User } from '../../libs/Interfaces.js';
 
 export var property_data: {
@@ -168,7 +168,7 @@ export const data = new SlashCommandBuilder()
                     .setRequired(false)
             )
     )
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
     let opt = {
         subcommand: ctx.interaction.options.getSubcommand() as "reports" | "profile",
         category: (ctx.interaction.options.getString('category') || 'all') as "all" | "events" | "mini-events" | "lvl" | "gold" | "pv" | "max_pv" | "xp" | "max_xp" | "energy" | "max_energy" | "strenght" | "defense" | "speed" | "gems" | "quest_missions_percentage" | "rank" | "rank_points",

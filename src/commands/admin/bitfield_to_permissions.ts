@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import bitfieldCalculator from 'discord-bitfield-calculator';
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('bitfield_to_permissions')
@@ -11,9 +11,9 @@ export const data = new SlashCommandBuilder()
             .setRequired(true)
             .setDescription('Le bitfield à convertir')
     );
-export async function execute(ctx: Context) {
-    let permissions = bitfieldCalculator.permissions(ctx.interaction.options.getString('bitfield'));
+export async function execute(interaction: CommandInteraction) {
+    let permissions = bitfieldCalculator.permissions(interaction.options.getString('bitfield'));
     console.log("Permissions :");
     console.log(permissions);
-    await ctx.interaction.reply(`${permissions}`);
+    await interaction.reply(`${permissions}`);
 }

@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { GuildChannel } from 'discord.js';
-import { Context } from '../../libs/Context.js';
+import { CommandInteraction } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('fetch')
@@ -11,41 +11,41 @@ export const data = new SlashCommandBuilder()
             .setRequired(true)
             .setDescription('L\'id de l\'objet à récupérer')
     );
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
     let thing;
-    let id = ctx.interaction.options.getString('id');
+    let id = interaction.options.getString('id');
 	try {
-        thing = ctx.client.users.resolve(id);
+        thing = client.users.resolve(id);
     } catch {
         console.log("Not a user");
     }
     try {
-        thing = ctx.client.channels.resolve(id);
+        thing = client.channels.resolve(id);
     } catch {
         console.log("Not a channel");
     }
     try {
-        thing = ctx.client.guilds.resolve(id);
+        thing = client.guilds.resolve(id);
     } catch {
         console.log("Not a guild");
     }
     try {
-        thing = ctx.client.emojis.resolve(id);
+        thing = client.emojis.resolve(id);
     } catch {
         console.log("Not an emoji");
     }
     try {
-        thing = await ctx.client.fetchWebhook(id);
+        thing = await client.fetchWebhook(id);
     } catch {
         console.log("Not a webhook");
     }
     try {
-        thing = await ctx.client.fetchInvite(id);
+        thing = await client.fetchInvite(id);
     } catch {
         console.log("Not an invite");
     }
     try {
-        thing = await ctx.client.fetchSticker(id);
+        thing = await client.fetchSticker(id);
     } catch {
         console.log("Not a sticker");
     }
@@ -56,5 +56,5 @@ export async function execute(ctx: Context) {
         console.log("Permissions :");
         console.log(thing.permissionOverwrites.cache);
     }
-    await ctx.interaction.reply(`${thing}`);
+    await interaction.reply(`${thing}`);
 }

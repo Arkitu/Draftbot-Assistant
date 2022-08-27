@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Context } from '../../libs/Context.js';
-import { Reminder } from '../../libs/Reminder.js';
+import { CommandInteraction } from 'discord.js';
+import Reminder from '../../libs/Reminder.js';
 import { DB_Reminder } from '../../libs/Interfaces.js';
 import { TextBasedChannel, User } from 'discord.js';
 
@@ -12,7 +12,7 @@ export const data = new SlashCommandBuilder()
         .setDescription("Le message du rappel")
         .setRequired(true)
     );
-export async function execute(ctx: Context) {
+export async function execute(interaction: CommandInteraction) {
     await ctx.interaction.deferReply();
     let opt = {
         msg: ctx.interaction.options.getString("message")

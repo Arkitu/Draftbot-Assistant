@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { User, TextBasedChannel } from 'discord.js';
-import { Reminder } from '../../libs/Reminder.js';
-import { Context } from '../../libs/Context.js';
+import Reminder from '../../libs/Reminder.js';
+import { CommandInteraction } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('add_reminder')
@@ -25,12 +25,12 @@ export const data = new SlashCommandBuilder()
         .addChoice("heures", "heures")
         .addChoice("jours", "jours")
     );
-export async function execute(ctx: Context) {
-    await ctx.interaction.deferReply();
+export async function execute(interaction: CommandInteraction) {
+    await interaction.deferReply();
     let args = {
-        time: ctx.interaction.options.getInteger("time"),
-        message: ctx.interaction.options.getString("message"),
-        unit: ctx.interaction.options.getString("unit") || "minutes"
+        time: interaction.options.getInteger("time"),
+        message: interaction.options.getString("message"),
+        unit: interaction.options.getString("unit") || "minutes"
     }
 
     let dead_line = new Date();
@@ -51,21 +51,26 @@ export async function execute(ctx: Context) {
     }
     
     let channel: User | TextBasedChannel
-    if (ctx.interaction.channel) {
-        channel = ctx.interaction.channel
+    if (interaction.channel) {
+        channel = interaction.channel
     } else {
-        channel = ctx.interaction.user
+        channel = interaction.user
     }
 
-    let reminder = new Reminder({
-        ctx: ctx,
-        channel: channel,
-        dead_line_timestamp: dead_line.getTime(),
-        message: args.message,
-        author: ctx.interaction.user
-    })
-    reminder.save();
-    reminder.start();
+    const user = models.User.findOrCreate({
+        where: {
+            discordId: interaction.user.id
+        }
+    });
 
-    await ctx.interaction.editReply("Le rappel a été ajouté !");
+    const reminder = new models.Reminder({
+        channelId: channel.id,
+        channelIsUser: channel instanceof User,
+        deadLineTimestamp: dead_line.getTime(),
+        message: args.message
+    });
+    (await user)[0].$add('reminders', reminder);
+    reminder.save();
+
+    await interaction.editReply(`Le rappel de ${args.time} ${args.unit} a été ajouté !`);
 }

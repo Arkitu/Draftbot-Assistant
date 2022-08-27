@@ -9,13 +9,14 @@ export default class Tracking extends Model {
     type: "profile" | "long_report" | "short_report";
 
     @Column
-    private data: string
+    stringifiedData: string
 
-    getData() {
-        return JSON.parse(this.data);
+	@Column(DataType.VIRTUAL)
+    get data() {
+        return JSON.parse(this.stringifiedData);
     }
 
-    setData(value: {
+    set data (value: {
 		lvl: number,
 		pv: number,
 		max_pv: number,
@@ -49,8 +50,7 @@ export default class Tracking extends Model {
             this.data = null;
             return;
         }
-        this.data = JSON.stringify(value)
-        return this
+        this.stringifiedData = JSON.stringify(value)
     }
 
     @BelongsTo(()=>User)

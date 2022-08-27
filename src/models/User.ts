@@ -1,9 +1,7 @@
 import { transform as deflat, flatten } from "dottie";
-import { Context } from '../libs/Context.js';
 import { Table, Column, Model, HasMany, PrimaryKey, Unique, DataType, BelongsTo } from 'sequelize-typescript';
 import { User as DiscordUser } from 'discord.js';
-import { Reminder, PropoReminder, Tracking } from '.';
-import { Guild } from ".";
+import { Reminder, PropoReminder, Tracking, Guild, Goal } from '.';
 
 interface Config {
     reminders?: {
@@ -64,7 +62,7 @@ export default class User extends Model {
     })
     @PrimaryKey
     @Unique
-    discord_id: string;
+    discordId: string;
 
     @HasMany(()=>Reminder)
     reminders: Reminder[];
@@ -72,95 +70,78 @@ export default class User extends Model {
     @HasMany(()=>Tracking)
     trackings: Tracking[];
 
+    @HasMany(()=>Goal)
+    goals: Goal[];
+
     @BelongsTo(()=>Guild)
     guild: Guild;
 
     // config
     @HasMany(() => PropoReminder)
-    private 'config.reminders.on': PropoReminder[];
+    propoReminders: PropoReminder[];
 
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.events': boolean;
+    'config.reminders.auto_proposition.events': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.minievents': boolean;
+    'config.reminders.auto_proposition.minievents': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.guilddaily': boolean;
+    'config.reminders.auto_proposition.guilddaily': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.daily': boolean;
+    'config.reminders.auto_proposition.daily': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.petfeed': boolean;
+    'config.reminders.auto_proposition.petfeed': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.petfree': boolean;
+    'config.reminders.auto_proposition.petfree': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.vote': boolean;
+    'config.reminders.auto_proposition.vote': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.reminders.auto_proposition.in_dm': boolean;
+    'config.reminders.auto_proposition.in_dm': boolean;
 
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.tracking.reports': boolean;
+    'config.tracking.reports': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.tracking.public': boolean;
+    'config.tracking.public': boolean;
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    private 'config.tracking.profile': boolean;
-
-    @Column
-    private 'config.goal.start': number;
-    @Column
-    private 'config.goal.end': number;
-    @Column
-    private 'config.goal.value': number;
-    @Column
-    private 'config.goal.unit': "lvl" | "gold" | "pv" | "xp" | "gems" | "quest_missions_percentage" | "rank_points";
-    @Column
-    private 'config.goal.init_value': number;
-    @Column({
-        allowNull: false,
-        defaultValue: false
-    })
-    private 'config.goal.active': boolean;
+    'config.tracking.profile': boolean;
 
     // Not saved in database
-    // context
-    @Column({
-        type: DataType.VIRTUAL,
-        allowNull: false
-    })
-    ctx: Context;
 
-    // object config linked to flatten config properties
+    /**
+     * Object config linked to flatten config properties
+     */
     @Column(DataType.VIRTUAL)
     get config(): Config {
         return deflat(this.toJSON())["config"]
@@ -169,12 +150,19 @@ export default class User extends Model {
         this.set(flatten(value))
     }
 
-    // discord user (/!\ dont use it, use getDiscordUser instead)
+    /**
+     * Verify that user is in cache before using this property.
+     * If you're not sure, use `fetchDiscordUser()` instead.
+     */
     @Column(DataType.VIRTUAL)
-    private discordUser: DiscordUser | undefined = undefined;
+    get discordUser(): DiscordUser {
+        return client.users.cache.get(this.discordId);
+    }
 
-    async getDiscordUser() {
-        if (this.discordUser) return this.discordUser;
-        return await this.ctx.client.users.fetch(this.discord_id);
+    /**
+     * Fetch DiscordUser by id. If user is already in cache, you can use `discordUser` instead.
+     */
+    async fetchDiscordUser(): Promise<DiscordUser> {
+        return await client.users.fetch(this.discordId);
     }
 }
