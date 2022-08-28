@@ -4,38 +4,28 @@ import { User as DiscordUser } from 'discord.js';
 import { Reminder, PropoReminder, Tracking, Guild, Goal } from '.';
 
 interface Config {
-    reminders?: {
-        auto_proposition?: {
-            events?: boolean,
-            minievents?: boolean,
-            guilddaily?: boolean,
-            daily?: boolean,
-            petfree?: boolean,
-            petfeed?: boolean,
-            vote?: boolean,
-            in_dm?: boolean
-        },
-        on?: PropoReminder[]
+    reminders: {
+        auto_proposition: {
+            events: boolean,
+            minievents: boolean,
+            guilddaily: boolean,
+            daily: boolean,
+            petfree: boolean,
+            petfeed: boolean,
+            vote: boolean,
+            in_dm: boolean
+        }
     },
-    tracking?: {
-        reports?: boolean,
-        public?: boolean,
-        profile?: boolean
-    },
-    goal?: {
-        start: number,
-        end: number,
-        value: number,
-        unit: "lvl" | "gold" | "pv" | "xp" | "gems" | "quest_missions_percentage" | "rank_points",
-        init_value: number,
-        end_value: number,
-        active: boolean
+    tracking: {
+        reports: boolean,
+        public: boolean,
+        profile: boolean
     }
 }
 
 
 
-interface ConfigSetArgs extends Config {
+interface ConfigSetArgs {
     reminders?: {
         auto_proposition?: {
             events?: boolean,
@@ -47,6 +37,11 @@ interface ConfigSetArgs extends Config {
             vote?: boolean,
             in_dm?: boolean
         }
+    },
+    tracking?: {
+        reports?: boolean,
+        public?: boolean,
+        profile?: boolean
     }
 }
 

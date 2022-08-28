@@ -18,8 +18,8 @@ export const data = new SlashCommandBuilder()
             )
             .addSubcommand(subcommand =>
                 subcommand
-                    .setName("add_propo")
-                    .setDescription("Ajouter une proposition de rappel")
+                    .setName("add_custom_propo")
+                    .setDescription("Ajouter une proposition de rappel à la suite d'un message donné")
                     .addStringOption(option =>
                         option
                             .setName("trigger")
@@ -50,8 +50,8 @@ export const data = new SlashCommandBuilder()
             )
             .addSubcommand(subcommand =>
                 subcommand
-                    .setName("del_propo")
-                    .setDescription("Supprime une proposition de rappel")
+                    .setName("del_custom_propo")
+                    .setDescription("Supprime une proposition de rappel à la suite d'un message donné")
                     .addStringOption(option =>
                         option
                             .setName("trigger")
@@ -61,38 +61,21 @@ export const data = new SlashCommandBuilder()
             )
             .addSubcommand(subcommand =>
                 subcommand
-                    .setName("events")
-                    .setDescription("Active/désactive la proposition automatique de rappel après un event")
-            )
-            .addSubcommand(subcommand =>
-                subcommand
-                    .setName("minievents")
-                    .setDescription("Active/désactive la proposition automatique de rappel après un minievent")
-            )
-            .addSubcommand(subcommand =>
-                subcommand
-                    .setName("guilddaily")
-                    .setDescription("Active/désactive la proposition automatique de rappel après un /guilddaily")
-            )
-            .addSubcommand(subcommand =>
-                subcommand
-                    .setName("daily")
-                    .setDescription("Active/désactive la proposition automatique de rappel après un /daily")
-            )
-            .addSubcommand(subcommand =>
-                subcommand
-                    .setName("petfeed")
-                    .setDescription("Active/désactive la proposition automatique de rappel après un /petfeed")
-            )
-            .addSubcommand(subcommand =>
-                subcommand
-                    .setName("petfree")
-                    .setDescription("Active/désactive la proposition automatique de rappel après un /petfree")
-            )
-            .addSubcommand(subcommand =>
-                subcommand
-                    .setName("vote")
-                    .setDescription("Active/désactive la proposition automatique de rappel après un /vote")
+                    .setName("switch_command_propo")
+                    .setDescription("Active/désactive une proposition de rappel suite à une commande")
+                    .addStringOption(opt =>
+                        opt
+                            .setName("trigger")
+                            .setDescription("La situation dans laquelle activer/désactiver la proposition")
+                            .setRequired(true)
+                            .addChoice("events", "events")
+                            .addChoice("minievents", "minievents")
+                            .addChoice("guilddaily", "guilddaily")
+                            .addChoice("daily", "daily")
+                            .addChoice("petfeed", "petfeed")
+                            .addChoice("petfree", "petfree")
+                            .addChoice("vote", "vote")
+                    )
             )
             .addSubcommand(subcommand =>
                 subcommand
@@ -133,8 +116,13 @@ export async function execute(interaction: CommandInteraction) {
         trigger: interaction.options.getString("trigger"),
         duration: interaction.options.getInteger("duration"),
         unit: interaction.options.getString("unit"),
-        in_dm: interaction.options.getBoolean("in_dm")
+        in_dm: interaction.options.getBoolean("in_dm"),
+        option: interaction.options.getString("option") as "reports" | "public" | "profile"
     };
+    if (`${opt.subcommandgroup}/${opt.subcommand}` === "reminders/switch_custom_propo") {
+        ;
+    }
+
     let include: Includeable[] = [];
     if (`${opt.subcommandgroup}/${opt.subcommand}` === "reminders/view") {
         include.push(models.PropoReminder)
@@ -147,7 +135,7 @@ export async function execute(interaction: CommandInteraction) {
     }))[0];
 
     switch (`${opt.subcommandgroup}/${opt.subcommand}`) {
-        case "reminders/view":
+        case "reminders/view": {
             let reminders_embed = new MessageEmbed()
                 .setColor(config.getData("/main_color"))
                 .setAuthor({ name: `Paramètres des reminders de ${interaction.user.username}`, iconURL: client.user.avatarURL() })
@@ -166,118 +154,104 @@ export async function execute(interaction: CommandInteraction) {
                     str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <durée> <unité>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
                     return str_propos;
                 })());
-            await interaction.editReply({ embeds: [reminders_embed] });
+            interaction.editReply({ embeds: [reminders_embed] });
             break;
-        case "reminders/add_propo":
+        }
+        case "reminders/add_custom_propo": {
             if (opt.trigger.includes("/")) {
-                await interaction.editReply("Vous ne pouvez pas utiliser le caractère `/` dans le message déclencheur");
+                interaction.editReply("Vous ne pouvez pas utiliser le caractère `/` dans le message déclencheur");
                 return;
             }
-            let propoReminder = 
-            db.push(`/users/${user_hash}/config/reminders/on/${opt.trigger}`, { duration: opt.duration, unit: opt.unit, in_dm: opt.in_dm });
-            await interaction.editReply("Proposition ajoutée avec succès !");
+
+            let multiplier = {
+                secondes: 1000,
+                minutes: 60 * 1000,
+                heures: 60 * 60 * 1000,
+                jours: 24 * 60 * 60 * 1000
+            }[opt.unit];
+
+            const propoReminder = new models.PropoReminder({
+                trigger: opt.trigger,
+                duration: opt.duration * multiplier,
+                inDm: opt.in_dm
+            })
+            user.$add('propoReminders', propoReminder);
+            propoReminder.save()
+            
+            interaction.editReply("Proposition ajoutée avec succès !");
             break;
-        case "reminders/del_propo":
-            if (opt.trigger in db_user.config.reminders.on) {
-                db.delete(`/users/${user_hash}/config/reminders/on/${opt.trigger}`);
-                await interaction.editReply("Proposition supprimée avec succès !");
+        }
+        case "reminders/del_custom_propo": {
+            const deleted = await models.PropoReminder.destroy({
+                where: {
+                    trigger: opt.trigger,
+                    userId: user.discordId
+                }
+            })
+            if (deleted) {
+                interaction.editReply(`La/les proposition(s) pour le message \`${opt.trigger}\` supprimée avec succès !`);
             } else {
-                await interaction.editReply("Cette proposition n'existe pas !");
+                interaction.editReply(`Aucune proposition n'existe pour le message \`${opt.trigger}\` !`);
             }
             break;
-        case "reminders/events":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/events`, !db_user.config.reminders.auto_proposition.events);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+        }
+        case "reminders/switch_custom_propo": {
+            let trigger = opt.trigger as "events" | "minievents" | "guilddaily" | "daily" | "petfeed" | "petfree" | "vote";
+            user.config.reminders.auto_proposition[trigger] = !user.config.reminders.auto_proposition[trigger];
+            user.save()
+            interaction.editReply(`L'option a été ${["désactivée", "activée"][+user.config.reminders.auto_proposition[trigger]]} avec succès !`)
             break;
-        case "reminders/minievents":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/minievents`, !db_user.config.reminders.auto_proposition.minievents);
-            await interaction.editReply("L'option a été modifiée avec succès !");
+        }
+        case "reminders/in_dm": {
+            user.config.reminders.auto_proposition.in_dm = !user.config.reminders.auto_proposition.in_dm;
+            user.save()
+            interaction.editReply(`L'option a été ${["désactivée", "activée"][+user.config.reminders.auto_proposition.in_dm]} avec succès !`);
             break;
-        case "reminders/guilddaily":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/guilddaily`, !db_user.config.reminders.auto_proposition.guilddaily);
-            await interaction.editReply("L'option a été modifiée avec succès !");
-            break;
-        case "reminders/daily":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/daily`, !db_user.config.reminders.auto_proposition.daily);
-            await interaction.editReply("L'option a été modifiée avec succès !");
-            break;
-        case "reminders/petfree":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfree`, !db_user.config.reminders.auto_proposition.petfree);
-            await interaction.editReply("L'option a été modifiée avec succès !");
-            break;
-        case "reminders/petfeed":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/petfeed`, !db_user.config.reminders.auto_proposition.petfeed);
-            await interaction.editReply("L'option a été modifiée avec succès !");
-            break;
-        case "reminders/vote":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/vote`, !db_user.config.reminders.auto_proposition.vote);
-            await interaction.editReply("L'option a été modifiée avec succès !");
-            break;
-        case "reminders/in_dm":
-            db.push(`/users/${user_hash}/config/reminders/auto_proposition/in_dm`, !db_user.config.reminders.auto_proposition.in_dm);
-            await interaction.editReply("L'option a été modifiée avec succès !");
-            break;
-        case "tracking/view":
+        }
+        case "tracking/view": {
             let tracking_embed = new MessageEmbed()
                 .setColor(config.getData("/main_color"))
-                .setAuthor({ name: `Paramètres de suivi de ${interaction.user.username}`, iconURL: interaction.client.user.avatarURL() })
+                .setAuthor({ name: `Paramètres de suivi de ${user.discordUser.username}`, iconURL: user.discordUser.avatarURL() })
                 .setDescription(`Suivi des reports : ${(()=>{
-                    if (db_user.config.tracking.reports) {
+                    if (user.config.tracking.reports) {
                         return "🟢";
                     } else {
                         return "🔴";
                     }
                 })()}\nTracking public : ${(()=>{
-                    if (db_user.config.tracking.public) {
+                    if (user.config.tracking.public) {
                         return "🟢";
                     } else {
                         return "🔴";
                     }
                 })()}\n Tracking du profil : ${(()=>{
-                    if (db_user.config.tracking.profile) {
+                    if (user.config.tracking.profile) {
                         return "🟢";
                     } else {
                         return "🔴";
                     }
                 })()}`);
-            await interaction.editReply({ embeds: [tracking_embed] });
+            interaction.editReply({ embeds: [tracking_embed] });
             break;
-        case "tracking/switch_option":
-            switch (interaction.options.getString("option")) {
-                case "reports":
-                    db.push(`/users/${user_hash}/config/tracking/reports`, !db_user.config.tracking.reports);
-                    if (!db_user.config.tracking.reports) {
-                        // Delete all tracked reports
-                        for (let i=0; i < db_user.tracking.length; i++) {
-                            if (["long_report", "short_report"].includes(db_user.tracking[i].type)) {
-                                db.delete(`/users/${user_hash}/tracking[${i}]`);
-                                i--;
-                            }
-                        }
-                    }
-                    await interaction.editReply("L'option a été modifiée avec succès !");
-                    break;
-                case "public":
-                    db.push(`/users/${user_hash}/config/tracking/public`, !db_user.config.tracking.public);
-                    await interaction.editReply("L'option a été modifiée avec succès !");
-                    break;
-                case "profile":
-                    db.push(`/users/${user_hash}/config/tracking/profile`, !db_user.config.tracking.profile);
-                    if (!db_user.config.tracking.profile) {
-                        // Delete all tracked profiles
-                        for (let i=0; i < db_user.tracking.length; i++) {
-                            if (db_user.tracking[i].type === "profile") {
-                                db.delete(`/users/${user_hash}/tracking[${i}]`);
-                                i--;
-                            }
-                        }
-                    }
-                    await interaction.editReply("L'option a été modifiée avec succès !");
-                    break;
-            }
+        }
+        case "tracking/switch_option": {
+            user.config.tracking[opt.option] = !user.config.tracking[opt.option];
+            user.save()
+
+            models.Tracking.destroy({
+                where: {
+                    userId: user.discordId,
+                    type: opt.option
+                }
+            });
+
+            interaction.editReply(`L'option a été ${["désactivée", "activée"][+user.config.tracking[opt.option]]} avec succès !`);
             break;
-        default:
+        }
+        default: {
             log_error(`${interaction.user.username} a utilisé une commande inconnue ("/config ${opt.subcommandgroup} ${opt.subcommand}")`);
-            await interaction.editReply(":warning: Cette commande n'existe pas ! Le propriétaire du bot en a été informé.");
+            interaction.editReply(":warning: Cette commande n'existe pas ! Le propriétaire du bot en a été informé.");
+            break;
+        }
     }
 }

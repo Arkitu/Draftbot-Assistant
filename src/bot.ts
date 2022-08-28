@@ -285,9 +285,8 @@ let propoMsgListener = async (message: Discord.Message) => {
 		}
 	})
 	if (!reminders.length) return;
-	const reminder = reminders[0];
 
-	await proposeAutoReminder(message, [reminder.duration], user)
+	await proposeAutoReminder(message, reminders.map(r=>r.duration), user)
 }
 
 async function proposeAutoReminder(message: Discord.Message, reminders: number[], author: User) {

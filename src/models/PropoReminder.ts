@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { User } from '.';
 
 @Table
@@ -19,5 +19,8 @@ export default class PropoReminder extends Model {
     inDm: boolean;
 
     @BelongsTo(()=>User)
-    user: User
+    user: User;
+
+    @ForeignKey(()=>User)
+    userId: string;
 }

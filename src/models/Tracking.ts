@@ -1,5 +1,5 @@
 import { User } from '.';
-import { Table, Column, Model, DataType, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 
 @Table
 export default class Tracking extends Model {
@@ -55,4 +55,7 @@ export default class Tracking extends Model {
 
     @BelongsTo(()=>User)
     user: User;
+
+	@ForeignKey(()=>User)
+	userId: string;
 }
