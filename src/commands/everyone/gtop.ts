@@ -76,62 +76,6 @@ export const data = new SlashCommandBuilder()
 	.setDescription('Affiche le classement des guildes');
 export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply();
-	/*
-	let embed = new MessageEmbed()
-		.setTitle("🏆 Classement des guildes")
-		.setColor(config.getData("/main_color"));
-	let components : MessageActionRow;
-	let guilds = Object.values(await db.getData("/guilds") as DB_Guild).sort((a, b) => {return b.level - a.level;});
-	let guilds_limited = models.Guild.findAll({
-		limit: 15,
-		order: [["level", "DESC"]]
-	})
-	let page = 1;
-	if (guilds.length > 16) {
-		guilds_limited = guilds.slice(0, 15);
-		embed.setFooter({ text: `Page ${page}/${Math.ceil(guilds.length/15)} | ${guilds.length} guildes` });
-		components = new MessageActionRow()
-			.addComponents(
-				new MessageButton()
-					.setCustomId('next_page')
-					.setStyle('SECONDARY')
-					.setEmoji('➡')
-			);
-	} else {
-		guilds_limited = guilds;
-	}
-
-	let description = "";
-
-	for (let i = 0; i < guilds_limited.length; i++) {
-		let emoji;
-		switch (i) {
-			case 0:
-				emoji = "🥇";
-				break;
-			case 1:
-				emoji = "🥈";
-				break;
-			case 2:
-				emoji = "🥉";
-				break;
-			case 3:
-			case 4:
-				emoji = "🎖️";
-				break;
-			default:
-				emoji = "⚫";
-				break;
-		}
-		description += `${emoji}${i + 1} **${guilds_limited[i].name}** | \`Niveau ${Math.round(guilds_limited[i].level*100)/100}\`\n`
-	}
-	embed.setDescription(description);
-	if (components) {
-		await interaction.editReply({ embeds: [embed], components: [components] });
-	} else {
-		await interaction.editReply({ embeds: [embed] });
-	}
-	*/
 	let page = 0;
 	let gtop = await createGtop(page);
 
