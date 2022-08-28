@@ -14,28 +14,28 @@ export const data = new SlashCommandBuilder()
 	);
 
 export async function execute(interaction: CommandInteraction) {
-	await ctx.interaction.deferReply();
+	await interaction.deferReply();
 
-	const opt_categorie = ctx.interaction.options.getString("categorie");
+	const opt_categorie = interaction.options.getString("categorie");
 
-	let help_embed = new MessageEmbed()
-		.setColor(ctx.config.getData("/main_color"))
-		.setThumbnail(ctx.client.user.avatarURL())
+	const help_embed = new MessageEmbed()
+		.setColor(config.getData("/main_color"))
+		.setThumbnail(client.user.avatarURL())
 	
 	if (opt_categorie) {
-		help_embed.setAuthor({ name: opt_categorie, iconURL: ctx.client.user.avatarURL(), url: ctx.config.getData("/help_link") });
-		for (let cmd of ctx.constants.getData(`/helpCategories[${ctx.constants.getIndex("/helpCategories", opt_categorie, "name")}]/commands`)) {
-			help_embed.addField(`\`/${cmd}\``, ctx.db.getData(`/commands[${ctx.db.getIndex("/commands", cmd, "name")}]/description`));
+		help_embed.setAuthor({ name: opt_categorie, iconURL: client.user.avatarURL(), url: config.getData("/help_link") });
+		for (let cmd of constants.getData(`/helpCategories[${constants.getIndex("/helpCategories", opt_categorie, "name")}]/commands`)) {
+			help_embed.addField(`\`/${cmd}\``, constants.getData(`/commands[${constants.getIndex("/commands", cmd, "name")}]/description`));
 		}
 		if (help_embed.fields.length === 0) {
 			help_embed.setDescription("Aucune commande dans cette catégorie");
 		}
 	} else {
-		help_embed.setAuthor({ name: `Aide de ${ctx.client.user.username}`, iconURL: ctx.client.user.avatarURL(), url: ctx.config.getData("/help_link") });
-		for (let categorie of ctx.constants.getData("/helpCategories")) {
+		help_embed.setAuthor({ name: `Aide de ${client.user.username}`, iconURL: client.user.avatarURL(), url: config.getData("/help_link") });
+		for (let categorie of constants.getData("/helpCategories")) {
 			help_embed.addField(categorie.name, `\`/help ${categorie.name}\``, true);
 		}
 	}
 
-	await ctx.interaction.editReply({ embeds: [help_embed] });
+	await interaction.editReply({ embeds: [help_embed] });
 }

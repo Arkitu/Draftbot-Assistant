@@ -8,8 +8,8 @@ import { Sequelize } from 'sequelize-typescript';
 import { PropoReminder, sequelizeModels, User } from './models';
 
 // Import config, constants, sequelize, models
-config = new JsonDB(new Config("../config", false, true, '/'));
-constants = new JsonDB(new Config("../constants", false, true, '/'));
+config = new JsonDB(new Config("../config", true, true, '/'));
+constants = new JsonDB(new Config("../constants", true, true, '/'));
 models = sequelizeModels;
 
 const sequelize = new Sequelize("sqlite::memory", {

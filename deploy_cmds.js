@@ -3,6 +3,7 @@ import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
+import { constants } from "buffer";
 
 const config = new JsonDB(new Config("config", true, true, '/'));
 const db = new JsonDB(new Config("db", true, true, '/'));
@@ -52,7 +53,7 @@ const commandFiles = {
         cmd.perms = "everyone";
     }
 
-    db.push("/commands", cmds.admin.concat(cmds.everyone));
+    constants.push("/commands", cmds.admin.concat(cmds.everyone));
 
     console.log("Finished refreshing application (/) commands.");
 })();

@@ -36,7 +36,7 @@
         "betweenUsefulVotes": 86400000,
         "betweenGuildDailies": 79200000
     },
-	  "helpCategories": [
+	"helpCategories": [
         {
             "name": "Classiques",
             "commands": [
