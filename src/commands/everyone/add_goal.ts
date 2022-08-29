@@ -1,9 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import Goal from '../../libs/Goal.js';
-import { createHash } from "crypto";
 import { CommandInteraction } from 'discord.js';
 import { ProfileData } from '../../models/Tracking.js';
-import { DB_Tracking, DB_Tracking_Profile, DB_User, Profile_Property } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('add_goal')

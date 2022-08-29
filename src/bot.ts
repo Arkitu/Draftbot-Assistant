@@ -3,9 +3,9 @@ import * as Discord from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
-import { createHash } from "crypto";
 import { Sequelize } from 'sequelize-typescript';
-import { PropoReminder, sequelizeModels, User } from './models';
+import { sequelizeModels, User } from './models';
+import { GoalUnitTranslate } from './models/Goal.js';
 
 // Import config, constants, sequelize, models
 config = new JsonDB(new Config("../config", true, true, '/'));
@@ -511,15 +511,7 @@ let profileListener = async (msg: Discord.Message): Promise<void> => {
 					.setColor(config.getData("/main_color"))
 					.setTitle("Expiration de votre objectif")
 					.setDescription(`Votre objectif de ${goal.value} ${
-						{
-							lvl: "niveaux",
-							gold: ":moneybag:",
-							pv: ":heart:",
-							xp: ":star:",
-							gems: ":gem:",
-							quest_missions_percentage: "% de missions de quêtes",
-							rank_points: ":medal:"
-						}[goal.unit]
+						GoalUnitTranslate[goal.unit]
 					} a expiré, vous pouvez en définir un nouveau avec \`/set_goal\``)
 			]});
 			goal.destroy();
@@ -529,15 +521,7 @@ let profileListener = async (msg: Discord.Message): Promise<void> => {
 					.setColor(config.getData("/main_color"))
 					.setTitle("Objectif atteint !")
 					.setDescription(`<@${msg.author.id}>, vous avez atteint votre objectif de ${goal.value} ${
-						{
-							lvl: "niveaux",
-							gold: ":moneybag:",
-							pv: ":heart:",
-							xp: ":star:",
-							gems: ":gem:",
-							quest_missions_percentage: "% de missions de quêtes",
-							rank_points: ":medal:"
-						}[goal.unit]
+						GoalUnitTranslate[goal.unit]
 					} !`)
 			]});
 			goal.destroy();

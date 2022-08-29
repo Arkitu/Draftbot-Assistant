@@ -1,6 +1,16 @@
 import { User } from '.';
 import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 
+export const GoalUnitTranslate = {
+    lvl: "niveaux",
+    gold: ":moneybag:",
+    pv: ":heart:",
+    xp: ":star:",
+    gems: ":gem:",
+    quest_missions_percentage: "% de missions de quêtes",
+    rank_points: ":medal:"
+}
+
 @Table
 export default class Goal extends Model {
     @Column
