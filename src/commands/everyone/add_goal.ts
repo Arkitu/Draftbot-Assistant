@@ -2,11 +2,12 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import Goal from '../../libs/Goal.js';
 import { createHash } from "crypto";
 import { CommandInteraction } from 'discord.js';
+import { ProfileData } from '../../models/Tracking.js';
 import { DB_Tracking, DB_Tracking_Profile, DB_User, Profile_Property } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
-	.setName('set_goal')
-	.setDescription('Crée un objectif')
+	.setName('add_goal')
+	.setDescription('Crée un objectif. Il est conseillé de faire un /profile juste avant')
     .addIntegerOption(opt=>
         opt
             .setName('value')
@@ -44,45 +45,44 @@ export const data = new SlashCommandBuilder()
             .addChoice('1 mois', '2678400000')
     )
 export async function execute(interaction: CommandInteraction) {
-	await ctx.interaction.deferReply();
+	await interaction.deferReply();
 
     let opts = {
-        value: ctx.interaction.options.getInteger('value'),
-        unit: ctx.interaction.options.getString('unit') as 
+        value: interaction.options.getInteger('value'),
+        unit: interaction.options.getString('unit') as 
             'lvl' | 'gold' | 'pv' | 'xp' | 'gems' | 'quest_missions_percentage' | 'rank_points'
         || 'rank_points',
-        duration: parseInt(ctx.interaction.options.getString('duration')) || 604800000
+        duration: parseInt(interaction.options.getString('duration')) || 604800000
     };
 
-    let user_hash = createHash('md5').update(ctx.interaction.user.id).digest('hex');
-    if (!ctx.db.getData(`/users`).hasOwnProperty(user_hash)) {
-        await ctx.interaction.editReply(':warning: Veuillez activer le tracking du profil et enregistrer au moins une fois votre profil pour utiliser cette commande.');
+    const user = (await models.User.findOrCreate({
+        where: {
+            discordId: interaction.user.id
+        }
+    }))[0]
+
+    const lastProfile = (await user.$get("trackings", {
+        limit: 1,
+        order: [["createdAt", "DESC"]],
+        where: {
+            type: "profile"
+        }
+    }))[0]
+
+    if (!lastProfile) {
+        interaction.editReply(":warning: Vous devez activer le tracking des profiles (</config tracking switch_option:971457425842536458>) et traquer au moins un profile pour créer un objectif");
         return;
     }
-    let db_user: DB_User = ctx.db.getData(`/users/${user_hash}`);
-    if (db_user.tracking.filter((t: DB_Tracking)=>t.type==='profile').length===0) {
-        await ctx.interaction.editReply(':warning: Veuillez enregistrer au moins une fois votre profil pour utiliser cette commande.');
-        return;
-    }
-    
-    let init_value = db_user.tracking.filter(
-            (t: DB_Tracking): t is DB_Tracking_Profile =>t.type==='profile'
-        )
-        [
-            db_user.tracking.filter(
-                (t: DB_Tracking): t is DB_Tracking_Profile =>t.type==='profile'
-            ).length-1
-        ]
-        .data[opts.unit];
-    
-    new Goal({
-        ctx: ctx,
-        user_id: ctx.interaction.user.id,
-        start: new Date(),
-        end: new Date(new Date().getTime()+opts.duration),
-        value: opts.value,
+
+    const goal = new models.Goal({
+        start: Date.now(),
+        end: Date.now() + opts.duration,
         unit: opts.unit,
-        init_value: init_value
-    }).save();
-    await ctx.interaction.editReply(':white_check_mark: Objectif créé avec succès.');
+        initValue: (lastProfile.data as ProfileData)[opts.unit],
+        value: opts.value
+    });
+    user.$add("goals", goal)
+    goal.save()
+
+    await interaction.editReply(':white_check_mark: Objectif créé avec succès. Faites des </profile:1006239067597443128> assez souvent car c\'est avec eux que le bot vérifie vos objectifs');
 }
