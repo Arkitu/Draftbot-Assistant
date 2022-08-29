@@ -36,18 +36,31 @@ export const data = new SlashCommandBuilder()
             )
     )
 export async function execute(interaction: CommandInteraction) {
-    await ctx.interaction.deferReply();
+    await interaction.deferReply();
     let opt = {
-        subcommand: ctx.interaction.options.getSubcommand(),
-        category: ctx.interaction.options.getString('category') || 'all',
-        duration: ctx.interaction.options.getString('duration')
+        subcommand: interaction.options.getSubcommand(),
+        category: interaction.options.getString('category') || 'all',
+        duration: interaction.options.getString('duration')
     };
-    let all_users_tracking: DB_Tracking[] = [];
-    for (let user_hash in ctx.db.getData("/users")) {
-        for (let event of ctx.db.getData(`/users/${user_hash}/tracking`)) {
-            all_users_tracking.push(event as DB_Tracking);
-        }
+
+    let type: ["long_report", "short_report"] | ["long_report"] | ["short_report"];
+    switch (opt.category) {
+        case "all": 
+            type = ["long_report", "short_report"]
+            break;
+        case "events":
+            type = ["long_report"]
+            break;
+        case "mini-events":
+            type = ["short_report"]
+            break;
     }
+
+    let allUsersTrackings = await models.Tracking.findAll({
+        where: {
+            type: type
+        }
+    });
 
     // Get min_date and max_date
     let cur = new Date();
@@ -83,36 +96,36 @@ export async function execute(interaction: CommandInteraction) {
     let chart: ChartJSImage;
     switch (opt.subcommand) {
         case 'reports': {
-            let events: {
+            let trackings: {
                 [key: string]: {
                     long: number,
                     short: number
                 }
             } = {};
             for (let i = new Date(min_date.getTime()); i.getTime() <= max_date.getTime(); i.setDate(i.getDate() + 1)) {
-                events[i.getTime()] = {long: 0, short: 0};
+                trackings[i.getTime()] = {long: 0, short: 0};
             }
-            for (let event of all_users_tracking) {
-                if (["long_report", "short_report"].includes(event.type)) {
-                    let event_date = new Date(event.timestamp);
-                    if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
-                        event_date.setHours(0, 0, 0, 0);
-                        if (event.type == "long_report") {
-                            events[event_date.getTime()].long++;
+            for (let tracking of allUsersTrackings) {
+                if (["long_report", "short_report"].includes(tracking.type)) {
+                    let tracking_date = tracking.createdAt as Date;
+                    if (tracking_date.getTime() >= min_date.getTime() && tracking_date.getTime() <= max_date.getTime()) {
+                        tracking_date.setHours(0, 0, 0, 0);
+                        if (tracking.type == "long_report") {
+                            trackings[tracking_date.getTime()].long++;
                         } else {
-                            events[event_date.getTime()].short++;
+                            trackings[tracking_date.getTime()].short++;
                         }
                     }
                 }
             }
             let datasets = [];
-            if (opt.category == "all" || opt.category == "events") {
+            if (opt.category == "all" || opt.category == "trackings") {
                 let data = [];
-                for (let event in events) {
-                    if (events[event].long == 0 && events[event].short == 0) continue;
+                for (let tracking in trackings) {
+                    if (trackings[tracking].long == 0 && trackings[tracking].short == 0) continue;
                     data.push({
-                        x: parseInt(event),
-                        y: events[event].long
+                        x: parseInt(tracking),
+                        y: trackings[tracking].long
                     });
                 }
                 datasets.push({
@@ -123,13 +136,13 @@ export async function execute(interaction: CommandInteraction) {
                     data: data,
                 });
             }
-            if (opt.category == "all" || opt.category == "mini-events") {
+            if (opt.category == "all" || opt.category == "mini-trackings") {
                 let data = [];
-                for (let event in events) {
-                    if (events[event].long == 0 && events[event].short == 0 && parseInt(event) != min_date.getTime() && parseInt(event) != max_date.getTime()) continue;
+                for (let tracking in trackings) {
+                    if (trackings[tracking].long == 0 && trackings[tracking].short == 0 && parseInt(tracking) != min_date.getTime() && parseInt(tracking) != max_date.getTime()) continue;
                     data.push({
-                        x: parseInt(event),
-                        y: events[event].short
+                        x: parseInt(tracking),
+                        y: trackings[tracking].short
                     });
                 }
                 datasets.push({
@@ -206,9 +219,9 @@ export async function execute(interaction: CommandInteraction) {
                 }
             })()} de tout le monde`)
             .setImage(url_chart);
-        await ctx.interaction.editReply({ embeds: [embed] });
+        interaction.editReply({ embeds: [embed] });
     } else {
-        await chart.toFile(`./temp/${ctx.interaction.user.id}_chart.png`);
+        await chart.toFile(`./temp/${interaction.user.id}_chart.png`);
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
                 switch (opt.subcommand) {
@@ -218,8 +231,8 @@ export async function execute(interaction: CommandInteraction) {
                         return "du profil";
                 }
             })()} de tout le monde`)
-            .setImage(`attachment://${ctx.interaction.user.id}_chart.png`);
-        await ctx.interaction.editReply({ embeds: [embed], files: [`./temp/${ctx.interaction.user.id}_chart.png`] });
-        unlink(`./temp/${ctx.interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
+            .setImage(`attachment://${interaction.user.id}_chart.png`);
+        await interaction.editReply({ embeds: [embed], files: [`./temp/${interaction.user.id}_chart.png`] });
+        unlink(`./temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
     }
 }
