@@ -1,5 +1,4 @@
 import { MessageEmbed, User as DiscordUser, TextBasedChannel, DMChannel } from 'discord.js';
-import Context from '../libs/Context.js';
 import { User } from '.';
 import { Table, Column, Model, DataType, BelongsTo } from 'sequelize-typescript';
 
