@@ -1,4 +1,4 @@
-import { User } from '.';
+import { User } from './index.js';
 import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 
 export interface ProfileData {

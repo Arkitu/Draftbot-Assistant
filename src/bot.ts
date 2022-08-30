@@ -4,16 +4,20 @@ import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { Sequelize } from 'sequelize-typescript';
-import { sequelizeModels, User } from './models';
+import { sequelizeModels, User } from './models/index.js';
 import { GoalUnitTranslate } from './models/Goal.js';
+import { join, dirname } from 'path';
 
+const botDir = new URL(import.meta.url);
+console.debug(botDir)
 // Import config, constants, sequelize, models
-config = new JsonDB(new Config("../config", true, true, '/'));
-constants = new JsonDB(new Config("../constants", true, true, '/'));
-models = sequelizeModels;
+global.config = new JsonDB(new Config("./config.json", true, true, '/'));
+global.constants = new JsonDB(new Config("./constants.json", true, true, '/'));
+global.models = sequelizeModels;
 
-const sequelize = new Sequelize("sqlite::memory", {
-	models: Object.values(models)
+global.sequelize = new Sequelize("sqlite::memory", {
+	models: Object.values(models),
+	logging: false
 });
 
 sequelize.sync({ alter: true });
@@ -60,7 +64,7 @@ export class Client extends Discord.Client {
 }
 
 // Create a new client instance
-client = new Client({ intents: [
+global.client = new Client({ intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES
 ] });
@@ -549,20 +553,20 @@ client.on('messageCreate', (message) => {
 
 // Import all the commands from the commands files
 client.commands = new Collection();
-const admin_path = "./commands/admin";
-const everyone_path = "./commands/everyone";
+const admin_path = new URL("commands/admin/", botDir)
+const everyone_path = new URL("commands/everyone/", botDir)
 const commandFiles = {
 	admin: readdirSync(admin_path).filter(file => file.endsWith(".js")),
 	everyone: readdirSync(everyone_path).filter(file => file.endsWith(".js"))
 };
 for (const file of commandFiles.admin) {
-	import(`./commands/admin/${file}`)
+	import(join(dirname(botDir.pathname), "commands", "admin", file))
   		.then((command) => {
     		client.commands.set(command.data.name, command);
   		});
 }
 for (const file of commandFiles.everyone) {
-	import(`./commands/everyone/${file}`)
+	import(join(dirname(botDir.pathname), "commands", "everyone", file))
   		.then((command) => {
     		client.commands.set(command.data.name, command);
   		});

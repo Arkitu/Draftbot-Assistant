@@ -1,9 +1,9 @@
-import User from './User';
-import Reminder from './Reminder';
-import Tracking from './Tracking';
-import PropoReminder from './PropoReminder';
-import Guild from './Guild';
-import Goal from './Goal';
+import User from './User.js';
+import Reminder from './Reminder.js';
+import Tracking from './Tracking.js';
+import PropoReminder from './PropoReminder.js';
+import Guild from './Guild.js';
+import Goal from './Goal.js';
 
 const sequelizeModels = {
     User,

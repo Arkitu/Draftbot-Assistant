@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
-import { User } from '.';
+import { User } from './index.js';
 
 @Table
 export default class PropoReminder extends Model {

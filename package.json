@@ -24,7 +24,7 @@
   "scripts": {
     "postinstall": "./init",
     "start": "./start",
-    "deploy_cmds": "node ./deploy_cmds.js"
+    "deploy_cmds": "node ./dist/deploy_cmds.js"
   },
   "author": "Arkitu",
   "license": "ISC",

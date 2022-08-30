@@ -1,5 +1,5 @@
 import { MessageEmbed, User as DiscordUser, TextBasedChannel, DMChannel } from 'discord.js';
-import { User } from '.';
+import { User } from './index.js';
 import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 
 @Table
@@ -46,10 +46,7 @@ export default class Reminder extends Model {
         this.deadLineTimestamp = value.getTime()
     }
 
-    @Column({
-        type: DataType.VIRTUAL,
-        allowNull: false
-    })
+    @Column(DataType.VIRTUAL)
     private channel: TextBasedChannel | DiscordUser;
 
     async getChannel() {

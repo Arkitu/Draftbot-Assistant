@@ -5,27 +5,30 @@
         "minieventAuthorStart": "Journal de ",
         "hasLoseTimeEmoji": ":clock2:|🕑",
         "emojiEnd": ":",
-		"twoMessagesMinieventsEmojis": [":milk:", ":slot_machine:"],
-		"possibleTwoMessagesMinievents": [
-			{
-				"emoji": ":speech_balloon:",
-				"endsWith": ":x: Ne pas lui donner une pièce"
-			}
-		],
+        "twoMessagesMinieventsEmojis": [
+            ":milk:",
+            ":slot_machine:"
+        ],
+        "possibleTwoMessagesMinievents": [
+            {
+                "emoji": ":speech_balloon:",
+                "endsWith": ":x: Ne pas lui donner une pièce"
+            }
+        ],
         "petFeedAuthorEnd": ", vous offrez de la nourriture à votre familier.",
         "petFreeAuthorEnd": ", libération d'un familier"
     },
     "effectDurations": {
-		":sick:": 21600000,
-		":head_bandage:": 21600000,
-		":dizzy_face:": 43200000,
-		":drooling_face:": 4800000,
-		":lock:": 86400000,
-		":sleeping:": 10800000,
-		":cold_face:": 3600000,
-		":confounded:": 2400000,
-		":zany_face:": 14400000,
-		":scream:": 600000
+        ":sick:": 21600000,
+        ":head_bandage:": 21600000,
+        ":dizzy_face:": 43200000,
+        ":drooling_face:": 4800000,
+        ":lock:": 86400000,
+        ":sleeping:": 10800000,
+        ":cold_face:": 3600000,
+        ":confounded:": 2400000,
+        ":zany_face:": 14400000,
+        ":scream:": 600000
     },
     "times": {
         "betweenMinievents": 600000,
@@ -36,7 +39,7 @@
         "betweenUsefulVotes": 86400000,
         "betweenGuildDailies": 79200000
     },
-	"helpCategories": [
+    "helpCategories": [
         {
             "name": "Classiques",
             "commands": [
@@ -98,76 +101,1104 @@
         }
     },
     "pets": {
-        "❌": [0],
-        "🐕": [1],
-        "🐓": [1],
-        "🐦": [1],
-        "🐎": [1],
-        "🐢": [1],
-        "🐍": [1],
-        "🦎": [1],
-        "🐏": [1],
-        "🐐": [1],
-        "🦃": [1],
-        "🐩": [1],
-        "🦊": [2],
-        "🐻": [2],
-        "🐨": [2],
-        "🐸": [2],
-        "🐒": [2],
-        "🦉": [2],
-        "🦇": [2],
-        "🐺": [2],
-        "🐗": [2],
-        "🐈": [1],
-        "🦭": [2],
-        "🦛": [2],
-        "🦙": [2],
-        "🦢": [2],
-        "🦩": [2],
-        "🦝": [2],
-        "🦨": [2],
-        "🦡": [2],
-        "🦫": [2],
-        "🦥": [2],
-        "🐈‍⬛": [1],
-        "🐿️": [2],
-        "🦔": [2],
-        "🐻‍❄️": [3],
-        "🐼": [3],
-        "🦂": [3],
-        "🐊": [3],
-        "🐘": [3],
-        "🦓": [3],
-        "🦏": [3],
-        "🐪": [3],
-        "🐁": [1],
-        "🐫": [3],
-        "🦒": [3],
-        "🦘": [3],
-        "🦚": [3],
-        "🦜": [3],
-        "🦦": [3],
-        "🐅": [4],
-        "🦁": [4],
-        "🦅": [4],
-        "🦤": [4],
-        "🐹": [1],
-        "🐆": [4],
-        "🦣": [4],
-        "🕊️": [4],
-        "🦄️": [5],
-        "🐉️": [5],
-        "🦖️": [5],
-        "🔵": [5],
-        "⛄": [1],
-        "☃️": [4],
-        "🐇": [1],
-        "👽": [5],
-        "🐙": [3],
-        "🐂": [1],
-        "🐖": [1],
-        "🐧": [2, 4],
-        "🦆": [1, 5]
-    }
+        "❌": [
+            0
+        ],
+        "🐕": [
+            1
+        ],
+        "🐓": [
+            1
+        ],
+        "🐦": [
+            1
+        ],
+        "🐎": [
+            1
+        ],
+        "🐢": [
+            1
+        ],
+        "🐍": [
+            1
+        ],
+        "🦎": [
+            1
+        ],
+        "🐏": [
+            1
+        ],
+        "🐐": [
+            1
+        ],
+        "🦃": [
+            1
+        ],
+        "🐩": [
+            1
+        ],
+        "🦊": [
+            2
+        ],
+        "🐻": [
+            2
+        ],
+        "🐨": [
+            2
+        ],
+        "🐸": [
+            2
+        ],
+        "🐒": [
+            2
+        ],
+        "🦉": [
+            2
+        ],
+        "🦇": [
+            2
+        ],
+        "🐺": [
+            2
+        ],
+        "🐗": [
+            2
+        ],
+        "🐈": [
+            1
+        ],
+        "🦭": [
+            2
+        ],
+        "🦛": [
+            2
+        ],
+        "🦙": [
+            2
+        ],
+        "🦢": [
+            2
+        ],
+        "🦩": [
+            2
+        ],
+        "🦝": [
+            2
+        ],
+        "🦨": [
+            2
+        ],
+        "🦡": [
+            2
+        ],
+        "🦫": [
+            2
+        ],
+        "🦥": [
+            2
+        ],
+        "🐈‍⬛": [
+            1
+        ],
+        "🐿️": [
+            2
+        ],
+        "🦔": [
+            2
+        ],
+        "🐻‍❄️": [
+            3
+        ],
+        "🐼": [
+            3
+        ],
+        "🦂": [
+            3
+        ],
+        "🐊": [
+            3
+        ],
+        "🐘": [
+            3
+        ],
+        "🦓": [
+            3
+        ],
+        "🦏": [
+            3
+        ],
+        "🐪": [
+            3
+        ],
+        "🐁": [
+            1
+        ],
+        "🐫": [
+            3
+        ],
+        "🦒": [
+            3
+        ],
+        "🦘": [
+            3
+        ],
+        "🦚": [
+            3
+        ],
+        "🦜": [
+            3
+        ],
+        "🦦": [
+            3
+        ],
+        "🐅": [
+            4
+        ],
+        "🦁": [
+            4
+        ],
+        "🦅": [
+            4
+        ],
+        "🦤": [
+            4
+        ],
+        "🐹": [
+            1
+        ],
+        "🐆": [
+            4
+        ],
+        "🦣": [
+            4
+        ],
+        "🕊️": [
+            4
+        ],
+        "🦄️": [
+            5
+        ],
+        "🐉️": [
+            5
+        ],
+        "🦖️": [
+            5
+        ],
+        "🔵": [
+            5
+        ],
+        "⛄": [
+            1
+        ],
+        "☃️": [
+            4
+        ],
+        "🐇": [
+            1
+        ],
+        "👽": [
+            5
+        ],
+        "🐙": [
+            3
+        ],
+        "🐂": [
+            1
+        ],
+        "🐖": [
+            1
+        ],
+        "🐧": [
+            2,
+            4
+        ],
+        "🦆": [
+            1,
+            5
+        ]
+    },
+    "commands": [
+        {
+            "name": "add_goal_message",
+            "description": "Ajoute un messaeg sur lequel les utilisateurs peuvent cliquer pour ajouter un objectif",
+            "options": [
+                {
+                    "name": "channel",
+                    "description": "Le channel dans lequel le message sera créé",
+                    "required": true,
+                    "type": 7
+                },
+                {
+                    "type": 4,
+                    "name": "duration",
+                    "description": "La durée avant que le message ne disparaisse (en millisecondes)",
+                    "required": true
+                },
+                {
+                    "type": 4,
+                    "name": "start_time",
+                    "description": "L'heure à laquelle le message sera créé (en millisecondes)",
+                    "required": false
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "bitfield_to_permissions",
+            "description": "Convertit un bitfield en permissions",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "bitfield",
+                    "description": "Le bitfield à convertir",
+                    "required": true
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "fetch",
+            "description": "Récupère quelque chose avec son id",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "id",
+                    "description": "L'id de l'objet à récupérer",
+                    "required": true
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "get_db",
+            "description": "Renvoie des donnée depuis la db",
+            "options": [
+                {
+                    "choices": [
+                        {
+                            "name": "guild",
+                            "value": "Guild"
+                        },
+                        {
+                            "name": "goal",
+                            "value": "Goal"
+                        },
+                        {
+                            "name": "propo_reminder",
+                            "value": "PropoReminder"
+                        },
+                        {
+                            "name": "reminder",
+                            "value": "Reminder"
+                        },
+                        {
+                            "name": "tracking",
+                            "value": "Tracking"
+                        },
+                        {
+                            "name": "user",
+                            "value": "User"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "category",
+                    "description": "Le type de donnée",
+                    "required": true
+                },
+                {
+                    "name": "user",
+                    "description": "L'utilisateur à qui appartiennent les données (ne pas utiliser avec user ou guild)",
+                    "required": false,
+                    "type": 6
+                },
+                {
+                    "name": "send_in_discord",
+                    "description": "Si il faut envoyer ou pas le résultat dans discord (il sera loggé dans tous les cas)",
+                    "required": false,
+                    "type": 5
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "hash",
+            "description": "Renvoie le hash de la chaine de caractères passée en paramètre",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "string",
+                    "description": "La chaine de caractères à hasher",
+                    "required": true
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "infos",
+            "description": "Infos sur le bot",
+            "options": [
+                {
+                    "type": 1,
+                    "name": "tracked",
+                    "description": "Affiche le nombre d'utilisateurs suivis",
+                    "options": []
+                },
+                {
+                    "type": 1,
+                    "name": "tracked_events",
+                    "description": "Affiche le nombre d'événements trackés",
+                    "options": []
+                }
+            ],
+            "perms": "admin"
+        },
+        {
+            "name": "timestamp",
+            "description": "Affiche le timestamp actuel",
+            "options": [],
+            "perms": "admin"
+        },
+        {
+            "name": "add_goal",
+            "description": "Crée un objectif. Il est conseillé de faire un /profile juste avant",
+            "options": [
+                {
+                    "min_value": 0,
+                    "type": 4,
+                    "name": "value",
+                    "description": "La valeur de l'objectif",
+                    "required": true
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "level",
+                            "value": "lvl"
+                        },
+                        {
+                            "name": "gold",
+                            "value": "gold"
+                        },
+                        {
+                            "name": "pv",
+                            "value": "pv"
+                        },
+                        {
+                            "name": "xp",
+                            "value": "xp"
+                        },
+                        {
+                            "name": "gems",
+                            "value": "gems"
+                        },
+                        {
+                            "name": "quest_missions",
+                            "value": "quest_missions_percentage"
+                        },
+                        {
+                            "name": "rank_points",
+                            "value": "rank_points"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "unit",
+                    "description": "L'unité de l'objectif (par defaut: rank_points)",
+                    "required": false
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "1 jour",
+                            "value": "86400000"
+                        },
+                        {
+                            "name": "2 jours",
+                            "value": "172800000"
+                        },
+                        {
+                            "name": "3 jours",
+                            "value": "259200000"
+                        },
+                        {
+                            "name": "4 jours",
+                            "value": "345600000"
+                        },
+                        {
+                            "name": "5 jours",
+                            "value": "432000000"
+                        },
+                        {
+                            "name": "6 jours",
+                            "value": "518400000"
+                        },
+                        {
+                            "name": "1 semaine",
+                            "value": "604800000"
+                        },
+                        {
+                            "name": "2 semaines",
+                            "value": "1209600000"
+                        },
+                        {
+                            "name": "3 semaines",
+                            "value": "1814400000"
+                        },
+                        {
+                            "name": "1 mois",
+                            "value": "2678400000"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "duration",
+                    "description": "La durée de l'objectif (par defaut: 1 semaine)",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "add_reminder",
+            "description": "Ajoute un rappel",
+            "options": [
+                {
+                    "type": 3,
+                    "name": "message",
+                    "description": "Le message à rappeler",
+                    "required": true
+                },
+                {
+                    "type": 4,
+                    "name": "time",
+                    "description": "Le temps avant que le rappel ne soit envoyé",
+                    "required": true
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "secondes",
+                            "value": "secondes"
+                        },
+                        {
+                            "name": "minutes",
+                            "value": "minutes"
+                        },
+                        {
+                            "name": "heures",
+                            "value": "heures"
+                        },
+                        {
+                            "name": "jours",
+                            "value": "jours"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "unit",
+                    "description": "L'unité de temps (par default sur `minutes`)",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "config",
+            "description": "Paramètres du bot",
+            "options": [
+                {
+                    "type": 2,
+                    "name": "reminders",
+                    "description": "Paramètres des rappels",
+                    "options": [
+                        {
+                            "type": 1,
+                            "name": "view",
+                            "description": "Affiche les paramètres des rappels",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "add_custom_propo",
+                            "description": "Ajouter une proposition de rappel à la suite d'un message donné",
+                            "options": [
+                                {
+                                    "type": 3,
+                                    "name": "trigger",
+                                    "description": "Le mot clé déclenchant la proposition de rappel",
+                                    "required": true
+                                },
+                                {
+                                    "type": 4,
+                                    "name": "duration",
+                                    "description": "La durée du rappel",
+                                    "required": true
+                                },
+                                {
+                                    "choices": [
+                                        {
+                                            "name": "secondes",
+                                            "value": "secondes"
+                                        },
+                                        {
+                                            "name": "minutes",
+                                            "value": "minutes"
+                                        },
+                                        {
+                                            "name": "heures",
+                                            "value": "heures"
+                                        },
+                                        {
+                                            "name": "jours",
+                                            "value": "jours"
+                                        }
+                                    ],
+                                    "type": 3,
+                                    "name": "unit",
+                                    "description": "L'unité de temps",
+                                    "required": true
+                                },
+                                {
+                                    "name": "in_dm",
+                                    "description": "L'endroit où le rappel sera envoyé",
+                                    "required": false,
+                                    "type": 5
+                                }
+                            ]
+                        },
+                        {
+                            "type": 1,
+                            "name": "del_custom_propo",
+                            "description": "Supprime une proposition de rappel à la suite d'un message donné",
+                            "options": [
+                                {
+                                    "type": 3,
+                                    "name": "trigger",
+                                    "description": "Le mot clé déclenchant la proposition de rappel",
+                                    "required": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": 1,
+                            "name": "switch_command_propo",
+                            "description": "Active/désactive une proposition de rappel suite à une commande",
+                            "options": [
+                                {
+                                    "choices": [
+                                        {
+                                            "name": "events",
+                                            "value": "events"
+                                        },
+                                        {
+                                            "name": "minievents",
+                                            "value": "minievents"
+                                        },
+                                        {
+                                            "name": "guilddaily",
+                                            "value": "guilddaily"
+                                        },
+                                        {
+                                            "name": "daily",
+                                            "value": "daily"
+                                        },
+                                        {
+                                            "name": "petfeed",
+                                            "value": "petfeed"
+                                        },
+                                        {
+                                            "name": "petfree",
+                                            "value": "petfree"
+                                        },
+                                        {
+                                            "name": "vote",
+                                            "value": "vote"
+                                        }
+                                    ],
+                                    "type": 3,
+                                    "name": "trigger",
+                                    "description": "La situation dans laquelle activer/désactiver la proposition",
+                                    "required": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": 1,
+                            "name": "in_dm",
+                            "description": "Active/désactive l'envoi des reminders en DM",
+                            "options": []
+                        }
+                    ]
+                },
+                {
+                    "type": 2,
+                    "name": "tracking",
+                    "description": "Paramètres de suivi",
+                    "options": [
+                        {
+                            "type": 1,
+                            "name": "view",
+                            "description": "Affiche les paramètres de suivi",
+                            "options": []
+                        },
+                        {
+                            "type": 1,
+                            "name": "switch_option",
+                            "description": "Active ou désactive une option de suivi",
+                            "options": [
+                                {
+                                    "choices": [
+                                        {
+                                            "name": "reports",
+                                            "value": "reports"
+                                        },
+                                        {
+                                            "name": "public",
+                                            "value": "public"
+                                        },
+                                        {
+                                            "name": "profile",
+                                            "value": "profile"
+                                        }
+                                    ],
+                                    "type": 3,
+                                    "name": "option",
+                                    "description": "L'option à activer ou désactiver",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "goals",
+            "description": "Renvois la liste des objectifs",
+            "options": [],
+            "perms": "everyone"
+        },
+        {
+            "name": "gtop",
+            "description": "Affiche le classement des guildes",
+            "options": [],
+            "perms": "everyone"
+        },
+        {
+            "name": "help",
+            "description": "Affiche la liste des commandes",
+            "options": [
+                {
+                    "choices": [
+                        {
+                            "name": "Classiques",
+                            "value": "Classiques"
+                        },
+                        {
+                            "name": "Reminders",
+                            "value": "Reminders"
+                        },
+                        {
+                            "name": "Tracking",
+                            "value": "Tracking"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "categorie",
+                    "description": "La categorie sur laquelle vous souhaitez des précisions",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "ping",
+            "description": "Répond pong",
+            "options": [],
+            "perms": "everyone"
+        },
+        {
+            "name": "reminders",
+            "description": "Renvois la liste des rappels",
+            "options": [],
+            "perms": "everyone"
+        },
+        {
+            "name": "remove_goal",
+            "description": "Supprime un objectif",
+            "options": [
+                {
+                    "type": 4,
+                    "name": "id",
+                    "description": "L'id de l'objectif (fais /goals pour le connaître)",
+                    "required": true
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "remove_reminder",
+            "description": "Supprime un rappel",
+            "options": [
+                {
+                    "type": 4,
+                    "name": "id",
+                    "description": "L'id du rappel (faites /reminders pour le connaître)",
+                    "required": true
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "set_goal",
+            "description": "Crée un objectif",
+            "options": [
+                {
+                    "min_value": 0,
+                    "type": 4,
+                    "name": "value",
+                    "description": "La valeur de l'objectif",
+                    "required": true
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "level",
+                            "value": "lvl"
+                        },
+                        {
+                            "name": "gold",
+                            "value": "gold"
+                        },
+                        {
+                            "name": "pv",
+                            "value": "pv"
+                        },
+                        {
+                            "name": "xp",
+                            "value": "xp"
+                        },
+                        {
+                            "name": "gems",
+                            "value": "gems"
+                        },
+                        {
+                            "name": "quest_missions",
+                            "value": "quest_missions_percentage"
+                        },
+                        {
+                            "name": "rank_points",
+                            "value": "rank_points"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "unit",
+                    "description": "L'unité de l'objectif (par defaut: rank_points)",
+                    "required": false
+                },
+                {
+                    "choices": [
+                        {
+                            "name": "1 jour",
+                            "value": "86400000"
+                        },
+                        {
+                            "name": "2 jours",
+                            "value": "172800000"
+                        },
+                        {
+                            "name": "3 jours",
+                            "value": "259200000"
+                        },
+                        {
+                            "name": "4 jours",
+                            "value": "345600000"
+                        },
+                        {
+                            "name": "5 jours",
+                            "value": "432000000"
+                        },
+                        {
+                            "name": "6 jours",
+                            "value": "518400000"
+                        },
+                        {
+                            "name": "1 semaine",
+                            "value": "604800000"
+                        },
+                        {
+                            "name": "2 semaines",
+                            "value": "1209600000"
+                        },
+                        {
+                            "name": "3 semaines",
+                            "value": "1814400000"
+                        },
+                        {
+                            "name": "1 mois",
+                            "value": "2678400000"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "duration",
+                    "description": "La durée de l'objectif (par defaut: 1 semaine)",
+                    "required": false
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "tracking",
+            "description": "Affiche des statistiques sur vous",
+            "options": [
+                {
+                    "type": 1,
+                    "name": "reports",
+                    "description": "Affiche les statistiques sur les rapports",
+                    "options": [
+                        {
+                            "choices": [
+                                {
+                                    "name": "all",
+                                    "value": "all"
+                                },
+                                {
+                                    "name": "events",
+                                    "value": "events"
+                                },
+                                {
+                                    "name": "mini-events",
+                                    "value": "mini-events"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "category",
+                            "description": "La catégorie des statistiques",
+                            "required": true
+                        },
+                        {
+                            "choices": [
+                                {
+                                    "name": "1 semaine",
+                                    "value": "1 semaine"
+                                },
+                                {
+                                    "name": "1 mois",
+                                    "value": "1 mois"
+                                },
+                                {
+                                    "name": "3 mois",
+                                    "value": "3 mois"
+                                },
+                                {
+                                    "name": "6 mois",
+                                    "value": "6 mois"
+                                },
+                                {
+                                    "name": "1 an",
+                                    "value": "1 an"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "duration",
+                            "description": "La période des statistiques (par défaut : 1 semaine)",
+                            "required": false
+                        },
+                        {
+                            "name": "user",
+                            "description": "L'utilisateur dont les statistiques doivent être affichées (par defaut vous-même)",
+                            "required": false,
+                            "type": 6
+                        },
+                        {
+                            "choices": [
+                                {
+                                    "name": "battons",
+                                    "value": "bar"
+                                },
+                                {
+                                    "name": "courbes",
+                                    "value": "line"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "mode",
+                            "description": "Le mode d'affichage des statistiques (par défaut : battons)",
+                            "required": false
+                        }
+                    ]
+                },
+                {
+                    "type": 1,
+                    "name": "profile",
+                    "description": "Affiche les statistiques sur les profils",
+                    "options": [
+                        {
+                            "choices": [
+                                {
+                                    "name": "level",
+                                    "value": "lvl"
+                                },
+                                {
+                                    "name": "gold",
+                                    "value": "gold"
+                                },
+                                {
+                                    "name": "pv",
+                                    "value": "pv"
+                                },
+                                {
+                                    "name": "max_pv",
+                                    "value": "max_pv"
+                                },
+                                {
+                                    "name": "xp",
+                                    "value": "xp"
+                                },
+                                {
+                                    "name": "max_xp",
+                                    "value": "max_xp"
+                                },
+                                {
+                                    "name": "energy",
+                                    "value": "energy"
+                                },
+                                {
+                                    "name": "max_energy",
+                                    "value": "max_energy"
+                                },
+                                {
+                                    "name": "strenght",
+                                    "value": "strenght"
+                                },
+                                {
+                                    "name": "defense",
+                                    "value": "defense"
+                                },
+                                {
+                                    "name": "speed",
+                                    "value": "speed"
+                                },
+                                {
+                                    "name": "gems",
+                                    "value": "gems"
+                                },
+                                {
+                                    "name": "quest_missions",
+                                    "value": "quest_missions_percentage"
+                                },
+                                {
+                                    "name": "rank",
+                                    "value": "rank"
+                                },
+                                {
+                                    "name": "rank_points",
+                                    "value": "rank_points"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "category",
+                            "description": "La catégorie des statistiques",
+                            "required": true
+                        },
+                        {
+                            "choices": [
+                                {
+                                    "name": "1 semaine",
+                                    "value": "1 semaine"
+                                },
+                                {
+                                    "name": "1 mois",
+                                    "value": "1 mois"
+                                },
+                                {
+                                    "name": "3 mois",
+                                    "value": "3 mois"
+                                },
+                                {
+                                    "name": "6 mois",
+                                    "value": "6 mois"
+                                },
+                                {
+                                    "name": "1 an",
+                                    "value": "1 an"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "duration",
+                            "description": "La période des statistiques (par défaut : 1 semaine)",
+                            "required": false
+                        },
+                        {
+                            "name": "user",
+                            "description": "L'utilisateur dont les statistiques doivent être affichées (par defaut vous même)",
+                            "required": false,
+                            "type": 6
+                        }
+                    ]
+                }
+            ],
+            "perms": "everyone"
+        },
+        {
+            "name": "tracking_of_everyone",
+            "description": "Affiche des statistiques sur tous les utilisateurs",
+            "options": [
+                {
+                    "type": 1,
+                    "name": "reports",
+                    "description": "Affiche les statistiques sur les rapports",
+                    "options": [
+                        {
+                            "choices": [
+                                {
+                                    "name": "all",
+                                    "value": "all"
+                                },
+                                {
+                                    "name": "events",
+                                    "value": "events"
+                                },
+                                {
+                                    "name": "mini-events",
+                                    "value": "mini-events"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "category",
+                            "description": "La catégorie des statistiques",
+                            "required": true
+                        },
+                        {
+                            "choices": [
+                                {
+                                    "name": "1 semaine",
+                                    "value": "1 semaine"
+                                },
+                                {
+                                    "name": "1 mois",
+                                    "value": "1 mois"
+                                },
+                                {
+                                    "name": "3 mois",
+                                    "value": "3 mois"
+                                },
+                                {
+                                    "name": "6 mois",
+                                    "value": "6 mois"
+                                },
+                                {
+                                    "name": "1 an",
+                                    "value": "1 an"
+                                }
+                            ],
+                            "type": 3,
+                            "name": "duration",
+                            "description": "La période des statistiques (par défaut : 1 semaine)",
+                            "required": false
+                        }
+                    ]
+                }
+            ],
+            "perms": "everyone"
+        }
+    ]
 }

@@ -3,15 +3,22 @@ import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
-import { constants } from "buffer";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { join } from "path";
 
-const config = new JsonDB(new Config("config", true, true, '/'));
-const db = new JsonDB(new Config("db", true, true, '/'));
+class SlashCommandBuilderWithPerms extends SlashCommandBuilder {
+    perms: "admin" | "everyone";
+}
+
+global.config = new JsonDB(new Config("./config", true, true, '/'));
+global.constants = new JsonDB(new Config("./constants", true, true, '/'));
+
 
 const path = {
-    admin: "./commands/admin",
-    everyone: "./commands/everyone"
+    admin: new URL("commands/admin/", import.meta.url),
+    everyone: new URL("commands/everyone/", import.meta.url)
 }
+console.debug(path)
 const commandFiles = {
     admin: readdirSync(path.admin).filter(file => file.endsWith(".js")),
     everyone: readdirSync(path.everyone).filter(file => file.endsWith(".js"))
@@ -22,17 +29,20 @@ const commandFiles = {
 
     console.log("Started refreshing application (/) commands.");
     
-    db.delete("/commands");
+    constants.delete("/commands");
 
-    let cmds = {
+    let cmds: {
+        admin: SlashCommandBuilderWithPerms[],
+        everyone: SlashCommandBuilderWithPerms[]
+    } = {
         admin: [],
         everyone: []
-    }
+    };
     for (let file of commandFiles.admin) {
-        cmds.admin.push(await (await import(path.admin + "/" + file)).data.toJSON());
+        cmds.admin.push(await (await import(join(path.admin.pathname, file))).data.toJSON() as SlashCommandBuilderWithPerms);
     }
     for (let file of commandFiles.everyone) {
-        cmds.everyone.push(await (await import(path.everyone + "/" + file)).data.toJSON());
+        cmds.everyone.push(await (await import(join(path.everyone.pathname, file))).data.toJSON() as SlashCommandBuilderWithPerms);
     }
 
     console.debug(cmds);

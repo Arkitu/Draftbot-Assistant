@@ -1,7 +1,8 @@
-import { transform as deflat, flatten } from "dottie";
-import { Table, Column, Model, HasMany, PrimaryKey, Unique, DataType, BelongsTo } from 'sequelize-typescript';
+import * as dottie from "dottie"
+const { transform: deflat, flatten } = dottie;
+import { Table, Column, Model, HasMany, PrimaryKey, Unique, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { User as DiscordUser } from 'discord.js';
-import { Reminder, PropoReminder, Tracking, Guild, Goal } from '.';
+import { Reminder, PropoReminder, Tracking, Guild, Goal } from './index.js';
 
 interface Config {
     reminders: {
@@ -53,27 +54,29 @@ export default class User extends Model {
         validate: {
             len: [18,18],
             isInt: true
-        }
+        },
+        primaryKey: true
     })
-    @PrimaryKey
-    @Unique
     discordId: string;
 
     @HasMany(()=>Reminder)
-    reminders: Reminder[];
+    reminders: ReturnType<() => Reminder>[];
 
     @HasMany(()=>Tracking)
-    trackings: Tracking[];
+    trackings: ReturnType<() => Tracking>[];
 
     @HasMany(()=>Goal)
-    goals: Goal[];
+    goals: ReturnType<() => Goal>[];
 
     @BelongsTo(()=>Guild)
-    guild: Guild;
+    guild: ReturnType<() => Guild>;
+
+    @ForeignKey(()=>Guild)
+    guildId: number;
 
     // config
     @HasMany(() => PropoReminder)
-    propoReminders: PropoReminder[];
+    propoReminders: ReturnType<() => PropoReminder>[];
 
     @Column({
         allowNull: false,

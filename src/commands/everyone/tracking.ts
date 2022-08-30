@@ -4,7 +4,7 @@ import { MessageEmbed } from 'discord.js';
 import { unlink } from 'fs';
 import { log_error } from "../../bot.js";
 import { CommandInteraction } from 'discord.js';
-import { User } from '../../models';
+import { User } from '../../models/index.js';
 import { ProfileData } from '../../models/Tracking.js';
 
 export var property_data: {

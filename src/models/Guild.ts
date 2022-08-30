@@ -1,11 +1,11 @@
-import { Table, Column, Model, DataType, BelongsTo, PrimaryKey, Unique, HasMany } from 'sequelize-typescript';
-import { User } from '.';
+import { Table, Column, Model, HasMany } from 'sequelize-typescript';
+import { User } from './index.js';
 
 @Table
 export default class Guild extends Model {
-    @Column
-    @PrimaryKey
-    @Unique
+    @Column({
+        primaryKey: true
+    })
     name: string;
 
     @Column
