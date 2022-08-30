@@ -5,7 +5,6 @@ import { unlink } from 'fs';
 import { log_error } from "../../bot.js";
 import { property_data } from './tracking.js';
 import { CommandInteraction } from 'discord.js';
-import { DB_Tracking } from '../../libs/Interfaces.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('tracking_of_everyone')

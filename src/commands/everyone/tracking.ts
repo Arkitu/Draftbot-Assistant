@@ -5,6 +5,8 @@ import { createHash } from "crypto";
 import { unlink } from 'fs';
 import { log, log_error } from "../../bot.js";
 import { CommandInteraction } from 'discord.js';
+import { User } from '../../models';
+import { ProfileData } from '../../models/Tracking.js';
 import { DB_User } from '../../libs/Interfaces.js';
 
 export var property_data: {
@@ -170,27 +172,60 @@ export const data = new SlashCommandBuilder()
     )
 export async function execute(interaction: CommandInteraction) {
     let opt = {
-        subcommand: ctx.interaction.options.getSubcommand() as "reports" | "profile",
-        category: (ctx.interaction.options.getString('category') || 'all') as "all" | "events" | "mini-events" | "lvl" | "gold" | "pv" | "max_pv" | "xp" | "max_xp" | "energy" | "max_energy" | "strenght" | "defense" | "speed" | "gems" | "quest_missions_percentage" | "rank" | "rank_points",
-        duration: ctx.interaction.options.getString('duration') as "1 semaine" | "1 mois" | "3 mois" | "6 mois" | "1 an",
-        user: ctx.interaction.options.getUser('user') || ctx.interaction.user,
-        mode: (ctx.interaction.options.getString('mode') || 'bar') as "bar" | "line"
+        subcommand: interaction.options.getSubcommand() as "reports" | "profile",
+        category: (interaction.options.getString('category') || 'all') as "all" | "events" | "mini-events" | "lvl" | "gold" | "pv" | "max_pv" | "xp" | "max_xp" | "energy" | "max_energy" | "strenght" | "defense" | "speed" | "gems" | "quest_missions_percentage" | "rank" | "rank_points",
+        duration: interaction.options.getString('duration') as "1 semaine" | "1 mois" | "3 mois" | "6 mois" | "1 an",
+        user: interaction.options.getUser('user') || interaction.user,
+        mode: (interaction.options.getString('mode') || 'bar') as "bar" | "line"
     };
-    let user_hash = createHash('md5').update(opt.user.id).digest('hex');
-    if (!(user_hash in ctx.db.getData("/users"))) {
-        if (opt.user.id != ctx.interaction.user.id) {
-            await ctx.interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
+
+    let user: User;
+
+    if (opt.user.id != interaction.user.id) {
+        user = await models.User.findByPk(opt.user.id);
+        if (!user) {
+            interaction.reply(":warning: Cet utilisateur n'est pas dans ma base de données");
             return;
         }
-        log(`Création de l'utilisateur ${opt.user.username} à partir de /tracking`);
-        ctx.db.push("/users/" + user_hash, ctx.constants.getData("/databaseDefault/user"));
+        if (!user.config.tracking.public) {
+            interaction.reply(":warning: Les tracking de cet utilisateur ne sont pas publics. Tu peux lui demander de passer en public avec </config tracking switch_option:971457425842536458>");
+        }
+    } else {
+        user = (await models.User.findOrCreate({
+            where: {
+                discordId: opt.user.id
+            }
+        }))[0];
     }
-    let db_user: DB_User = ctx.db.getData(`/users/${user_hash}`);
-    if (opt.user.id != ctx.interaction.user.id && !db_user.config.tracking.public) {
-        await ctx.interaction.reply(":warning: Cet utilisateur n'est pas enregistré dans ma base de données ou son compte n'est pas public. Vous pouvez lui demander d'activer le mode public avec la commande `/config tracking switch_option option:public`");
-        return;
+
+    await interaction.deferReply({ ephemeral: user.config.tracking.public });
+
+    let type: ["long_report", "short_report"] | ["long_report"] | ["short_report"] | ["profile"];
+
+    switch (opt.subcommand) {
+        case "profile":
+            type = ["profile"];
+            break;
+        case "reports":
+            switch (opt.category) {
+                case "all":
+                    type = ["long_report", "short_report"];
+                    break;
+                case "events":
+                    type = ["long_report"];
+                    break;
+                case "mini-events":
+                    type = ["short_report"];
+                    break;
+            }
     }
-    await ctx.interaction.deferReply({ ephemeral: !db_user.config.tracking.public });
+
+    const trackings = await models.Tracking.findAll({
+        where: {
+            discordId: user.discordId,
+            type: type
+        }
+    });
 
     // Get min_date and max_date
     let cur = new Date();
@@ -235,9 +270,8 @@ export async function execute(interaction: CommandInteraction) {
             for (let i = new Date(min_date.getTime()); i.getTime() <= max_date.getTime(); i.setDate(i.getDate() + 1)) {
                 events[i.getTime()] = {long: 0, short: 0};
             }
-            for (let event of db_user.tracking) {
-                if (["long_report", "short_report"].includes(event.type)) {
-                    let event_date = new Date(event.timestamp);
+            for (let event of trackings) {
+                let event_date = event.createdAt as Date;
                     if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
                         event_date.setHours(0, 0, 0, 0);
                         if (event.type == "long_report") {
@@ -246,7 +280,6 @@ export async function execute(interaction: CommandInteraction) {
                             events[event_date.getTime()].short++;
                         }
                     }
-                }
             }
             let datasets = [];
             if (opt.category == "all" || opt.category == "events") {
@@ -354,15 +387,13 @@ export async function execute(interaction: CommandInteraction) {
                 backgroundColor: `rgba(${property_data["profile/" + opt.category].color}, 0.2)`,
                 data: [],
             }];
-            for (let event of db_user.tracking) {
-                if (event.type === "profile") {
-                    let event_date = new Date(event.timestamp);
-                    if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
-                        datasets[0].data.push({
-                            x: event.timestamp,
-                            y: event.data[opt.category]
-                        });
-                    }
+            for (let event of trackings) {
+                let event_date = event.createdAt as Date;
+                if (event_date.getTime() >= min_date.getTime() && event_date.getTime() <= max_date.getTime()) {
+                    datasets[0].data.push({
+                        x: event_date.getTime(),
+                        y: (event.data as ProfileData)[opt.category]
+                    });
                 }
             }
             while (datasets[0].data.length > 300) {
@@ -371,7 +402,7 @@ export async function execute(interaction: CommandInteraction) {
                 }
             }
             if (datasets[0].data.length == 0) {
-                await ctx.interaction.editReply(":warning: Je n'ai enregistré aucun évènement de ce type pour cette période.");
+                await interaction.editReply(":warning: Je n'ai enregistré aucun évènement de ce type pour cette période.");
                 return;
             }
             chart = await ChartJSImage().chart({
@@ -430,9 +461,9 @@ export async function execute(interaction: CommandInteraction) {
                 }
             })()} de ${opt.user.username}`)
             .setImage(url_chart);
-        await ctx.interaction.editReply({ embeds: [embed] });
+        interaction.editReply({ embeds: [embed] });
     } else {
-        await chart.toFile(`./temp/${ctx.interaction.user.id}_chart.png`);
+        await chart.toFile(`./temp/${interaction.user.id}_chart.png`);
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
                 switch (opt.subcommand) {
@@ -442,8 +473,8 @@ export async function execute(interaction: CommandInteraction) {
                         return "du profil";
                 }
             })()} de ${opt.user.username}`)
-            .setImage(`attachment://${ctx.interaction.user.id}_chart.png`);
-        await ctx.interaction.editReply({ embeds: [embed], files: [`./temp/${ctx.interaction.user.id}_chart.png`] });
-        unlink(`./temp/${ctx.interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
+            .setImage(`attachment://${interaction.user.id}_chart.png`);
+        await interaction.editReply({ embeds: [embed], files: [`./temp/${interaction.user.id}_chart.png`] });
+        unlink(`./temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
     }
 }
