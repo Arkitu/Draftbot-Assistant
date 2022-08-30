@@ -1,13 +1,11 @@
 import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed, Options } from 'discord.js';
-import { createHash } from "crypto";
+import { MessageEmbed } from 'discord.js';
 import { unlink } from 'fs';
-import { log, log_error } from "../../bot.js";
+import { log_error } from "../../bot.js";
 import { CommandInteraction } from 'discord.js';
 import { User } from '../../models';
 import { ProfileData } from '../../models/Tracking.js';
-import { DB_User } from '../../libs/Interfaces.js';
 
 export var property_data: {
     [key: string]: {

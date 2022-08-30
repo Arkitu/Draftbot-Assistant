@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { User, TextBasedChannel } from 'discord.js';
-import Reminder from '../../libs/Reminder.js';
 import { CommandInteraction } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
