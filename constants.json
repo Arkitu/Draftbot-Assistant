@@ -413,7 +413,13 @@
                 },
                 {
                     "name": "send_in_discord",
-                    "description": "Si il faut envoyer ou pas le résultat dans discord (il sera loggé dans tous les cas)",
+                    "description": "Si il faut envoyer ou pas le résultat dans discord (par défaut à false)",
+                    "required": false,
+                    "type": 5
+                },
+                {
+                    "name": "to_json",
+                    "description": "Si il faut utiliser toJSON sur les données avant de les afficher (par défaut à true)",
                     "required": false,
                     "type": 5
                 }

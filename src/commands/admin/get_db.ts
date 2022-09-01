@@ -23,7 +23,11 @@ export const data = new SlashCommandBuilder()
     )
     .addBooleanOption(opt=>
         opt.setName("send_in_discord")
-            .setDescription("Si il faut envoyer ou pas le résultat dans discord (il sera loggé dans tous les cas)")
+            .setDescription("Si il faut envoyer ou pas le résultat dans discord (par défaut à false)")
+    )
+    .addBooleanOption(opt=>
+        opt.setName("to_json")
+            .setDescription("Si il faut utiliser toJSON sur les données avant de les afficher (par défaut à true)")
     )
 export async function execute(interaction: CommandInteraction) {
 	await interaction.deferReply()
@@ -31,7 +35,8 @@ export async function execute(interaction: CommandInteraction) {
     const opts = {
         category: interaction.options.getString("category", true) as "Guild" | "Goal" | "PropoReminder" | "Reminder" | "Tracking" | "User",
         user: interaction.options.getUser("user"),
-        send_in_discord: interaction.options.getBoolean("send_in_discord") || false
+        send_in_discord: interaction.options.getBoolean("send_in_discord") === null ? false : interaction.options.getBoolean("send_in_discord"),
+        to_json: interaction.options.getBoolean("to_json") === null ? true : interaction.options.getBoolean("to_json")
     };
 
     const model: any = models[opts.category]
@@ -39,20 +44,20 @@ export async function execute(interaction: CommandInteraction) {
     let fetched: any[];
 
     if (opts.user) {
-        fetched = (await model.findAll({
+        fetched = await model.findAll({
             where: {
                 userId: opts.user.id
             }
-        })).map((f: any)=>f.toJSON());
+        })
     } else {
-        fetched = (await model.findAll())
-            .map((f: any)=>f.toJSON());
+        fetched = await model.findAll()
     }
+    if (opts.to_json) fetched.map((f: any)=>f.toJSON());
 
     console.log(...fetched);
 
     interaction.editReply("Données récupérées !");
     if (opts.send_in_discord) {
-        interaction.followUp(fetched.toString());
+        interaction.followUp(fetched.map((f)=>f.toString()).join("\n"));
     }
 }

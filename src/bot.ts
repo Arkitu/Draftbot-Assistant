@@ -9,17 +9,24 @@ import { GoalUnitTranslate } from './models/Goal.js';
 import { join, dirname } from 'path';
 
 const botDir = new URL(import.meta.url);
-console.debug(botDir)
+const botDirString = (()=>{
+	let urlArray = decodeURI(botDir.pathname).split("/");
+	urlArray.pop();
+	return urlArray.join("/");
+})()
 // Import config, constants, sequelize, models
-global.config = new JsonDB(new Config("./config.json", true, true, '/'));
-global.constants = new JsonDB(new Config("./constants.json", true, true, '/'));
+global.config = new JsonDB(new Config(`${botDirString}/../config.json`, true, true, '/'));
+global.constants = new JsonDB(new Config(`${botDirString}/../constants.json`, true, true, '/'));
 global.models = sequelizeModels;
 
-global.sequelize = new Sequelize("sqlite::memory", {
+global.sequelize = new Sequelize({
+	dialect: 'sqlite',
+  	storage: `${botDirString}/../db`,
 	models: Object.values(models),
 	logging: false
 });
 
+sequelize.authenticate();
 sequelize.sync({ alter: true });
 
 // Some utils functions
@@ -75,6 +82,7 @@ client.once('ready', async () => {
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
 	for (let reminder of await models.Reminder.findAll()) {
+		console.debug(reminder.toJSON())
 		reminder.start()
 	}
 });

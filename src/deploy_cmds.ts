@@ -18,7 +18,6 @@ const path = {
     admin: new URL("commands/admin/", import.meta.url),
     everyone: new URL("commands/everyone/", import.meta.url)
 }
-console.debug(path)
 const commandFiles = {
     admin: readdirSync(path.admin).filter(file => file.endsWith(".js")),
     everyone: readdirSync(path.everyone).filter(file => file.endsWith(".js"))

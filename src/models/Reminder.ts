@@ -12,29 +12,30 @@ export default class Reminder extends Model {
             isInt: true
         }
     })
-    channelId: string;
+    declare channelId: string;
 
     @Column({
         allowNull: false,
         defaultValue: false
     })
-    channelIsUser: boolean;
+    declare channelIsUser: boolean;
 
     @Column({
         allowNull: false
     })
-    deadLineTimestamp: number;
+    declare deadLineTimestamp: number;
 
     @Column({
         allowNull: false
     })
-    message: string;
+    declare message: string;
 
     @BelongsTo(()=>User)
-    user: User;
+    declare user: User;
 
     @ForeignKey(()=>User)
-    userId: string;
+    @Column
+    declare userId: string;
     
     // Not saved in database
     @Column(DataType.VIRTUAL)
@@ -43,7 +44,7 @@ export default class Reminder extends Model {
     }
 
     set deadLine (value: Date) {
-        this.deadLineTimestamp = value.getTime()
+        this.deadLineTimestamp = value.getTime();
     }
 
     @Column(DataType.VIRTUAL)
@@ -64,12 +65,16 @@ export default class Reminder extends Model {
 
     // Methods
     async start() {
+        console.debug(1);
         setTimeout(async () => {
+            console.debug(2)
             if (await models.Reminder.findOne({ where: { id: this.id } })) {
+                console.debug(3)
+                console.debug(this.message, typeof this.message)
                 let embed = new MessageEmbed()
                     .setColor(config.getData("/main_color"))
                     .setTitle("Reminder")
-                    .setDescription(this.message)
+                    .setDescription(this.get('message'))
                 this.sendReminderMessage({ embed: embed });
                 this.destroy()
             }
