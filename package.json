@@ -4,6 +4,7 @@
     "@discordjs/rest": "^0.3.0",
     "@types/dottie": "^2.0.4",
     "chart.js-image": "^6.0.3",
+    "dirname-filename-esm": "^1.1.1",
     "discord": "^0.8.2",
     "discord-api-types": "^0.27.2",
     "discord-bitfield-calculator": "^1.0.0",
@@ -13,8 +14,7 @@
     "moment": "^2.29.4",
     "node-json-db": "^1.4.1",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.5.0",
-    "sequelize-typescript": "^2.1.0",
+    "sequelize": "^6.21.4",
     "sqlite3": "^5.0.11"
   },
   "name": "drafbot-assistant",
@@ -30,8 +30,9 @@
   "license": "ISC",
   "devDependencies": {
     "@types/forever-monitor": "^1.7.6",
-    "@types/node": "^18.7.8",
-    "@types/validator": "^13.7.5",
+    "@types/node": "^18.7.14",
+    "@types/validator": "^13.7.6",
+    "sequelize-cli": "^6.4.1",
     "typescript": "^4.7.4"
   },
   "engines": {
