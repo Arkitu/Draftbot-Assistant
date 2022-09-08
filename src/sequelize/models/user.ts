@@ -1,6 +1,7 @@
 import { Sequelize, DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import { SequelizeWithAssociate } from ".";
 import * as dottie from "dottie";
-import { DB } from ".";
+
 
 interface Config {
   reminders: {
@@ -42,16 +43,16 @@ interface ConfigSetArgs {
   }
 }
 
-export default (sequelize: Sequelize) => {
+export default (db: SequelizeWithAssociate) => {
   class User extends Model {
-    static setDataValue: any;
+    declare static setDataValue: any;
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models: DB) {
-      // define association here
+    static associate(db: SequelizeWithAssociate) {
+      this.hasMany(db.models.Reminder);
     }
 
     static get initArgs() {
@@ -87,9 +88,11 @@ export default (sequelize: Sequelize) => {
       return args;
     }
   }
+
   User.init(User.initArgs, {
     sequelize,
     modelName: 'User',
   });
+
   return User;
 };
