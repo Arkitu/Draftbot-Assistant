@@ -1,34 +1,32 @@
 import { DMChannel, MessageEmbed, TextBasedChannel } from "discord.js";
-import { DataTypes, Model, ModelAttributes, Optional, Sequelize } from "sequelize";
-import { ModelWithAssociate, SequelizeWithAssociate, snowflakeValidate } from ".";
+import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import { ModelWithAssociate, snowflakeValidate } from ".";
+import { User } from "./user.js";
 
 export class Reminder extends Model {
+  declare id: number;
   declare channelId: string;
   declare channelIsUser: boolean;
   declare deadLineTimestamp: number;
   declare message: string;
   declare deadLine: Date;
+  /**
+   * You need to assure you that the channel is cached before using reminder.channel or use fetchChannel() instead
+   */
   declare channel: TextBasedChannel;
-  declare getUser: (): User
+  declare getUser: () => Promise<User>;
   declare static deadLineTimestamp: number;
   declare static setDataValue: any;
   declare static channelId: string;
 
-  /**
-   * You need to fetch the channel before using reminder.channel
-   */
   fetchChannel() {
     return client.channels.fetch(this.channelId);
   }
 
   // Methods
   async start() {
-    console.debug(1);
     setTimeout(async () => {
-        console.debug(2)
         if (await db.models.Reminder.findOne({ where: { id: this.id } })) {
-            console.debug(3)
-            console.debug(this.message, typeof this.message)
             let embed = new MessageEmbed()
                 .setColor(config.getData("/main_color"))
                 .setTitle("Reminder")
@@ -42,14 +40,15 @@ export class Reminder extends Model {
 
   async sendReminderMessage(opts: {embed: MessageEmbed}) {
     await this.fetchChannel();
-    await this.user.fetchDiscordUser();
+    const user = await this.getUser();
+    await user.fetchDiscordUser();
     if (this.channel instanceof DMChannel) {
         this.channel.send({embeds: [opts.embed]});
         return;
     }
     if (!("permissionsFor" in this.channel)) return;
     if (this.channel.permissionsFor(client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
-        this.channel.send({content: this.user.discordUser.toString(), embeds: [opts.embed]});
+        this.channel.send({content: user.discordUser.toString(), embeds: [opts.embed]});
     }
   }
 

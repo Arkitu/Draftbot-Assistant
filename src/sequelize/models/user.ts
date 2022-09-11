@@ -1,4 +1,5 @@
-import { Sequelize, DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import { User as DiscordUser } from "discord.js";
 import { SequelizeWithAssociate } from ".";
 import * as dottie from "dottie";
 
@@ -43,54 +44,77 @@ interface ConfigSetArgs {
   }
 }
 
-export default (db: SequelizeWithAssociate) => {
-  class User extends Model {
-    declare static setDataValue: any;
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(db: SequelizeWithAssociate) {
-      this.hasMany(db.models.Reminder);
-    }
+export class User extends Model {
+  declare discordId: string;
+  declare config: Config;
+  declare discordUser: DiscordUser;
+  declare static setDataValue: any;
+  declare static discordId: string;
 
-    static get initArgs() {
-      let args: ModelAttributes<User, Optional<any, never>> = {
-        discordId: {
-          type: DataTypes.STRING,
-          primaryKey: true
-        },
-        config: {
-          type: DataTypes.VIRTUAL,
-          get: (): Config=>{
-            return dottie.transform(this)["config"]
-          },
-          set: (val: ConfigSetArgs)=>{
-            const flat = dottie.flatten(val);
-            for (let key in flat) {
-              this.setDataValue(key, flat[key])
-            }
-          }
-        }
-      }
-
-      for (let key in dottie.flatten(this)) {
-        if (key.startsWith("config.")) {
-          args[key] = {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-            allowNull: false
-          }
-        }
-      }
-
-      return args;
-    }
+  /**
+   * You need to fetch the user before using user.discordUser
+   */
+  fetchDiscordUser () {
+    return client.users.fetch(this.discordId);
   }
 
+
+
+  /**
+   * Helper method for defining associations.
+   * This method is not a part of Sequelize lifecycle.
+   * The `models/index` file will call this method automatically.
+   */
+  static associate(db: SequelizeWithAssociate) {
+    this.hasMany(db.models.Reminder);
+    this.hasMany(db.models.Tracking);
+  }
+
+  static get initArgs() {
+    let args: ModelAttributes<User, Optional<any, never>> = {
+      discordId: {
+        type: DataTypes.STRING,
+        primaryKey: true
+      },
+      discordUser: {
+        type: DataTypes.VIRTUAL,
+        get: ()=>{
+          return client.users.cache.get(this.discordId);
+        }
+      },
+      config: {
+        type: DataTypes.VIRTUAL,
+        get: (): Config=>{
+          return dottie.transform(this)["config"]
+        },
+        set: (val: ConfigSetArgs)=>{
+          const flat = dottie.flatten(val);
+          for (let key in flat) {
+            this.setDataValue(key, flat[key])
+          }
+        }
+      }
+    }
+
+    for (let key in dottie.flatten(this)) {
+      if (key.startsWith("config.")) {
+        args[key] = {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false,
+          allowNull: false
+        }
+      }
+    }
+
+    return args;
+  }
+}
+
+export default () => {
+  
+
   User.init(User.initArgs, {
-    sequelize,
+    sequelize: db,
     modelName: 'User',
   });
 
