@@ -68,6 +68,7 @@ export class User extends Model {
   static associate(db: SequelizeWithAssociate) {
     this.hasMany(db.models.Reminder);
     this.hasMany(db.models.Tracking);
+    this.belongsTo(db.models.Guild);
   }
 
   static get initArgs() {

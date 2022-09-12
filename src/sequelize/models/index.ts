@@ -12,8 +12,7 @@ export const snowflakeValidate: ModelValidateOptions = {
 }
 
 export interface ModelWithAssociate extends ModelCtor<Model<any, any>> {
-  associate?: (db: Sequelize)=>void,
-  name: string
+  associate?: ()=>void
 }
 
 export interface SequelizeWithAssociate extends Sequelize {
@@ -47,7 +46,7 @@ fs
 
 Object.keys(db.models).forEach(modelName => {
   if ("associate" in db.models[modelName]) {
-    db.models[modelName].associate(db);
+    db.models[modelName].associate();
   }
 });
 
