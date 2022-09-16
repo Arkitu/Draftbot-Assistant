@@ -1,5 +1,7 @@
 import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
 import { ModelWithAssociate, SequelizeWithAssociate, snowflakeValidate } from ".";
+import { Guild } from "./guild";
+import { User } from "./user";
 
 export interface ProfileData {
 	lvl: number,
@@ -34,10 +36,28 @@ export interface LongReportData {
 	id: string
 }
 
+export interface GuildData {
+  level: number,
+  xp: number,
+  max_xp: number,
+  full_level?: number
+}
+
 export class Tracking extends Model {
   declare id: number;
+  declare type: "profile" | "long_report" | "short_report" | "guild";
   declare data: ProfileData | LongReportData | null;
   declare static stringifiedData: string | null;
+  declare getGuild: ()=>Promise<Guild>;
+  declare getUser: ()=>Promise<User>;
+
+  getTrackable() {
+    if (this.type === "guild") {
+      return this.getGuild();
+    } else {
+      return this.getUser();
+    }
+  }
   
   /**
    * Helper method for defining associations.
@@ -46,6 +66,7 @@ export class Tracking extends Model {
    */
   static associate() {
     this.belongsTo(db.models.User);
+    this.belongsTo(db.models.Guild);
   }
 
   static get initArgs() {
@@ -54,16 +75,20 @@ export class Tracking extends Model {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isIn: [["profile", "long_report", "short_report"]]
+          isIn: [["profile", "long_report", "short_report", "guild"]]
         }
       },
       stringifiedData: DataTypes.STRING,
       data: {
         type: DataTypes.VIRTUAL,
         get: ()=>{
-          return JSON.parse(this.stringifiedData);
+          let data = JSON.parse(this.stringifiedData);
+          if (data.level != undefined) {
+            data.full_level = data.level + (data.xp/data.max_xp);
+          }
+          return 
         },
-        set: (val: ProfileData | LongReportData | null)=>{
+        set: (val: ProfileData | LongReportData | GuildData | null)=>{
           this.stringifiedData = JSON.stringify(val);
         }
       }

@@ -3,7 +3,6 @@ import { ModelWithAssociate } from ".";
 
 export class Guild extends Model {
   declare name: string;
-  declare level: number;
   declare description: string;
   
   /**
@@ -13,6 +12,7 @@ export class Guild extends Model {
    */
   static associate() {
     this.hasMany(db.models.User);
+    this.hasMany(db.models.Tracking);
   }
 
   static get initArgs() {
@@ -22,7 +22,6 @@ export class Guild extends Model {
         allowNull: false,
         primaryKey: true
       },
-      level: DataTypes.FLOAT,
       description: DataTypes.STRING
     };
     return args;
