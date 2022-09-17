@@ -1,7 +1,6 @@
 import Context from '../libs/Context';
 import { Client } from '../bot.js';
 import { JsonDB } from 'node-json-db';
-import { sequelizeModels } from '../models';
 import { SequelizeWithAssociate } from '../sequelize/models';
 
 declare global {

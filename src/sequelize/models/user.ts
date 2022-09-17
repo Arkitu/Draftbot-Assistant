@@ -1,8 +1,24 @@
-import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  ModelAttributes,
+  Optional,
+  InferAttributes,
+  InferCreationAttributes,
+  HasManyCreateAssociationMixin
+} from "sequelize";
 import { User as DiscordUser } from "discord.js";
 import { SequelizeWithAssociate } from ".";
 import * as dottie from "dottie";
 
+export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, never>> = {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true
+  },
+  description: DataTypes.STRING
+};
 
 interface Config {
   reminders: {

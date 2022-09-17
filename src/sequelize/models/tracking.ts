@@ -1,7 +1,24 @@
-import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  ModelAttributes,
+  Optional,
+  InferAttributes,
+  InferCreationAttributes,
+  HasManyCreateAssociationMixin
+} from "sequelize";
 import { ModelWithAssociate, SequelizeWithAssociate, snowflakeValidate } from ".";
 import { Guild } from "./guild";
 import { User } from "./user";
+
+export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, never>> = {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true
+  },
+  description: DataTypes.STRING
+};
 
 export interface ProfileData {
 	lvl: number,

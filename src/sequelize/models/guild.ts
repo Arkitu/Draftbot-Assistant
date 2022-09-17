@@ -1,10 +1,34 @@
-import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  ModelAttributes,
+  Optional,
+  InferAttributes,
+  InferCreationAttributes,
+  HasManyCreateAssociationMixin
+} from "sequelize";
 import { ModelWithAssociate } from ".";
+import { Tracking } from "./tracking";
 
-export class Guild extends Model {
+export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, never>> = {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true
+  },
+  description: DataTypes.STRING
+};
+
+export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes<Guild>> {
   declare name: string;
   declare description: string;
-  
+
+  declare createTracking: HasManyCreateAssociationMixin<Tracking>;
+
+  doSomething() {
+    console.log("something")
+  }
+
   /**
    * Helper method for defining associations.
    * This method is not a part of Sequelize lifecycle.
@@ -14,22 +38,10 @@ export class Guild extends Model {
     this.hasMany(db.models.User);
     this.hasMany(db.models.Tracking);
   }
-
-  static get initArgs() {
-    let args: ModelAttributes<Guild, Optional<any, never>> = {
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        primaryKey: true
-      },
-      description: DataTypes.STRING
-    };
-    return args;
-  }
 }
 
 export default () => {
-  Guild.init(Guild.initArgs, {
+  Guild.init(initArgs, {
     sequelize: db,
     modelName: 'Guild',
   });

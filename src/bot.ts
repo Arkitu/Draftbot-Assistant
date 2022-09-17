@@ -3,10 +3,9 @@ import * as Discord from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
-import { Sequelize } from 'sequelize-typescript';
-import { sequelizeModels, User } from './models/index.js';
 import { GoalUnitTranslate } from './models/Goal.js';
 import { join, dirname } from 'path';
+import './sequelize/models/index.js';
 
 const botDir = new URL(import.meta.url);
 const botDirString = (()=>{
@@ -14,20 +13,13 @@ const botDirString = (()=>{
 	urlArray.pop();
 	return urlArray.join("/");
 })()
-// Import config, constants, sequelize, models
+// Import config and constants
 global.config = new JsonDB(new Config(`${botDirString}/../config.json`, true, true, '/'));
 global.constants = new JsonDB(new Config(`${botDirString}/../constants.json`, true, true, '/'));
-global.models = sequelizeModels;
 
-global.sequelize = new Sequelize({
-	dialect: 'sqlite',
-  	storage: `${botDirString}/../db`,
-	models: Object.values(models),
-	logging: false
-});
-
-sequelize.authenticate();
-sequelize.sync({ alter: true });
+// Sync the db
+db.authenticate();
+db.sync({ alter: true });
 
 // Some utils functions
 export function log(msg: string) {
@@ -81,7 +73,7 @@ client.once('ready', async () => {
 	log('Bot logged !');
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
 	// Relauch the stoped reminders
-	for (let reminder of await models.Reminder.findAll()) {
+	for (let reminder of await db.models.Reminder.findAll()) {
 		console.debug(reminder.toJSON())
 		reminder.start()
 	}
@@ -112,11 +104,23 @@ let fetchGuildListener = async (msg: Discord.Message) => {
 	if (!msg.embeds.length) return;
 	if (!msg.embeds[0].title) return;
     if (!msg.embeds[0].title.startsWith("Guilde ")) return;
-	let guild = new models.Guild({
+	const guild = (await db.models.Guild.findOrCreate({
+		where: {
+			name: msg.embeds[0].title.substring(7)
+		}
+	}))[0]
+
+	guild.createTracking({
+		
+	})
+
+	/*
+	let guild = db.models.Guild.build({
 		name: msg.embeds[0].title.substring(7),
 		level: parseInt((msg.embeds[0].fields[1].name.split(" "))[6]) + (parseInt((msg.embeds[0].fields[1].name.split(" "))[1]) / parseInt((msg.embeds[0].fields[1].name.split(" "))[3])),
 		description: "",
 	})
+	*/
 	if (isNaN(guild.level)) guild.level = 100;
 	if (msg.embeds[0].description) {
 		guild.description = msg.embeds[0].description.split("`")[1];

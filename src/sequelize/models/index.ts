@@ -34,18 +34,12 @@ export interface SequelizeWithAssociate extends Sequelize {
 }
 
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = (await import(__dirname + '/../config/config.json'))[env];
 
-let db: SequelizeWithAssociate;
-
-
-
-if (config.use_env_variable) {
-  db = new Sequelize(process.env[config.use_env_variable], config)
-} else {
-  db = new Sequelize(config.database, config.username, config.password, config)
-}
+global.db = new Sequelize({
+	dialect: 'sqlite',
+  storage: path.join(__dirname, "..", "db.sqlite"),
+	logging: false
+});
 
 fs
   .readdirSync(__dirname)
@@ -53,7 +47,7 @@ fs
     return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
   })
   .forEach(async file => {
-    (await import(path.join(__dirname, file)))(db)
+    (await import(path.join(__dirname, file)))()
   });
 
 Object.keys(db.models).forEach(modelName => {

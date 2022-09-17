@@ -1,11 +1,42 @@
-import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  ModelAttributes,
+  Optional,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  BelongsToGetAssociationMixin
+} from "sequelize";
 import { ModelWithAssociate } from ".";
+import { User } from "./user";
 
-export class PropoReminder extends Model {
-  declare id: number;
+export const initArgs: ModelAttributes<PropoReminder, Optional<InferAttributes<PropoReminder>, never>> = {
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  trigger: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  duration: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  inDm: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  }
+};
+
+export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCreationAttributes<PropoReminder>> {
+  declare id: CreationOptional<number>;
   declare trigger: string;
   declare duration: number;
   declare inDm: boolean;
+  declare getUser: BelongsToGetAssociationMixin<User>;
   
   /**
    * Helper method for defining associations.
@@ -15,28 +46,10 @@ export class PropoReminder extends Model {
   static associate() {
     this.belongsTo(db.models.User);
   }
-
-  static get initArgs() {
-    let args: ModelAttributes<PropoReminder, Optional<any, never>> = {
-      trigger: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      duration: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
-      inDm: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      }
-    };
-    return args;
-  }
 }
 
 export default () => {
-  PropoReminder.init(PropoReminder.initArgs, {
+  PropoReminder.init(initArgs, {
     sequelize: db,
     modelName: 'PropoReminder',
   });

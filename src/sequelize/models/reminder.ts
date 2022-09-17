@@ -1,10 +1,61 @@
 import { DMChannel, MessageEmbed, TextBasedChannel } from "discord.js";
-import { DataTypes, Model, ModelAttributes, Optional } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  ModelAttributes,
+  Optional,
+  InferAttributes,
+  InferCreationAttributes,
+  HasManyCreateAssociationMixin,
+  CreationOptional,
+  BelongsToGetAssociationMixin
+} from "sequelize";
 import { ModelWithAssociate, snowflakeValidate } from ".";
 import { User } from "./user.js";
 
-export class Reminder extends Model {
-  declare id: number;
+export const initArgs: ModelAttributes<Reminder, Optional<InferAttributes<Reminder>, never>> = {
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  channelId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: snowflakeValidate
+  },
+  channelIsUser: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
+  deadLineTimestamp: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  message: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  deadLine: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return new Date(this.deadLineTimestamp);
+    },
+    set(val: Date) {
+      this.deadLineTimestamp = val.getTime();
+    }
+  },
+  channel: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return client.channels.cache.get(this.channelId);
+    }
+  }
+};
+
+export class Reminder extends Model<InferAttributes<Reminder>, InferCreationAttributes<Reminder>> {
+  declare id: CreationOptional<number>;
   declare channelId: string;
   declare channelIsUser: boolean;
   declare deadLineTimestamp: number;
@@ -14,10 +65,7 @@ export class Reminder extends Model {
    * You need to assure you that the channel is cached before using reminder.channel or use fetchChannel() instead
    */
   declare channel: TextBasedChannel;
-  declare getUser: () => Promise<User>;
-  declare static deadLineTimestamp: number;
-  declare static setDataValue: any;
-  declare static channelId: string;
+  declare getUser: BelongsToGetAssociationMixin<User>;
 
   fetchChannel() {
     return client.channels.fetch(this.channelId);
@@ -60,49 +108,10 @@ export class Reminder extends Model {
   static associate() {
     this.belongsTo(db.models.User)
   }
-
-  static get initArgs() {
-    let args: ModelAttributes<Reminder, Optional<any, never>> = {
-      channelId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: snowflakeValidate
-      },
-      channelIsUser: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      },
-      deadLineTimestamp: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
-      message: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      deadLine: {
-        type: DataTypes.VIRTUAL,
-        get: ()=>{
-          return new Date(this.deadLineTimestamp);
-        },
-        set: (val: Date)=>{
-          this.setDataValue(val.getTime());
-        }
-      },
-      channel: {
-        type: DataTypes.VIRTUAL,
-        get: ()=>{
-          return client.channels.cache.get(this.channelId);
-        }
-      }
-    };
-    return args;
-  }
 }
 
 export default () => {
-  Reminder.init(Reminder.initArgs, {
+  Reminder.init(initArgs, {
     sequelize: db,
     modelName: 'Reminder',
   });
