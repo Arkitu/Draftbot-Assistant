@@ -1,124 +1,139 @@
 import {
-  DataTypes,
-  Model,
-  ModelAttributes,
-  Optional,
-  InferAttributes,
-  InferCreationAttributes,
-  HasManyCreateAssociationMixin
+    DataTypes,
+    Model,
+    ModelAttributes,
+    Optional,
+    InferAttributes,
+    InferCreationAttributes,
+    HasManyCreateAssociationMixin,
+    CreationOptional,
+    BelongsToGetAssociationMixin,
+    NonAttribute
 } from "sequelize";
 import { ModelWithAssociate, SequelizeWithAssociate, snowflakeValidate } from ".";
 import { Guild } from "./guild";
 import { User } from "./user";
 
-export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, never>> = {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    primaryKey: true
-  },
-  description: DataTypes.STRING
-};
-
 export interface ProfileData {
-	lvl: number,
-	pv: number,
-	max_pv: number,
-	xp: number,
-	max_xp: number,
-	gold: number,
-	energy: number,
-	max_energy: number,
-	strenght: number,
-	defense: number,
-	speed: number,
-	gems: number,
-	quest_missions_percentage: number,
-	rank: number,
-	rank_points: number,
-	class: {
-		name: string,
-		emoji: string
-	},
-	guild_name: string | null,
-	destination: string
+    type: "profile"
+    lvl: number,
+    pv: number,
+    max_pv: number,
+    xp: number,
+    max_xp: number,
+    gold: number,
+    energy: number,
+    max_energy: number,
+    strenght: number,
+    defense: number,
+    speed: number,
+    gems: number,
+    quest_missions_percentage: number,
+    rank: number,
+    rank_points: number,
+    class: {
+        name: string,
+        emoji: string
+    },
+    guild_name: string | null,
+    destination: string
 }
 
 export interface LongReportData {
-	points: number,
-	gold: number,
-	xp: number,
-	time: number,
-	pv: number,
-	id: string
+    type: "long_report"
+    points: number,
+    gold: number,
+    xp: number,
+    time: number,
+    pv: number,
+    id: string
 }
 
-export interface GuildData {
-  level: number,
-  xp: number,
-  max_xp: number,
-  full_level?: number
+export interface PartialGuildData {
+    type: "guild"
+    level: number,
+    xp: number,
+    max_xp: number
 }
 
-export class Tracking extends Model {
-  declare id: number;
-  declare type: "profile" | "long_report" | "short_report" | "guild";
-  declare data: ProfileData | LongReportData | null;
-  declare static stringifiedData: string | null;
-  declare getGuild: ()=>Promise<Guild>;
-  declare getUser: ()=>Promise<User>;
-
-  getTrackable() {
-    if (this.type === "guild") {
-      return this.getGuild();
-    } else {
-      return this.getUser();
+class GuildData implements PartialGuildData {
+    type: "guild";
+    level: number;
+    xp: number;
+    max_xp: number;
+    constructor(opts: PartialGuildData) {
+        this.type = opts.type;
+        this.level = opts.level;
+        this.xp = opts.xp;
+        this.max_xp = opts.max_xp;
     }
-  }
-  
-  /**
-   * Helper method for defining associations.
-   * This method is not a part of Sequelize lifecycle.
-   * The `models/index` file will call this method automatically.
-   */
-  static associate() {
-    this.belongsTo(db.models.User);
-    this.belongsTo(db.models.Guild);
-  }
 
-  static get initArgs() {
-    let args: ModelAttributes<Tracking, Optional<any, never>> = {
-      type: {
+    get full_level() {
+        return this.level + (this.xp / this.max_xp);
+    }
+}
+
+export const initArgs: ModelAttributes<Tracking, Optional<InferAttributes<Tracking>, never>> = {
+    id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    type: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isIn: [["profile", "long_report", "short_report", "guild"]]
+            isIn: [["profile", "long_report", "short_report", "guild"]]
         }
-      },
-      stringifiedData: DataTypes.STRING,
-      data: {
-        type: DataTypes.VIRTUAL,
-        get: ()=>{
-          let data = JSON.parse(this.stringifiedData);
-          if (data.level != undefined) {
-            data.full_level = data.level + (data.xp/data.max_xp);
-          }
-          return 
-        },
-        set: (val: ProfileData | LongReportData | GuildData | null)=>{
-          this.stringifiedData = JSON.stringify(val);
+    },
+    stringifiedData: {
+        type: DataTypes.TEXT("long")
+    }
+};
+
+export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttributes<Tracking>> {
+    declare id: CreationOptional<number>;
+    declare type: "profile" | "long_report" | "short_report" | "guild";
+    declare stringifiedData: CreationOptional<string>;
+    declare getGuild: BelongsToGetAssociationMixin<Guild>;
+    declare getUser: BelongsToGetAssociationMixin<User>;
+
+    get data(): NonAttribute<ProfileData | LongReportData | GuildData | null> {
+        let data = JSON.parse(this.stringifiedData) as ProfileData | LongReportData | PartialGuildData | null;
+        
+        if (data.type === "guild") {
+            return new GuildData(data)
         }
-      }
-    };
-    return args;
-  }
+        return data;
+    }
+    set data(val: ProfileData | LongReportData | PartialGuildData | null) {
+        this.stringifiedData = JSON.stringify(val);
+    }
+
+    getTrackable(): Promise<Guild | User> {
+        if (this.type === "guild") {
+            return this.getGuild();
+        } else {
+            return this.getUser();
+        }
+    }
+
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate() {
+        this.belongsTo(db.models.User);
+        this.belongsTo(db.models.Guild);
+    }
 }
 
 export default () => {
-  Tracking.init(Tracking.initArgs, {
-    sequelize: db,
-    modelName: 'Tracking',
-  });
+    Tracking.init(initArgs, {
+        sequelize: db,
+        modelName: 'Tracking',
+    });
 
-  return Tracking as ModelWithAssociate;
+    return Tracking as ModelWithAssociate;
 };

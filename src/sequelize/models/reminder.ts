@@ -1,120 +1,120 @@
 import { DMChannel, MessageEmbed, TextBasedChannel } from "discord.js";
 import {
-  DataTypes,
-  Model,
-  ModelAttributes,
-  Optional,
-  InferAttributes,
-  InferCreationAttributes,
-  HasManyCreateAssociationMixin,
-  CreationOptional,
-  BelongsToGetAssociationMixin
+    DataTypes,
+    Model,
+    ModelAttributes,
+    Optional,
+    InferAttributes,
+    InferCreationAttributes,
+    HasManyCreateAssociationMixin,
+    CreationOptional,
+    BelongsToGetAssociationMixin,
+    NonAttribute
 } from "sequelize";
 import { ModelWithAssociate, snowflakeValidate } from ".";
 import { User } from "./user.js";
 
 export const initArgs: ModelAttributes<Reminder, Optional<InferAttributes<Reminder>, never>> = {
-  id: {
-    type: DataTypes.INTEGER.UNSIGNED,
-    autoIncrement: true,
-    primaryKey: true
-  },
-  channelId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: snowflakeValidate
-  },
-  channelIsUser: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  },
-  deadLineTimestamp: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  message: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  deadLine: {
-    type: DataTypes.VIRTUAL,
-    get() {
-      return new Date(this.deadLineTimestamp);
+    id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true
     },
-    set(val: Date) {
-      this.deadLineTimestamp = val.getTime();
+    channelId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: snowflakeValidate
+    },
+    channelIsUser: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    deadLineTimestamp: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    message: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
-  },
-  channel: {
-    type: DataTypes.VIRTUAL,
-    get() {
-      return client.channels.cache.get(this.channelId);
-    }
-  }
 };
 
 export class Reminder extends Model<InferAttributes<Reminder>, InferCreationAttributes<Reminder>> {
-  declare id: CreationOptional<number>;
-  declare channelId: string;
-  declare channelIsUser: boolean;
-  declare deadLineTimestamp: number;
-  declare message: string;
-  declare deadLine: Date;
-  /**
-   * You need to assure you that the channel is cached before using reminder.channel or use fetchChannel() instead
-   */
-  declare channel: TextBasedChannel;
-  declare getUser: BelongsToGetAssociationMixin<User>;
+    declare id: CreationOptional<number>;
+    declare channelId: string;
+    declare channelIsUser: boolean;
+    declare deadLineTimestamp: number;
+    declare message: string;
+    declare getUser: BelongsToGetAssociationMixin<User>;
 
-  fetchChannel() {
-    return client.channels.fetch(this.channelId);
-  }
+    fetchChannel() {
+        return client.channels.fetch(this.channelId);
+    }
 
-  // Methods
-  async start() {
-    setTimeout(async () => {
-        if (await db.models.Reminder.findOne({ where: { id: this.id } })) {
-            let embed = new MessageEmbed()
-                .setColor(config.getData("/main_color"))
-                .setTitle("Reminder")
-                .setDescription(this.get('message'))
-            this.sendReminderMessage({ embed: embed });
-            this.destroy()
+    // deadLine
+    get deadLine(): NonAttribute<Date> {
+        return new Date(this.deadLineTimestamp);
+    }
+    set deadLine(val: Date) {
+        this.deadLineTimestamp = val.getTime();
+    }
+
+    /**
+     * You need to assure you that the channel is cached before using reminder.channel or use fetchChannel() instead
+     */
+    get channel(): NonAttribute<TextBasedChannel> {
+        let channel = client.channels.cache.get(this.channelId);
+        if (!channel.isText()) {
+            throw new Error(`Reminder channel is not TextBased ! His type is ${channel.type}`);
         }
-    }, (this.deadLine.getTime() - Date.now()));
-    return this;
-  }
-
-  async sendReminderMessage(opts: {embed: MessageEmbed}) {
-    await this.fetchChannel();
-    const user = await this.getUser();
-    await user.fetchDiscordUser();
-    if (this.channel instanceof DMChannel) {
-        this.channel.send({embeds: [opts.embed]});
-        return;
+        return channel;
     }
-    if (!("permissionsFor" in this.channel)) return;
-    if (this.channel.permissionsFor(client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
-        this.channel.send({content: user.discordUser.toString(), embeds: [opts.embed]});
-    }
-  }
 
-  /**
-   * Helper method for defining associations.
-   * This method is not a part of Sequelize lifecycle.
-   * The `models/index` file will call this method automatically.
-   */
-  static associate() {
-    this.belongsTo(db.models.User)
-  }
+    // Methods
+    async start() {
+        setTimeout(async () => {
+            if (await db.models.Reminder.findOne({ where: { id: this.id } })) {
+                let embed = new MessageEmbed()
+                    .setColor(config.getData("/main_color"))
+                    .setTitle("Reminder")
+                    .setDescription(this.get('message'))
+                this.sendReminderMessage({ embed: embed });
+                this.destroy()
+            }
+        }, (this.deadLine.getTime() - Date.now()));
+        return this;
+    }
+
+    async sendReminderMessage(opts: { embed: MessageEmbed }) {
+        await this.fetchChannel();
+        const user = await this.getUser();
+        await user.fetchDiscordUser();
+        if (this.channel instanceof DMChannel) {
+            this.channel.send({ embeds: [opts.embed] });
+            return;
+        }
+        if (!("permissionsFor" in this.channel)) return;
+        if (this.channel.permissionsFor(client.user).has(["SEND_MESSAGES", "EMBED_LINKS"])) {
+            this.channel.send({ content: user.discordUser.toString(), embeds: [opts.embed] });
+        }
+    }
+
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate() {
+        this.belongsTo(db.models.User)
+    }
 }
 
 export default () => {
-  Reminder.init(initArgs, {
-    sequelize: db,
-    modelName: 'Reminder',
-  });
+    Reminder.init(initArgs, {
+        sequelize: db,
+        modelName: 'Reminder',
+    });
 
-  return Reminder as ModelWithAssociate;
+    return Reminder as ModelWithAssociate;
 };
