@@ -25,7 +25,7 @@ export async function execute(interaction: CommandInteraction) {
 	if (opt_categorie) {
 		help_embed.setAuthor({ name: opt_categorie, iconURL: client.user.avatarURL(), url: config.getData("/help_link") });
 		for (let cmd of constants.getData(`/helpCategories[${constants.getIndex("/helpCategories", opt_categorie, "name")}]/commands`)) {
-			help_embed.addField(`\`/${cmd}\``, constants.getData(`/commands[${constants.getIndex("/commands", cmd, "name")}]/description`));
+			help_embed.addFields({ name: `\`/${cmd}\``, value: constants.getData(`/commands[${constants.getIndex("/commands", cmd, "name")}]/description`)});
 		}
 		if (help_embed.fields.length === 0) {
 			help_embed.setDescription("Aucune commande dans cette catégorie");
@@ -33,7 +33,7 @@ export async function execute(interaction: CommandInteraction) {
 	} else {
 		help_embed.setAuthor({ name: `Aide de ${client.user.username}`, iconURL: client.user.avatarURL(), url: config.getData("/help_link") });
 		for (let categorie of constants.getData("/helpCategories")) {
-			help_embed.addField(categorie.name, `\`/help ${categorie.name}\``, true);
+			help_embed.addFields({ name: categorie.name, value: `\`/help ${categorie.name}\``, inline:true });
 		}
 	}
 
