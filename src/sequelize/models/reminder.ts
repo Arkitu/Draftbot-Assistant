@@ -9,12 +9,13 @@ import {
     HasManyCreateAssociationMixin,
     CreationOptional,
     BelongsToGetAssociationMixin,
-    NonAttribute
+    NonAttribute,
+    ForeignKey
 } from "sequelize";
 import { ModelWithAssociate, snowflakeValidate } from ".";
 import { User } from "./user.js";
 
-export const initArgs: ModelAttributes<Reminder, Optional<InferAttributes<Reminder>, never>> = {
+export const initArgs = {
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -47,6 +48,7 @@ export class Reminder extends Model<InferAttributes<Reminder>, InferCreationAttr
     declare deadLineTimestamp: number;
     declare message: string;
     declare getUser: BelongsToGetAssociationMixin<User>;
+    declare userId: ForeignKey<User["discordId"]>;
 
     fetchChannel() {
         return client.channels.fetch(this.channelId);

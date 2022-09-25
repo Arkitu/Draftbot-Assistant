@@ -9,10 +9,10 @@ async function createReminders(page: number, user: DiscordUser): Promise<{embed:
 	
 	const buttons = new MessageActionRow();
 
-	const reminders = await models.Reminder.findAll({
+	const reminders = await db.models.Reminder.findAll({
 		offset: page*10,
 		limit: 10,
-		order: sequelize.col('deadLineTimestamp'),
+		order: db.col('deadLineTimestamp'),
 		where: {
 			userId: user.id
 		}
@@ -36,10 +36,10 @@ async function createReminders(page: number, user: DiscordUser): Promise<{embed:
 	if (
 		reminders.length > 10
 		&&
-		(page+1)*10 < await models.Reminder.count({
+		(page+1)*10 < await db.models.Reminder.count({
 			where: { userId: user.id }
-		}
-	)) {
+		})
+	) {
 		buttons.addComponents(
 			new MessageButton()
 				.setCustomId('next_page')

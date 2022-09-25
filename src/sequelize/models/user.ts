@@ -98,6 +98,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare getPropoReminder: HasManyGetAssociationsMixin<PropoReminder>;
     declare createPropoReminder: HasManyCreateAssociationMixin<PropoReminder>;
     declare createReminder: HasManyCreateAssociationMixin<Reminder>;
+    declare countReminders: HasManyCountAssociationsMixin;
     declare createTracking: HasManyCreateAssociationMixin<Tracking>;
     declare getTrackings: HasManyGetAssociationsMixin<Tracking>;
     declare createGoal: HasManyCreateAssociationMixin<Goal>;
