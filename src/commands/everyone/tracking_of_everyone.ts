@@ -55,7 +55,7 @@ export async function execute(interaction: CommandInteraction) {
             break;
     }
 
-    let allUsersTrackings = await models.Tracking.findAll({
+    let allUsersTrackings = await db.models.Tracking.findAll({
         where: {
             type: type
         }
@@ -106,7 +106,7 @@ export async function execute(interaction: CommandInteraction) {
             }
             for (let tracking of allUsersTrackings) {
                 if (["long_report", "short_report"].includes(tracking.type)) {
-                    let tracking_date = tracking.createdAt as Date;
+                    let tracking_date = tracking.createdAt;
                     if (tracking_date.getTime() >= min_date.getTime() && tracking_date.getTime() <= max_date.getTime()) {
                         tracking_date.setHours(0, 0, 0, 0);
                         if (tracking.type == "long_report") {
@@ -220,7 +220,7 @@ export async function execute(interaction: CommandInteraction) {
             .setImage(url_chart);
         interaction.editReply({ embeds: [embed] });
     } else {
-        await chart.toFile(`./temp/${interaction.user.id}_chart.png`);
+        await chart.toFile(`${botDirString}/../temp/${interaction.user.id}_chart.png`);
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
                 switch (opt.subcommand) {
@@ -231,7 +231,7 @@ export async function execute(interaction: CommandInteraction) {
                 }
             })()} de tout le monde`)
             .setImage(`attachment://${interaction.user.id}_chart.png`);
-        await interaction.editReply({ embeds: [embed], files: [`./temp/${interaction.user.id}_chart.png`] });
-        unlink(`./temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
+        await interaction.editReply({ embeds: [embed], files: [`${botDirString}/../temp/${interaction.user.id}_chart.png`] });
+        unlink(`${botDirString}/../temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
     }
 }

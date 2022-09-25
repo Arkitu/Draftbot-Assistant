@@ -9,8 +9,8 @@ import { LongReportData, PartialGuildData, ProfileData } from './sequelize/model
 import { User } from './sequelize/models/user.js';
 import { GoalUnitTranslate } from './sequelize/models/goal.js';
 
-const botDir = new URL(import.meta.url);
-const botDirString = (()=>{
+global.botDir = new URL(import.meta.url);
+global.botDirString = (()=>{
 	let urlArray = decodeURI(botDir.pathname).split("/");
 	urlArray.pop();
 	return urlArray.join("/");

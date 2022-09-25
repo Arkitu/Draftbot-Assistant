@@ -4,8 +4,8 @@ import { MessageEmbed } from 'discord.js';
 import { unlink } from 'fs';
 import { log_error } from "../../bot.js";
 import { CommandInteraction } from 'discord.js';
-import { User } from '../../models/index.js';
-import { ProfileData } from '../../models/Tracking.js';
+import { User } from '../../sequelize/models/user.js';
+import { ProfileData } from '../../sequelize/models/tracking.js';
 
 export var property_data: {
     [key: string]: {
@@ -180,7 +180,7 @@ export async function execute(interaction: CommandInteraction) {
     let user: User;
 
     if (opt.user.id != interaction.user.id) {
-        user = await models.User.findByPk(opt.user.id);
+        user = await db.models.User.findByPk(opt.user.id);
         if (!user) {
             interaction.reply(":warning: Cet utilisateur n'est pas dans ma base de données");
             return;
@@ -189,7 +189,7 @@ export async function execute(interaction: CommandInteraction) {
             interaction.reply(":warning: Les tracking de cet utilisateur ne sont pas publics. Tu peux lui demander de passer en public avec </config tracking switch_option:971457425842536458>");
         }
     } else {
-        user = (await models.User.findOrCreate({
+        user = (await db.models.User.findOrCreate({
             where: {
                 discordId: opt.user.id
             }
@@ -218,9 +218,8 @@ export async function execute(interaction: CommandInteraction) {
             }
     }
 
-    const trackings = await models.Tracking.findAll({
+    const trackings = await user.getTrackings({
         where: {
-            discordId: user.discordId,
             type: type
         }
     });
@@ -461,7 +460,7 @@ export async function execute(interaction: CommandInteraction) {
             .setImage(url_chart);
         interaction.editReply({ embeds: [embed] });
     } else {
-        await chart.toFile(`./temp/${interaction.user.id}_chart.png`);
+        await chart.toFile(`${botDirString}/../temp/${interaction.user.id}_chart.png`);
         let embed = new MessageEmbed()
             .setTitle(`Statistiques ${(()=>{
                 switch (opt.subcommand) {
@@ -472,7 +471,7 @@ export async function execute(interaction: CommandInteraction) {
                 }
             })()} de ${opt.user.username}`)
             .setImage(`attachment://${interaction.user.id}_chart.png`);
-        await interaction.editReply({ embeds: [embed], files: [`./temp/${interaction.user.id}_chart.png`] });
-        unlink(`./temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
+        await interaction.editReply({ embeds: [embed], files: [`${botDirString}/../temp/${interaction.user.id}_chart.png`] });
+        unlink(`${botDirString}/../temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
     }
 }

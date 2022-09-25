@@ -152,6 +152,11 @@ export default () => {
     User.init(initArgs, {
         sequelize: db,
         modelName: 'User',
+        hooks: {
+            afterCreate: (user)=>{
+                user.updateName()
+            }
+        }
     });
 
     return User;

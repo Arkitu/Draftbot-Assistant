@@ -8,6 +8,8 @@ declare global {
     var config: JsonDB;
     var constants: JsonDB;
     var db: SequelizeWithAssociate;
+    var botDir: URL;
+    var botDirString: string;
 }
 
 export {};

@@ -115,7 +115,8 @@ export const initArgs = {
             }
             this.stringifiedData = JSON.stringify(val);
         }
-    }
+    },
+    createdAt: DataTypes.DATE
 };
 
 export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttributes<Tracking>> {
@@ -126,7 +127,7 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
     declare getGuild: BelongsToGetAssociationMixin<Guild>;
     declare userId: ForeignKey<User["discordId"]>;
     declare getUser: BelongsToGetAssociationMixin<User>;
-    declare createdAt: NonAttribute<number>;
+    declare createdAt: CreationOptional<Date>;
 
     getTrackable(): Promise<Guild | User> {
         if (this.type === "guild") {
