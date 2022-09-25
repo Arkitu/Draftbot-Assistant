@@ -39,7 +39,7 @@ export async function execute(interaction: CommandInteraction) {
         to_json: interaction.options.getBoolean("to_json") === null ? true : interaction.options.getBoolean("to_json")
     };
 
-    const model: any = models[opts.category]
+    const model = db.models[opts.category]
 
     let fetched: any[];
 
