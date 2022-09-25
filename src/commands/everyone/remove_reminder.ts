@@ -16,7 +16,7 @@ export async function execute(interaction: CommandInteraction) {
         id: interaction.options.getInteger("id")
     }
 
-    const reminder = await models.Reminder.findByPk(opt.id);
+    const reminder = await db.models.Reminder.findByPk(opt.id);
     if (!reminder) {
         interaction.editReply(":warning: Ce rappel n'existe pas ! Faites `/reminders` pour connaitres vos rappels");
         return;
