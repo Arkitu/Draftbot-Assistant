@@ -82,11 +82,15 @@ export const initArgs: ModelAttributes<User, Optional<InferAttributes<User>, nev
         type: DataTypes.STRING,
         primaryKey: true
     },
+    name: {
+        type: DataTypes.STRING
+    },
     stringifiedConfig: DataTypes.TEXT("long")
 };
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare discordId: string;
+    declare name: string;
     declare stringifiedConfig: string;
     declare trackings: NonAttribute<Tracking[]>;
     declare goals: NonAttribute<Goal[]>;
@@ -121,6 +125,11 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
      */
     fetchDiscordUser() {
         return client.users.fetch(this.discordId);
+    }
+
+    async updateName() {
+        this.name = (await this.fetchDiscordUser()).username;
+        return this.name;
     }
 
     /**

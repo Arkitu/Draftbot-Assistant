@@ -9,7 +9,7 @@ async function createGtop(page: number): Promise<{embed: MessageEmbed, component
 	
 	const buttons = new MessageActionRow();
 
-	const guilds =await models.Guild.findAll({
+	const guilds = await db.models.Guild.findAll({
 		offset: page*15,
 		limit: 15,
 		order: [["level", "DESC"]]
@@ -39,11 +39,11 @@ async function createGtop(page: number): Promise<{embed: MessageEmbed, component
 					break;
 			}
 		}
-		description += `${emoji}${i + 1} **${guilds[i].name}** | \`Niveau ${Math.round(guilds[i].level*100)/100}\`\n`;
+		description += `${emoji}${i + 1} **${guilds[i].name}** | \`Niveau ${Math.round(guilds[i].data.level*100)/100}\`\n`;
 	}
 	embed.setDescription(description);
 
-	if (guilds.length > 15 && (page+1)*15 < await models.Guild.count()) {
+	if (guilds.length > 15 && (page+1)*15 < await db.models.Guild.count()) {
 		buttons.addComponents(
 			new MessageButton()
 				.setCustomId('next_page')
