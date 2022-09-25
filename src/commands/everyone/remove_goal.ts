@@ -16,7 +16,7 @@ export async function execute(interaction: CommandInteraction) {
         id: interaction.options.getInteger("id")
     }
 
-    const goal = await models.Goal.findByPk(opt.id);
+    const goal = await db.models.Goal.findByPk(opt.id);
     if (!goal) {
         interaction.editReply(":warning: Cet objectif n'existe pas ! Fais `/goals` pour connaitres tes objectifs");
         return;
