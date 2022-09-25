@@ -92,6 +92,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare getPropoReminder: HasManyGetAssociationsMixin<PropoReminder>;
     declare createReminder: HasManyCreateAssociationMixin<Reminder>;
     declare createTracking: HasManyCreateAssociationMixin<Tracking>;
+    declare getTrackings: HasManyGetAssociationsMixin<Tracking>;
+    declare createGoal: HasManyCreateAssociationMixin<Goal>;
 
     get config(): NonAttribute<Config> {
         if (!this.stringifiedConfig) {
