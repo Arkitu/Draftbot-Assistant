@@ -56,21 +56,18 @@ export async function execute(interaction: CommandInteraction) {
         channel = interaction.user
     }
 
-    const user = (await models.User.findOrCreate({
+    const user = (await db.models.User.findOrCreate({
         where: {
             discordId: interaction.user.id
         }
     }))[0]
 
-    const reminder = new models.Reminder({
+    user.createReminder({
         channelId: channel.id,
         channelIsUser: channel instanceof User,
         deadLineTimestamp: dead_line.getTime(),
         message: args.message
-    });
-    await user.$add('reminders', reminder);
-    reminder.start();
-    reminder.save();
+    }).then((r)=>r.start());
 
     await interaction.editReply(`Le rappel de ${args.time} ${args.unit} a été ajouté !`);
 }
