@@ -3,16 +3,18 @@ import * as Discord from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
-import { GoalUnitTranslate } from './models/Goal.js';
 import { join, dirname } from 'path';
 import './sequelize/models/index.js';
+import { LongReportData, PartialGuildData, ProfileData } from './sequelize/models/tracking.js';
+import { User } from './sequelize/models/user.js';
+import { GoalUnitTranslate } from './sequelize/models/goal.js';
 
 const botDir = new URL(import.meta.url);
 const botDirString = (()=>{
 	let urlArray = decodeURI(botDir.pathname).split("/");
 	urlArray.pop();
 	return urlArray.join("/");
-})()
+})();
 // Import config and constants
 global.config = new JsonDB(new Config(`${botDirString}/../config.json`, true, true, '/'));
 global.constants = new JsonDB(new Config(`${botDirString}/../constants.json`, true, true, '/'));
@@ -107,26 +109,29 @@ let fetchGuildListener = async (msg: Discord.Message) => {
 	const guild = (await db.models.Guild.findOrCreate({
 		where: {
 			name: msg.embeds[0].title.substring(7)
-		}
-	}))[0]
+		},
+		include: [db.models.Tracking]
+	}))[0];
 
-	guild.createTracking({
-		
-	})
-
-	/*
-	let guild = db.models.Guild.build({
-		name: msg.embeds[0].title.substring(7),
-		level: parseInt((msg.embeds[0].fields[1].name.split(" "))[6]) + (parseInt((msg.embeds[0].fields[1].name.split(" "))[1]) / parseInt((msg.embeds[0].fields[1].name.split(" "))[3])),
+	let guildData: PartialGuildData = {
+		type: "guild",
+		max_xp: parseInt((msg.embeds[0].fields[1].name.split(" "))[1]),
+		xp: parseInt((msg.embeds[0].fields[1].name.split(" "))[3]),
+		level: parseInt((msg.embeds[0].fields[1].name.split(" "))[6]),
 		description: "",
-	})
-	*/
-	if (isNaN(guild.level)) guild.level = 100;
+	};
+
+	if (isNaN(guildData.level)) guildData.level = 100;
 	if (msg.embeds[0].description) {
-		guild.description = msg.embeds[0].description.split("`")[1];
+		guildData.description = msg.embeds[0].description.split("`")[1];
 	}
-	guild.save();
-	log(`Guild ${guild.name} fetched. Level: ${Math.round(guild.level*100)/100}`);
+
+	await guild.createTracking({
+		type: "guild",
+		data: guildData
+	});
+
+	log(`Guild ${guild.name} fetched. Level: ${(await guild.fetchData()).full_level}`);
 }
 
 function getTimeLostByString(timeDisplayed: string): number {
@@ -143,7 +148,7 @@ const eventsMsgListener = async (message: Discord.Message) => {
 	if (message.author.id !== config.getData("/draftbot_id")) return;
 	if (!message.content) return;
 	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
-	const user = await models.User.findByPk(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))) // get the user
+	const user = await db.models.User.findByPk(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))) // get the user
 	if (!user) return;
 	if (!user.config.reminders.auto_proposition.events) return;
 
@@ -180,7 +185,7 @@ const minieventMsgListener = async (message: Discord.Message) => {
 	if (!message.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 	const userID = message.interaction ? message.interaction.user.id
 		: message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user = await models.User.findByPk(userID);
+	const user = await db.models.User.findByPk(userID);
 	if (!user) return;
 	if (!user.config.reminders.auto_proposition.minievents) return;
 	let text = message.embeds[0].description;
@@ -223,7 +228,7 @@ const guildDailyMessageListener = async (message: Discord.Message) => {
 	if (!message.interaction) return;
 	if (message.interaction.commandName !== "guilddaily") return;
 
-	const user = await models.User.findByPk(message.interaction.user.id);
+	const user = await db.models.User.findByPk(message.interaction.user.id);
 	if (!user) return;
 	if (!user.config.reminders.auto_proposition.guilddaily) return;
 
@@ -236,7 +241,7 @@ const dailyMessageListener = async (message: Discord.Message) => {
 	if (!message.interaction) return;
 	if (message.interaction.commandName !== "daily") return;
 
-	const user = await models.User.findByPk(message.interaction.user.id);
+	const user = await db.models.User.findByPk(message.interaction.user.id);
 	if (!user) return;
 	if (!user.config.reminders.auto_proposition.daily) return;
 
@@ -250,7 +255,7 @@ const petFeedMessageListener = async (message: Discord.Message) => {
 	if (!message.embeds[0].author.name.endsWith(constants.getData("/regex/petFeedAuthorEnd"))) return;
 
 	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user = await models.User.findByPk(userID);
+	const user = await db.models.User.findByPk(userID);
 	if (!user) return;
 	if (!user.config.reminders.auto_proposition.petfeed) return;
 
@@ -272,7 +277,7 @@ const petFreeMessageListener = async (message: Discord.Message) => {
 	if (message.interaction) return;
 
 	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user = await models.User.findByPk(userID);
+	const user = await db.models.User.findByPk(userID);
 	if (!user) return;
 	if (!user.config.reminders.auto_proposition.petfree) return;
 
@@ -284,7 +289,7 @@ const voteMessageListener = async (message: Discord.Message) => {
 	if (!message.interaction) return;
 	if (message.interaction.commandName !== "vote") return;
 
-	const user = await models.User.findByPk(message.interaction.user.id);
+	const user = await db.models.User.findByPk(message.interaction.user.id);
 	if (!user) return;
 	if (!user.config.reminders.auto_proposition.vote) return;
 
@@ -293,9 +298,9 @@ const voteMessageListener = async (message: Discord.Message) => {
 
 let propoMsgListener = async (message: Discord.Message) => {
 	if (!message.content) return;
-	const user = await models.User.findByPk(message.author.id)
+	const user = await db.models.User.findByPk(message.author.id)
 	if (!user) return;
-	const reminders = await user.$get('propoReminders', {
+	const reminders = await user.getPropoReminder({
 		where: {
 			trigger: message.content
 		}
@@ -342,13 +347,12 @@ async function addReminder(propositionMessage: Discord.Message, author: User) {
 
 		interaction.update({content: "Rappel ajouté !", components: []});
 		const endDate = interaction.message.createdTimestamp + parseInt(interaction.customId);
-		models.Reminder.create({
+		author.createReminder({
 			channelId: author.config.reminders.auto_proposition.in_dm
 				? author.discordId : propositionMessage.channel.id,
 			channelIsUser: author.config.reminders.auto_proposition.in_dm,
 			deadLineTimestamp: endDate,
-			message: `Vous avez ajouté un rappel il y a ${generateTimeDisplay(parseInt(interaction.customId))}`,
-			author: author
+			message: `Vous avez ajouté un rappel il y a ${generateTimeDisplay(parseInt(interaction.customId))}`
 		}).then((r)=>r.start())
 		propositionMessage = interaction.message;
 		log(`${author.discordUser.toString()} ajoute un rappel pour dans ${generateTimeDisplay(parseInt(interaction.customId))} suite à une proposition de rappel automatique`);
@@ -368,12 +372,13 @@ let longReportListener = async (msg: Discord.Message) => {
 	if (!msg.content) return;
 	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(msg.content))) return;
 
-	const user = await models.User.findByPk(msg.content.split("<@")[1].split(">")[0])
+	const user = await db.models.User.findByPk(msg.content.split("<@")[1].split(">")[0])
 	if (!user) return;
 	if (!user.config.tracking.reports) return;
 
 	// Training message : :newspaper: ** Journal de @Arkitu  :** :medal: Points gagnés : ** 358** | :moneybag: Argent gagné : ** 24** | :star: XP gagné : ** 25** | :clock10: Temps perdu : ** 45 Min ** | ⛓️ Vous grimpez jusqu'en haut des échafaudages, mais à l'exception d'un magnifique paysage, vous ne trouvez rien. Après avoir passé quelques minutes à l'admirer, vous repartez.
-	const data = {
+	const data: LongReportData = {
+		type: "long_report",
 		points: 0,
 		gold: 0,
 		xp: 0,
@@ -429,12 +434,10 @@ let longReportListener = async (msg: Discord.Message) => {
 		}
 	}
 
-	const tracking = new models.Tracking({
+	user.createTracking({
 		type: "long_report",
 		data: data
-	});
-	user.$add('tracking', tracking);
-	tracking.save()
+	})
 
 	log("Long repport tracked");
 }
@@ -446,15 +449,13 @@ let shortReportListener = async (msg: Discord.Message): Promise<void> => {
 	if (!msg.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 	if (!msg.interaction) return;
 
-	const user = await models.User.findByPk(msg.interaction.user.id)
+	const user = await db.models.User.findByPk(msg.interaction.user.id)
 	if (!user) return;
 	if (!user.config.tracking.reports) return;
 
-	const tracking = new models.Tracking({
+	user.createTracking({
 		type: "short_report"
 	});
-	user.$add('tracking', tracking);
-	tracking.save()
 
 	log("Short repport tracked");
 }
@@ -465,7 +466,7 @@ let profileListener = async (msg: Discord.Message): Promise<void> => {
 	if (msg.interaction.commandName !== "profile") return;
 	if (msg.interaction.user.username !== msg.embeds[0].title.split(" | ")[1]) return;
 
-	const user = await models.User.findByPk(msg.interaction.user.id, {include:[models.Goal]})
+	const user = await db.models.User.findByPk(msg.interaction.user.id, {include:[db.models.Goal]})
 	if (!user) return;
 	if (!user.config.tracking.reports) return;
 
@@ -488,7 +489,8 @@ let profileListener = async (msg: Discord.Message): Promise<void> => {
 		})
 	}
 
-	let data = {
+	let data: ProfileData = {
+		type: "profile",
 		lvl: parseInt(splited_embed.title[2].split(" ")[1]),
 		pv: parseInt(splited_embed.fields[0][0].value.split("/")[0]),
 		max_pv: parseInt(splited_embed.fields[0][0].value.split("/")[1]),
@@ -513,12 +515,10 @@ let profileListener = async (msg: Discord.Message): Promise<void> => {
 		destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
 	}
 
-	const tracking = new models.Tracking({
+	user.createTracking({
 		type: "profile",
 		data: data
 	});
-	user.$add('trackings', tracking);
-	tracking.save();
 
 	for (let goal of user.goals) {
 		if (goal.end < msg.createdTimestamp) {

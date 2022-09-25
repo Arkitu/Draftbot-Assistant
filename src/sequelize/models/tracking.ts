@@ -53,23 +53,35 @@ export interface PartialGuildData {
     type: "guild"
     level: number,
     xp: number,
-    max_xp: number
+    max_xp: number,
+    description: string
 }
 
-class GuildData implements PartialGuildData {
-    type: "guild";
+export class GuildData implements PartialGuildData {
+    type: "guild" = "guild";
     level: number;
     xp: number;
     max_xp: number;
+    description: string;
     constructor(opts: PartialGuildData) {
-        this.type = opts.type;
         this.level = opts.level;
         this.xp = opts.xp;
         this.max_xp = opts.max_xp;
+        this.description = opts.description
     }
 
     get full_level() {
         return this.level + (this.xp / this.max_xp);
+    }
+
+    toJSON(): PartialGuildData {
+        return {
+            type: this.type,
+            level: this.level,
+            xp: this.xp,
+            max_xp: this.max_xp,
+            description: this.description
+        };
     }
 }
 
@@ -86,8 +98,22 @@ export const initArgs: ModelAttributes<Tracking, Optional<InferAttributes<Tracki
             isIn: [["profile", "long_report", "short_report", "guild"]]
         }
     },
-    stringifiedData: {
-        type: DataTypes.TEXT("long")
+    stringifiedData: DataTypes.TEXT("long"),
+    data: {
+        type: DataTypes.VIRTUAL,
+        get(): ProfileData | LongReportData | GuildData | null {
+            let data = JSON.parse(this.stringifiedData) as ProfileData | LongReportData | PartialGuildData | null;
+            if (data.type === "guild") {
+                return new GuildData(data)
+            }
+            return data;
+        },
+        set(val: ProfileData | LongReportData | PartialGuildData | GuildData | null) {
+            if ("toJSON" in val) {
+                this.stringifiedData = JSON.stringify(val.toJSON());
+            }
+            this.stringifiedData = JSON.stringify(val);
+        }
     }
 };
 
@@ -95,20 +121,10 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
     declare id: CreationOptional<number>;
     declare type: "profile" | "long_report" | "short_report" | "guild";
     declare stringifiedData: CreationOptional<string>;
+    declare data: ProfileData | LongReportData | GuildData | PartialGuildData | null;
     declare getGuild: BelongsToGetAssociationMixin<Guild>;
     declare getUser: BelongsToGetAssociationMixin<User>;
-
-    get data(): NonAttribute<ProfileData | LongReportData | GuildData | null> {
-        let data = JSON.parse(this.stringifiedData) as ProfileData | LongReportData | PartialGuildData | null;
-        
-        if (data.type === "guild") {
-            return new GuildData(data)
-        }
-        return data;
-    }
-    set data(val: ProfileData | LongReportData | PartialGuildData | null) {
-        this.stringifiedData = JSON.stringify(val);
-    }
+    declare createdAt: NonAttribute<number>;
 
     getTrackable(): Promise<Guild | User> {
         if (this.type === "guild") {

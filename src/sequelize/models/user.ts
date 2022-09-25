@@ -6,10 +6,15 @@ import {
     InferAttributes,
     InferCreationAttributes,
     HasManyCreateAssociationMixin,
-    NonAttribute
+    NonAttribute,
+    HasManyGetAssociationsMixin
 } from "sequelize";
 import { User as DiscordUser } from "discord.js";
 import { SequelizeWithAssociate } from ".";
+import { PropoReminder } from "./proporeminder";
+import { Reminder } from "./reminder";
+import { Tracking } from "./tracking";
+import { Goal } from "./goal";
 
 interface Config {
     reminders: {
@@ -51,6 +56,26 @@ interface ConfigSetArgs {
     }
 }
 
+const DEFAULT_CONFIG: Config = {
+    reminders: {
+        auto_proposition: {
+            events: false,
+            minievents: false,
+            guilddaily: false,
+            daily: false,
+            petfree: false,
+            petfeed: false,
+            vote: false,
+            in_dm: false
+        }
+    },
+    tracking: {
+        reports: false,
+        public: false,
+        profile: false
+    }
+}
+
 export const initArgs: ModelAttributes<User, Optional<InferAttributes<User>, never>> = {
     discordId: {
         type: DataTypes.STRING,
@@ -62,14 +87,25 @@ export const initArgs: ModelAttributes<User, Optional<InferAttributes<User>, nev
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare discordId: string;
     declare stringifiedConfig: string;
+    declare trackings: NonAttribute<Tracking[]>;
+    declare goals: NonAttribute<Goal[]>;
+    declare getPropoReminder: HasManyGetAssociationsMixin<PropoReminder>;
+    declare createReminder: HasManyCreateAssociationMixin<Reminder>;
+    declare createTracking: HasManyCreateAssociationMixin<Tracking>;
 
     get config(): NonAttribute<Config> {
+        if (!this.stringifiedConfig) {
+            this.config = DEFAULT_CONFIG;
+        }
         return JSON.parse(this.stringifiedConfig) as Config;
     }
     set config(val: ConfigSetArgs) {
         this.stringifiedConfig = JSON.stringify({...this.config, ...val});
     }
 
+    /**
+     * You need to fetch the user before using user.discordUser. If you're not sure, use `await fetchDiscordUser()` instead 
+     */
     get discordUser(): NonAttribute<DiscordUser> {
         return client.users.cache.get(this.discordId);
     }
@@ -88,6 +124,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
      */
     static associate(db: SequelizeWithAssociate) {
         this.hasMany(db.models.Reminder);
+        this.hasMany(db.models.PropoReminder);
         this.hasMany(db.models.Tracking);
         this.belongsTo(db.models.Guild);
     }
