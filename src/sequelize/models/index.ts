@@ -1,12 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Sequelize, Model, DataTypes, ModelCtor, ModelValidateOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, ModelValidateOptions, ModelStatic } from 'sequelize';
 import { dirname, filename } from 'dirname-filename-esm';
 import { User } from './user.js';
 import { Reminder } from './reminder.js';
 import { Tracking } from './tracking.js';
 import { PropoReminder } from './proporeminder.js';
 import { Guild } from './guild.js';
+import { Goal } from './goal.js';
 
 const __dirname = dirname(import.meta);
 const __filename = filename(import.meta);
@@ -16,7 +17,7 @@ export const snowflakeValidate: ModelValidateOptions = {
     isInt: true
 }
 
-export interface ModelWithAssociate<M extends Model<any, any> = Model<any, any>> extends ModelCtor<M> {
+export interface ModelWithAssociate<M extends Model<any, any> = Model<any, any>> extends ModelStatic<M> {
     associate?: () => void
 }
 
@@ -26,7 +27,8 @@ export interface Models {
     Tracking?: ModelWithAssociate<Tracking>,
     PropoReminder?: ModelWithAssociate<PropoReminder>,
     Guild?: ModelWithAssociate<Guild>,
-    [key: string]: ModelWithAssociate
+    Goal?: ModelWithAssociate<Goal>
+    [key: string]: ModelWithAssociate<Model<any, any>>
 }
 
 export interface SequelizeWithAssociate extends Sequelize {

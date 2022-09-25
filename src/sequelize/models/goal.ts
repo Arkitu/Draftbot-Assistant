@@ -7,7 +7,8 @@ import {
     InferCreationAttributes,
     CreationOptional,
     BelongsToGetAssociationMixin,
-    NonAttribute
+    NonAttribute,
+    ForeignKey
 } from "sequelize";
 import { ModelWithAssociate } from ".";
 import { User } from "./user";
@@ -22,7 +23,7 @@ export const GoalUnitTranslate = {
     rank_points: ":medal:"
 }
 
-export const initArgs: ModelAttributes<Goal, Optional<InferAttributes<Goal>, never>> = {
+export const initArgs = {
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -57,6 +58,7 @@ export class Goal extends Model<InferAttributes<Goal>, InferCreationAttributes<G
     declare unit: "lvl" | "gold" | "pv" | "xp" | "gems" | "quest_missions_percentage" | "rank_points";
     declare initValue: number;
     declare value: number;
+    declare userId: ForeignKey<User["discordId"]>;
     declare getUser: BelongsToGetAssociationMixin<User>;
 
     get endValue(): NonAttribute<number> {

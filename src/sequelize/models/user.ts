@@ -7,7 +7,8 @@ import {
     InferCreationAttributes,
     HasManyCreateAssociationMixin,
     NonAttribute,
-    HasManyGetAssociationsMixin
+    HasManyGetAssociationsMixin,
+    HasManyCountAssociationsMixin
 } from "sequelize";
 import { User as DiscordUser } from "discord.js";
 import { SequelizeWithAssociate } from ".";
@@ -96,6 +97,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare createTracking: HasManyCreateAssociationMixin<Tracking>;
     declare getTrackings: HasManyGetAssociationsMixin<Tracking>;
     declare createGoal: HasManyCreateAssociationMixin<Goal>;
+    declare countGoals: HasManyCountAssociationsMixin;
 
     get config(): NonAttribute<Config> {
         if (!this.stringifiedConfig) {

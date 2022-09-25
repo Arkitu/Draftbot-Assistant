@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ProfileData } from '../../models/Tracking.js';
-import { GoalUnitTranslate } from '../../models/Goal.js';
+import { ProfileData } from '../../sequelize/models/tracking.js';
+import goal, { GoalUnitTranslate } from '../../sequelize/models/goal.js';
 import { MessageEmbed, Interaction, CommandInteraction, MessageActionRow, MessageButton, User as DiscordUser } from 'discord.js';
 
 
@@ -11,10 +11,10 @@ async function createGoals(page: number, discordUser: DiscordUser): Promise<{emb
 	
 	const buttons = new MessageActionRow();
 
-	const goals = await models.Goal.findAll({
+	const goals = await db.models.Goal.findAll({
 		offset: page*10,
 		limit: 10,
-		order: sequelize.col('end'),
+		order: db.col('end'),
 		where: {
 			userId: discordUser.id
 		}
@@ -28,34 +28,34 @@ async function createGoals(page: number, discordUser: DiscordUser): Promise<{emb
 		};
 	}
 
-    const user = (await models.User.findOrCreate({
+    const user = (await db.models.User.findOrCreate({
         where: {
             discordId: discordUser.id
         }
-    }))[0]
+    }))[0];
 
-    const lastProfile = (await user.$get("trackings", {
+    const lastProfile = (await user.getTrackings({
         limit: 1,
         order: [["createdAt", "DESC"]],
         where: {
             type: "profile"
         }
-    }))[0]
+    }))[0];
+
+	if (lastProfile.data.type != "profile") throw new Error("The fetched tracking's type is not profile");
 
 	for (let goal of goals) {
-		embed.addField(
-			`${(lastProfile.data as ProfileData)[goal.unit] - goal.initValue}/${goal.value} ${GoalUnitTranslate[goal.unit]}`,
-			`id: ${goal.id} | début: <t:${goal.start}:R> | fin: <t:${goal.end}:R>`
-		)
+		embed.addFields({
+			name: `${lastProfile.data[goal.unit] - goal.initValue}/${goal.value} ${GoalUnitTranslate[goal.unit]}`,
+			value: `id: ${goal.id} | début: <t:${goal.start}:R> | fin: <t:${goal.end}:R>`
+		})
 	}
 
 	if (
 		goals.length > 10
 		&&
-		(page+1)*10 < await models.Goal.count({
-			where: { userId: discordUser.id }
-		}
-	)) {
+		(page+1)*10 < await user.countGoals()
+	) {
 		buttons.addComponents(
 			new MessageButton()
 				.setCustomId('next_page')
