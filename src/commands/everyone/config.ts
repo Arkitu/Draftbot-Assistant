@@ -125,9 +125,9 @@ export async function execute(interaction: CommandInteraction) {
 
     let include: Includeable[] = [];
     if (`${opt.subcommandgroup}/${opt.subcommand}` === "reminders/view") {
-        include.push(models.PropoReminder)
+        include.push(db.models.PropoReminder)
     }
-    const user = (await models.User.findOrCreate({
+    const user = (await db.models.User.findOrCreate({
         where: {
             discordId: interaction.user.id
         },
@@ -139,21 +139,24 @@ export async function execute(interaction: CommandInteraction) {
             let reminders_embed = new MessageEmbed()
                 .setColor(config.getData("/main_color"))
                 .setAuthor({ name: `Paramètres des reminders de ${interaction.user.username}`, iconURL: client.user.avatarURL() })
-                .addField("Proposition de reminders :", (()=>{
-                    let str_propos = "";
-                    for (let propo of user.propoReminders) {
-                        if (str_propos.length > 800) {
-                            str_propos += "…\n";
-                            break;
+                .addFields({
+                    name: "Proposition de reminders :",
+                    value: (()=>{
+                        let str_propos = "";
+                        for (let propo of user.propoReminders) {
+                            if (str_propos.length > 800) {
+                                str_propos += "…\n";
+                                break;
+                            }
+                            str_propos += `${propo.trigger} : \`${generateTimeDisplay(propo.duration)} ${propo.inDm ? "en DM" : ""}\`\n`;
                         }
-                        str_propos += `${propo.trigger} : \`${generateTimeDisplay(propo.duration)} ${propo.inDm ? "en DM" : ""}\`\n`;
-                    }
-                    if (!str_propos) {
-                        str_propos = "Aucune proposition de rappel\n";
-                    }
-                    str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <durée> <unité>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
-                    return str_propos;
-                })());
+                        if (!str_propos) {
+                            str_propos = "Aucune proposition de rappel\n";
+                        }
+                        str_propos += "\nPour rajouter une proposition, utilisez la commande `/config reminders add_propo <message déclencheur> <durée> <unité>`\nPour en supprimer une, utilisez `/config reminders del_propo <message déclencheur>`";
+                        return str_propos;
+                    })()
+                });
             interaction.editReply({ embeds: [reminders_embed] });
             break;
         }
@@ -170,19 +173,17 @@ export async function execute(interaction: CommandInteraction) {
                 jours: 24 * 60 * 60 * 1000
             }[opt.unit];
 
-            const propoReminder = new models.PropoReminder({
+            user.createPropoReminder({
                 trigger: opt.trigger,
                 duration: opt.duration * multiplier,
                 inDm: opt.in_dm
             })
-            user.$add('propoReminders', propoReminder);
-            propoReminder.save()
             
             interaction.editReply("Proposition ajoutée avec succès !");
             break;
         }
         case "reminders/del_custom_propo": {
-            const deleted = await models.PropoReminder.destroy({
+            const deleted = await db.models.PropoReminder.destroy({
                 where: {
                     trigger: opt.trigger,
                     userId: user.discordId
@@ -238,7 +239,7 @@ export async function execute(interaction: CommandInteraction) {
             user.config.tracking[opt.option] = !user.config.tracking[opt.option];
             user.save()
 
-            models.Tracking.destroy({
+            db.models.Tracking.destroy({
                 where: {
                     userId: user.discordId,
                     type: opt.option

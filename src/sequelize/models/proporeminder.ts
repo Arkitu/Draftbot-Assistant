@@ -6,12 +6,15 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
-    BelongsToGetAssociationMixin
+    BelongsToGetAssociationMixin,
+    ForeignKey,
+    Attributes,
 } from "sequelize";
 import { ModelWithAssociate } from ".";
 import { User } from "./user";
 
-export const initArgs: ModelAttributes<PropoReminder, Optional<InferAttributes<PropoReminder>, never>> = {
+
+export const initArgs = {
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -36,6 +39,7 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
     declare trigger: string;
     declare duration: number;
     declare inDm: boolean;
+    declare userId: ForeignKey<User['discordId']>;
     declare getUser: BelongsToGetAssociationMixin<User>;
 
     /**

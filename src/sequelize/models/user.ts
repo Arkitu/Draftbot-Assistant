@@ -89,7 +89,9 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare stringifiedConfig: string;
     declare trackings: NonAttribute<Tracking[]>;
     declare goals: NonAttribute<Goal[]>;
+    declare propoReminders: NonAttribute<PropoReminder[]>;
     declare getPropoReminder: HasManyGetAssociationsMixin<PropoReminder>;
+    declare createPropoReminder: HasManyCreateAssociationMixin<PropoReminder>;
     declare createReminder: HasManyCreateAssociationMixin<Reminder>;
     declare createTracking: HasManyCreateAssociationMixin<Tracking>;
     declare getTrackings: HasManyGetAssociationsMixin<Tracking>;

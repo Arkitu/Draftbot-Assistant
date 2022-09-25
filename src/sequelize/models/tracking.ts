@@ -8,7 +8,8 @@ import {
     HasManyCreateAssociationMixin,
     CreationOptional,
     BelongsToGetAssociationMixin,
-    NonAttribute
+    NonAttribute,
+    ForeignKey
 } from "sequelize";
 import { ModelWithAssociate, SequelizeWithAssociate, snowflakeValidate } from ".";
 import { Guild } from "./guild";
@@ -85,7 +86,7 @@ export class GuildData implements PartialGuildData {
     }
 }
 
-export const initArgs: ModelAttributes<Tracking, Optional<InferAttributes<Tracking>, never>> = {
+export const initArgs = {
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -123,6 +124,7 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
     declare stringifiedData: CreationOptional<string>;
     declare data: ProfileData | LongReportData | GuildData | PartialGuildData | null;
     declare getGuild: BelongsToGetAssociationMixin<Guild>;
+    declare userId: ForeignKey<User["discordId"]>;
     declare getUser: BelongsToGetAssociationMixin<User>;
     declare createdAt: NonAttribute<number>;
 
