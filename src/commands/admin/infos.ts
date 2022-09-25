@@ -19,13 +19,13 @@ export async function execute(interaction: CommandInteraction) {
     await interaction.deferReply();
 	switch (interaction.options.getSubcommand()) {
         case 'tracked':
-            interaction.editReply(`${await models.Tracking.count({
+            interaction.editReply(`${await db.models.Tracking.count({
                 distinct: true,
                 col: "userId"
             })} utilisateurs suivis`);
             break;
         case 'tracked_events':
-            interaction.editReply(`${await models.Tracking.count()} événements trackés`);
+            interaction.editReply(`${await db.models.Tracking.count()} événements trackés`);
             break;
     }
 }
