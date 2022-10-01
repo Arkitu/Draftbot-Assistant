@@ -10,8 +10,7 @@ import {
     NonAttribute,
     ForeignKey
 } from "sequelize";
-import { ModelWithAssociate } from ".";
-import { User } from "./user";
+import { User } from "./user.js";
 
 export const GoalUnitTranslate = {
     lvl: "niveaux",
@@ -25,7 +24,7 @@ export const GoalUnitTranslate = {
 
 export const initArgs = {
     id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
@@ -71,15 +70,13 @@ export class Goal extends Model<InferAttributes<Goal>, InferCreationAttributes<G
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.belongsTo(db.models.User);
+        this.belongsTo(User);
     }
 }
 
-export default () => {
+export function initModel() {
     Goal.init(initArgs, {
         sequelize: db,
         modelName: 'Goal',
     });
-
-    return Goal as ModelWithAssociate;
-};
+}

@@ -10,18 +10,17 @@ import {
     ForeignKey,
     Attributes,
 } from "sequelize";
-import { ModelWithAssociate } from ".";
-import { User } from "./user";
+import { User } from "./user.js";
 
 
 export const initArgs = {
     id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     trigger: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     duration: {
@@ -48,15 +47,13 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.belongsTo(db.models.User);
+        this.belongsTo(User);
     }
 }
 
-export default () => {
+export function initModel() {
     PropoReminder.init(initArgs, {
         sequelize: db,
         modelName: 'PropoReminder',
     });
-
-    return PropoReminder as ModelWithAssociate;
-};
+}

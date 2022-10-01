@@ -11,9 +11,8 @@ import {
     NonAttribute,
     ForeignKey
 } from "sequelize";
-import { ModelWithAssociate, SequelizeWithAssociate, snowflakeValidate } from ".";
-import { Guild } from "./guild";
-import { User } from "./user";
+import { Guild } from "./guild.js";
+import { User } from "./user.js";
 
 export interface ProfileData {
     type: "profile"
@@ -88,18 +87,18 @@ export class GuildData implements PartialGuildData {
 
 export const initArgs = {
     id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     type: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
         validate: {
             isIn: [["profile", "long_report", "short_report", "guild"]]
         }
     },
-    stringifiedData: DataTypes.TEXT("long"),
+    stringifiedData: DataTypes.TEXT,
     data: {
         type: DataTypes.VIRTUAL,
         get(): ProfileData | LongReportData | GuildData | null {
@@ -143,16 +142,14 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.belongsTo(db.models.User);
-        this.belongsTo(db.models.Guild);
+        this.belongsTo(User);
+        this.belongsTo(Guild);
     }
 }
 
-export default () => {
+export function initModel() {
     Tracking.init(initArgs, {
         sequelize: db,
         modelName: 'Tracking',
     });
-
-    return Tracking as ModelWithAssociate;
-};
+}

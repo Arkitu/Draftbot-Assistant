@@ -9,16 +9,16 @@ import {
     HasManyGetAssociationsMixin,
     NonAttribute
 } from "sequelize";
-import { ModelWithAssociate } from ".";
-import { GuildData, Tracking } from "./tracking";
+import { GuildData, Tracking } from "./tracking.js";
+import { User } from "./user.js";
 
 export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, never>> = {
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
         primaryKey: true
     },
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     data: {
         type: DataTypes.VIRTUAL,
         /**
@@ -28,7 +28,7 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
             if (!this.trackings) {
                 throw new Error("Trying to access guild.data but trackings are not loaded or don't exist");
             }
-            return this.trackings.sort((a, b)=>a.createdAt - b.createdAt)[0].data;
+            return this.trackings.sort((a, b)=>a.createdAt.getTime() - b.createdAt.getTime())[0].data;
         }
     }
 };
@@ -57,16 +57,14 @@ export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.hasMany(db.models.User);
-        this.hasMany(db.models.Tracking);
+        this.hasMany(User);
+        this.hasMany(Tracking);
     }
 }
 
-export default () => {
+export function initModel() {
     Guild.init(initArgs, {
         sequelize: db,
         modelName: 'Guild',
     });
-
-    return Guild as ModelWithAssociate;
-};
+}

@@ -19,10 +19,6 @@ global.botDirString = (()=>{
 global.config = new JsonDB(new Config(`${botDirString}/../config.json`, true, true, '/'));
 global.constants = new JsonDB(new Config(`${botDirString}/../constants.json`, true, true, '/'));
 
-// Sync the db
-db.authenticate();
-db.sync({ alter: true });
-
 // Some utils functions
 export function log(msg: string) {
 	var datetime: string = new Date().toLocaleString();
@@ -74,11 +70,14 @@ global.client = new Client({ intents: [
 client.once('ready', async () => {
 	log('Bot logged !');
 	client.users.fetch(config.getData("/creator_id")).then(u => u.send("🔄 Le bot a redemarré !"));
-	// Relauch the stoped reminders
-	for (let reminder of await db.models.Reminder.findAll()) {
-		console.debug(reminder.toJSON())
-		reminder.start()
-	}
+	await db.authenticate();
+	setTimeout(async ()=>{
+		// Relauch the stoped reminders
+		for (let reminder of await db.models.Reminder.findAll()) {
+			console.debug(reminder.toJSON())
+			reminder.start()
+		}
+	}, 5000)
 });
 
 // Set listeners

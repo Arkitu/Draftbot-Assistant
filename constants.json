@@ -319,31 +319,6 @@
     },
     "commands": [
         {
-            "name": "add_goal_message",
-            "description": "Ajoute un messaeg sur lequel les utilisateurs peuvent cliquer pour ajouter un objectif",
-            "options": [
-                {
-                    "name": "channel",
-                    "description": "Le channel dans lequel le message sera créé",
-                    "required": true,
-                    "type": 7
-                },
-                {
-                    "type": 4,
-                    "name": "duration",
-                    "description": "La durée avant que le message ne disparaisse (en millisecondes)",
-                    "required": true
-                },
-                {
-                    "type": 4,
-                    "name": "start_time",
-                    "description": "L'heure à laquelle le message sera créé (en millisecondes)",
-                    "required": false
-                }
-            ],
-            "perms": "admin"
-        },
-        {
             "name": "bitfield_to_permissions",
             "description": "Convertit un bitfield en permissions",
             "options": [
@@ -849,104 +824,6 @@
                     "name": "id",
                     "description": "L'id du rappel (faites /reminders pour le connaître)",
                     "required": true
-                }
-            ],
-            "perms": "everyone"
-        },
-        {
-            "name": "set_goal",
-            "description": "Crée un objectif",
-            "options": [
-                {
-                    "min_value": 0,
-                    "type": 4,
-                    "name": "value",
-                    "description": "La valeur de l'objectif",
-                    "required": true
-                },
-                {
-                    "choices": [
-                        {
-                            "name": "level",
-                            "value": "lvl"
-                        },
-                        {
-                            "name": "gold",
-                            "value": "gold"
-                        },
-                        {
-                            "name": "pv",
-                            "value": "pv"
-                        },
-                        {
-                            "name": "xp",
-                            "value": "xp"
-                        },
-                        {
-                            "name": "gems",
-                            "value": "gems"
-                        },
-                        {
-                            "name": "quest_missions",
-                            "value": "quest_missions_percentage"
-                        },
-                        {
-                            "name": "rank_points",
-                            "value": "rank_points"
-                        }
-                    ],
-                    "type": 3,
-                    "name": "unit",
-                    "description": "L'unité de l'objectif (par defaut: rank_points)",
-                    "required": false
-                },
-                {
-                    "choices": [
-                        {
-                            "name": "1 jour",
-                            "value": "86400000"
-                        },
-                        {
-                            "name": "2 jours",
-                            "value": "172800000"
-                        },
-                        {
-                            "name": "3 jours",
-                            "value": "259200000"
-                        },
-                        {
-                            "name": "4 jours",
-                            "value": "345600000"
-                        },
-                        {
-                            "name": "5 jours",
-                            "value": "432000000"
-                        },
-                        {
-                            "name": "6 jours",
-                            "value": "518400000"
-                        },
-                        {
-                            "name": "1 semaine",
-                            "value": "604800000"
-                        },
-                        {
-                            "name": "2 semaines",
-                            "value": "1209600000"
-                        },
-                        {
-                            "name": "3 semaines",
-                            "value": "1814400000"
-                        },
-                        {
-                            "name": "1 mois",
-                            "value": "2678400000"
-                        }
-                    ],
-                    "type": 3,
-                    "name": "duration",
-                    "description": "La durée de l'objectif (par defaut: 1 semaine)",
-                    "required": false
                 }
             ],
             "perms": "everyone"

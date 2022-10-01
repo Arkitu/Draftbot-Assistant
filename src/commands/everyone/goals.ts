@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ProfileData } from '../../sequelize/models/tracking.js';
-import goal, { GoalUnitTranslate } from '../../sequelize/models/goal.js';
+import { GoalUnitTranslate } from '../../sequelize/models/goal.js';
 import { MessageEmbed, Interaction, CommandInteraction, MessageActionRow, MessageButton, User as DiscordUser } from 'discord.js';
 
 

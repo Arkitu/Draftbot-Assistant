@@ -2,15 +2,22 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Sequelize, Model, DataTypes, ModelValidateOptions, ModelStatic } from 'sequelize';
 import { dirname, filename } from 'dirname-filename-esm';
-import { User } from './user.js';
-import { Reminder } from './reminder.js';
-import { Tracking } from './tracking.js';
-import { PropoReminder } from './proporeminder.js';
-import { Guild } from './guild.js';
-import { Goal } from './goal.js';
+import { User, initModel as initUser } from './user.js';
+import { Reminder, initModel as initReminder } from './reminder.js';
+import { Tracking, initModel as initTracking } from './tracking.js';
+import { PropoReminder, initModel as initPropoReminder } from './proporeminder.js';
+import { Guild, initModel as initGuild } from './guild.js';
+import { Goal, initModel as initGoal } from './goal.js';
 
 const __dirname = dirname(import.meta);
 const __filename = filename(import.meta);
+
+global.botDir = new URL(import.meta.url);
+global.botDirString = (()=>{
+	let urlArray = decodeURI(botDir.pathname).split("/");
+	urlArray.pop();
+	return urlArray.join("/");
+})();
 
 export const snowflakeValidate: ModelValidateOptions = {
     len: [18, 18],
@@ -22,16 +29,16 @@ export interface ModelWithAssociate<M extends Model<any, any> = Model<any, any>>
 }
 
 export interface Models {
-    User?: ModelWithAssociate<User>,
-    Reminder?: ModelWithAssociate<Reminder>,
-    Tracking?: ModelWithAssociate<Tracking>,
-    PropoReminder?: ModelWithAssociate<PropoReminder>,
-    Guild?: ModelWithAssociate<Guild>,
-    Goal?: ModelWithAssociate<Goal>
-    [key: string]: ModelWithAssociate<Model<any, any>>
+    User?: ModelStatic<User>,
+    Reminder?: ModelStatic<Reminder>,
+    Tracking?: ModelStatic<Tracking>,
+    PropoReminder?: ModelStatic<PropoReminder>,
+    Guild?: ModelStatic<Guild>,
+    Goal?: ModelStatic<Goal>
+    [key: string]: ModelStatic<Model<any, any>>
 }
 
-export interface SequelizeWithAssociate extends Sequelize {
+export interface SequelizeWithModels extends Sequelize {
     readonly models: Models;
 }
 
@@ -39,23 +46,37 @@ const basename = path.basename(__filename);
 
 global.db = new Sequelize({
     dialect: 'sqlite',
-    storage: path.join(__dirname, "..", "db.sqlite"),
+    storage: path.join(__dirname, "../../..", "db.sqlite"),
     logging: false
 });
 
+initUser();
+initReminder();
+initTracking();
+initPropoReminder();
+initGuild();
+initGoal();
+
+/*
 fs
     .readdirSync(__dirname)
     .filter(file => {
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
     })
     .forEach(async file => {
-        (await import(path.join(__dirname, file)))()
+        import(path.join(`${botDirString}/`, file)).then((m)=>m.default())
     });
+*/
 
-Object.keys(db.models).forEach(modelName => {
-    if ("associate" in db.models[modelName]) {
-        db.models[modelName].associate();
+for (let model of Object.values(db.models)) {
+    if ("associate" in model) {
+        model = model as ModelWithAssociate;
+        console.debug(`Associating model ${model.name}`);
+        (model as ModelWithAssociate).associate();
     }
-});
+}
 
-module.exports = db;
+// Sync the db
+db.sync({ alter: true });
+
+export default db;

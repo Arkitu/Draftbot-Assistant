@@ -3,5 +3,5 @@
 /temp/
 /config.json
 /db.json
-/db
+/db.sqlite
 /package-lock.json

@@ -10,21 +10,20 @@ import {
     CreationOptional,
     BelongsToGetAssociationMixin,
     NonAttribute,
-    ForeignKey
+    ForeignKey,
+    Sequelize
 } from "sequelize";
-import { ModelWithAssociate, snowflakeValidate } from ".";
 import { User } from "./user.js";
 
 export const initArgs = {
     id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     channelId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: snowflakeValidate
+        type: DataTypes.TEXT,
+        allowNull: false
     },
     channelIsUser: {
         type: DataTypes.BOOLEAN,
@@ -36,7 +35,7 @@ export const initArgs = {
         allowNull: false
     },
     message: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     }
 };
@@ -108,15 +107,13 @@ export class Reminder extends Model<InferAttributes<Reminder>, InferCreationAttr
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.belongsTo(db.models.User)
+        this.belongsTo(db.models.User);
     }
 }
 
-export default () => {
+export function initModel() {
     Reminder.init(initArgs, {
         sequelize: db,
-        modelName: 'Reminder',
+        modelName: "Reminder"
     });
-
-    return Reminder as ModelWithAssociate;
-};
+}

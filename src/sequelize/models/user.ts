@@ -11,11 +11,11 @@ import {
     HasManyCountAssociationsMixin
 } from "sequelize";
 import { User as DiscordUser } from "discord.js";
-import { SequelizeWithAssociate } from ".";
-import { PropoReminder } from "./proporeminder";
-import { Reminder } from "./reminder";
-import { Tracking } from "./tracking";
-import { Goal } from "./goal";
+import { PropoReminder } from "./proporeminder.js";
+import { Reminder } from "./reminder.js";
+import { Tracking } from "./tracking.js";
+import { Goal } from "./goal.js";
+import { Guild } from "./guild.js";
 
 interface Config {
     reminders: {
@@ -79,13 +79,13 @@ const DEFAULT_CONFIG: Config = {
 
 export const initArgs: ModelAttributes<User, Optional<InferAttributes<User>, never>> = {
     discordId: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         primaryKey: true
     },
     name: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT
     },
-    stringifiedConfig: DataTypes.TEXT("long")
+    stringifiedConfig: DataTypes.TEXT
 };
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
@@ -138,26 +138,22 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(db: SequelizeWithAssociate) {
-        this.hasMany(db.models.Reminder);
-        this.hasMany(db.models.PropoReminder);
-        this.hasMany(db.models.Tracking);
-        this.belongsTo(db.models.Guild);
+    static associate() {
+        this.hasMany(Reminder);
+        this.hasMany(PropoReminder);
+        this.hasMany(Tracking);
+        this.belongsTo(Guild);
     }
 }
 
-export default () => {
-
-
+export function initModel() {
     User.init(initArgs, {
         sequelize: db,
         modelName: 'User',
         hooks: {
-            afterCreate: (user)=>{
+            afterCreate: (user) => {
                 user.updateName()
             }
         }
     });
-
-    return User;
-};
+}
