@@ -13,7 +13,7 @@ export async function execute(ctx: Context) {
 
     for (let apiGuild of (await ctx.client.guilds.fetch())) {
         let guild = await apiGuild[1].fetch();
-        console.debug(guild.id, guild.name, guild.memberCount);
+        console.debug(guild.id, guild.name, guild.members.cache.keys());
         for (let id of (await guild.members.fetch())) {
             ids.push(id[0]);
         }
