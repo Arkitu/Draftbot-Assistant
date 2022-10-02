@@ -27,7 +27,8 @@ export class Client extends DiscordClient {
 // Create a new client instance
 global.client = new Client({ intents: [
     Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES
+    Intents.FLAGS.GUILD_MESSAGES,
+	Intents.FLAGS.GUILD_MEMBERS
 ] });
 
 // When the client is ready, run this code (only once)
