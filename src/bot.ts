@@ -466,13 +466,9 @@ let profileListener = async (msg: Discord.Message): Promise<void> => {
 	if (msg.interaction.commandName !== "profile") return;
 	if (msg.interaction.user.username !== msg.embeds[0].title.split(" | ")[1]) return;
 
-	console.debug(-1);
 	const user = await db.models.User.findByPk(msg.interaction.user.id, {include:[db.models.Goal]})
 	if (!user) return;
-	console.debug(0);
 	if (!user.config.tracking.profile) return;
-
-	console.debug(1);
 
 	let embed = msg.embeds[0];
 
@@ -519,12 +515,10 @@ let profileListener = async (msg: Discord.Message): Promise<void> => {
 		destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
 	}
 
-	console.debug(2);
 	user.createTracking({
 		type: "profile",
 		data: data
 	});
-	console.debug(3);
 
 	for (let goal of user.Goals) {
 		if (goal.end < msg.createdTimestamp) {
