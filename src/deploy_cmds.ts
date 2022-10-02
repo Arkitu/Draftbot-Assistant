@@ -27,7 +27,7 @@ const commandFiles = {
     const rest = new REST({ version: "9" }).setToken(config.getData("/token"));
 
     console.log("Started refreshing application (/) commands.");
-    
+
     constants.delete("/commands");
 
     let cmds: {
