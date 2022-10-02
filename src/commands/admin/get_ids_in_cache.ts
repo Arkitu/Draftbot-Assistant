@@ -7,7 +7,15 @@ export const data = new SlashCommandBuilder()
 export async function execute(ctx: Context) {
     await ctx.interaction.deferReply();
 	
-    let ids = ctx.client.users.cache.map(user => user.id);
+    let ids: string[] = [];
+
+    for (let guild in ctx.client.guilds.cache) {
+        for (let member of ctx.client.guilds.cache.get(guild).members.cache) {
+            ids.push(member[1].id);
+        }
+    }
+
+    //let ids = ctx.client.users.cache.map(user => user.id);
 
     let str_ids = "\"" + ids.join('",\n"') + "\""
 
