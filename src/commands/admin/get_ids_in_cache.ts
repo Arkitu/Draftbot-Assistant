@@ -10,6 +10,7 @@ export async function execute(ctx: Context) {
     let ids: string[] = [];
 
     for (let guild in await ctx.client.guilds.fetch()) {
+        console.debug(guild)
         for (let member of await ctx.client.guilds.cache.get(guild).members.fetch()) {
             ids.push(member[1].id);
         }
