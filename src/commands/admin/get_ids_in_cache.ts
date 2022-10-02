@@ -25,6 +25,8 @@ export async function execute(ctx: Context) {
 
     console.log(str_ids);
 
+    ctx.db.push("/ids", ids)
+
     if (str_ids.length < 2000) {
         await ctx.interaction.editReply(str_ids);
     } else {
