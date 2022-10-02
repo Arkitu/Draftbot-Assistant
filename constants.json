@@ -332,6 +332,31 @@
             "perms": "admin"
         },
         {
+            "name": "create_in_db",
+            "description": "Crée des données dans la db",
+            "options": [
+                {
+                    "choices": [
+                        {
+                            "name": "me",
+                            "value": "me"
+                        }
+                    ],
+                    "type": 3,
+                    "name": "category",
+                    "description": "Le type de donnée",
+                    "required": true
+                },
+                {
+                    "name": "force",
+                    "description": "Si il faut forcer la création (et supprimer l'objet si il existe)",
+                    "required": false,
+                    "type": 5
+                }
+            ],
+            "perms": "admin"
+        },
+        {
             "name": "fetch",
             "description": "Récupère quelque chose avec son id",
             "options": [

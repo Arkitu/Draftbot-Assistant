@@ -1,14 +1,11 @@
 import {
     DataTypes,
     Model,
-    ModelAttributes,
-    Optional,
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
     BelongsToGetAssociationMixin,
-    ForeignKey,
-    Attributes,
+    ForeignKey
 } from "sequelize";
 import { User } from "./user.js";
 
@@ -38,7 +35,7 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
     declare trigger: string;
     declare duration: number;
     declare inDm: boolean;
-    declare userId: ForeignKey<User['discordId']>;
+    declare UserId: ForeignKey<User['discordId']>;
     declare getUser: BelongsToGetAssociationMixin<User>;
 
     /**
@@ -47,7 +44,7 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.belongsTo(User);
+        this.belongsTo(db.models.User);
     }
 }
 

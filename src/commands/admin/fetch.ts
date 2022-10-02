@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { GuildChannel } from 'discord.js';
-import { CommandInteraction } from 'discord.js';
+import { GuildChannel, CommandInteraction } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('fetch')

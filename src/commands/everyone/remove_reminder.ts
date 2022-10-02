@@ -21,7 +21,7 @@ export async function execute(interaction: CommandInteraction) {
         interaction.editReply(":warning: Ce rappel n'existe pas ! Faites `/reminders` pour connaitres vos rappels");
         return;
     }
-    if (reminder.userId != interaction.user.id) {
+    if (reminder.UserDiscordId != interaction.user.id) {
         interaction.editReply(":warning: Vous ne pouvez pas supprimer les rappels des autres ! Faites `/reminders` pour connaitres vos rappels");
         return;
     }

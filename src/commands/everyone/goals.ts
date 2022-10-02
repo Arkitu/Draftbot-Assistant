@@ -16,7 +16,7 @@ async function createGoals(page: number, discordUser: DiscordUser): Promise<{emb
 		limit: 10,
 		order: db.col('end'),
 		where: {
-			userId: discordUser.id
+			UserDiscordId: discordUser.id
 		}
 	});
 

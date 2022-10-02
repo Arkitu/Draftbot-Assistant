@@ -21,7 +21,7 @@ export async function execute(interaction: CommandInteraction) {
         interaction.editReply(":warning: Cet objectif n'existe pas ! Fais `/goals` pour connaitres tes objectifs");
         return;
     }
-    if (goal.userId != interaction.user.id) {
+    if (goal.UserDiscordId != interaction.user.id) {
         interaction.editReply(":warning: Tu ne peux pas supprimer les objectifs des autres ! Fais `/goals` pour connaitres tes objectifs");
         return;
     }

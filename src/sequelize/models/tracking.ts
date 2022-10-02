@@ -124,7 +124,7 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
     declare stringifiedData: CreationOptional<string>;
     declare data: ProfileData | LongReportData | GuildData | PartialGuildData | null;
     declare getGuild: BelongsToGetAssociationMixin<Guild>;
-    declare userId: ForeignKey<User["discordId"]>;
+    declare UserDiscordId: ForeignKey<User["discordId"]>;
     declare getUser: BelongsToGetAssociationMixin<User>;
     declare createdAt: CreationOptional<Date>;
 
@@ -142,8 +142,8 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.belongsTo(User);
-        this.belongsTo(Guild);
+        this.belongsTo(db.models.User);
+        this.belongsTo(db.models.Guild);
     }
 }
 

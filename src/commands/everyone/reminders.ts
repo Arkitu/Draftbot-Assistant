@@ -14,7 +14,7 @@ async function createReminders(page: number, user: DiscordUser): Promise<{embed:
 		limit: 10,
 		order: db.col('deadLineTimestamp'),
 		where: {
-			userId: user.id
+			UserDiscordId: user.id
 		}
 	});
 
@@ -37,7 +37,7 @@ async function createReminders(page: number, user: DiscordUser): Promise<{embed:
 		reminders.length > 10
 		&&
 		(page+1)*10 < await db.models.Reminder.count({
-			where: { userId: user.id }
+			where: { UserDiscordId: user.id }
 		})
 	) {
 		buttons.addComponents(

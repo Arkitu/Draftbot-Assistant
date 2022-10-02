@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed, CommandInteraction } from "discord.js";
 import { log_error, generateTimeDisplay } from "../../bot.js";
-import { CommandInteraction } from 'discord.js';
 import { Includeable } from "sequelize/types/model.js";
 
 export const data = new SlashCommandBuilder()
@@ -119,9 +118,6 @@ export async function execute(interaction: CommandInteraction) {
         in_dm: interaction.options.getBoolean("in_dm"),
         option: interaction.options.getString("option") as "reports" | "public" | "profile"
     };
-    if (`${opt.subcommandgroup}/${opt.subcommand}` === "reminders/switch_custom_propo") {
-        ;
-    }
 
     let include: Includeable[] = [];
     if (`${opt.subcommandgroup}/${opt.subcommand}` === "reminders/view") {
@@ -143,7 +139,7 @@ export async function execute(interaction: CommandInteraction) {
                     name: "Proposition de reminders :",
                     value: (()=>{
                         let str_propos = "";
-                        for (let propo of user.propoReminders) {
+                        for (let propo of user.PropoReminders) {
                             if (str_propos.length > 800) {
                                 str_propos += "…\n";
                                 break;
@@ -186,7 +182,7 @@ export async function execute(interaction: CommandInteraction) {
             const deleted = await db.models.PropoReminder.destroy({
                 where: {
                     trigger: opt.trigger,
-                    userId: user.discordId
+                    UserId: user.discordId
                 }
             })
             if (deleted) {
@@ -198,13 +194,25 @@ export async function execute(interaction: CommandInteraction) {
         }
         case "reminders/switch_custom_propo": {
             let trigger = opt.trigger as "events" | "minievents" | "guilddaily" | "daily" | "petfeed" | "petfree" | "vote";
-            user.config.reminders.auto_proposition[trigger] = !user.config.reminders.auto_proposition[trigger];
+            user.setConfig({
+                reminders: {
+                    auto_proposition: {
+                        [trigger]: !user.config.reminders.auto_proposition[trigger]
+                    }
+                }
+            });
             user.save()
             interaction.editReply(`L'option a été ${["désactivée", "activée"][+user.config.reminders.auto_proposition[trigger]]} avec succès !`)
             break;
         }
         case "reminders/in_dm": {
-            user.config.reminders.auto_proposition.in_dm = !user.config.reminders.auto_proposition.in_dm;
+            user.setConfig({
+                reminders: {
+                    auto_proposition: {
+                        in_dm: !user.config.reminders.auto_proposition.in_dm
+                    }
+                }
+            });
             user.save()
             interaction.editReply(`L'option a été ${["désactivée", "activée"][+user.config.reminders.auto_proposition.in_dm]} avec succès !`);
             break;
@@ -236,15 +244,17 @@ export async function execute(interaction: CommandInteraction) {
             break;
         }
         case "tracking/switch_option": {
-            user.config.tracking[opt.option] = !user.config.tracking[opt.option];
-            user.save()
+            user.setConfig({tracking: {[opt.option]: !user.config.tracking[opt.option]}});
+            user.save();
 
-            db.models.Tracking.destroy({
-                where: {
-                    userId: user.discordId,
-                    type: opt.option
-                }
-            });
+            if (["reports", "profile"].includes(opt.option)) {
+                db.models.Tracking.destroy({
+                    where: {
+                        UserDiscordId: user.discordId,
+                        type: opt.option
+                    }
+                });
+            }
 
             interaction.editReply(`L'option a été ${["désactivée", "activée"][+user.config.tracking[opt.option]]} avec succès !`);
             break;

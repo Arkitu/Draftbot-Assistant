@@ -57,7 +57,7 @@ export class Goal extends Model<InferAttributes<Goal>, InferCreationAttributes<G
     declare unit: "lvl" | "gold" | "pv" | "xp" | "gems" | "quest_missions_percentage" | "rank_points";
     declare initValue: number;
     declare value: number;
-    declare userId: ForeignKey<User["discordId"]>;
+    declare UserDiscordId: ForeignKey<User["discordId"]>;
     declare getUser: BelongsToGetAssociationMixin<User>;
 
     get endValue(): NonAttribute<number> {
@@ -70,7 +70,7 @@ export class Goal extends Model<InferAttributes<Goal>, InferCreationAttributes<G
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.belongsTo(User);
+        this.belongsTo(db.models.User);
     }
 }
 

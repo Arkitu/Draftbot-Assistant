@@ -25,10 +25,10 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
          * You need to load trackings before using data. If you're not sure use `await guild.fetchData()` instead
          */
         get() {
-            if (!this.trackings) {
+            if (!this.Trackings) {
                 throw new Error("Trying to access guild.data but trackings are not loaded or don't exist");
             }
-            return this.trackings.sort((a, b)=>a.createdAt.getTime() - b.createdAt.getTime())[0].data;
+            return this.Trackings.sort((a, b)=>a.createdAt.getTime() - b.createdAt.getTime())[0].data;
         }
     }
 };
@@ -37,7 +37,7 @@ export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes
     declare name: string;
     declare description: string;
     declare data: GuildData;
-    declare trackings?: NonAttribute<Tracking[]>;
+    declare Trackings?: NonAttribute<Tracking[]>;
     declare createTracking: HasManyCreateAssociationMixin<Tracking>;
     declare getTrackings: HasManyGetAssociationsMixin<Tracking>;
 
@@ -57,8 +57,8 @@ export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes
      * The `models/index` file will call this method automatically.
      */
     static associate() {
-        this.hasMany(User);
-        this.hasMany(Tracking);
+        this.hasMany(db.models.User);
+        this.hasMany(db.models.Tracking);
     }
 }
 

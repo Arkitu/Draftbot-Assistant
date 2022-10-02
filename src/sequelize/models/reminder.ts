@@ -47,7 +47,7 @@ export class Reminder extends Model<InferAttributes<Reminder>, InferCreationAttr
     declare deadLineTimestamp: number;
     declare message: string;
     declare getUser: BelongsToGetAssociationMixin<User>;
-    declare userId: ForeignKey<User["discordId"]>;
+    declare UserDiscordId: ForeignKey<User["discordId"]>;
 
     fetchChannel() {
         return client.channels.fetch(this.channelId);

@@ -52,7 +52,7 @@ export async function execute(interaction: CommandInteraction) {
     } else {
         fetched = await model.findAll()
     }
-    if (opts.to_json) fetched.map((f: any)=>f.toJSON());
+    if (opts.to_json) fetched.forEach((f: any)=>f.toJSON());
 
     console.log(...fetched);
 

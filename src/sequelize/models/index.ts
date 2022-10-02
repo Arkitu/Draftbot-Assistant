@@ -1,6 +1,5 @@
-import * as fs from 'fs';
 import * as path from 'path';
-import { Sequelize, Model, DataTypes, ModelValidateOptions, ModelStatic } from 'sequelize';
+import { Sequelize, Model, ModelValidateOptions, ModelStatic } from 'sequelize';
 import { dirname, filename } from 'dirname-filename-esm';
 import { User, initModel as initUser } from './user.js';
 import { Reminder, initModel as initReminder } from './reminder.js';
@@ -57,26 +56,14 @@ initPropoReminder();
 initGuild();
 initGoal();
 
-/*
-fs
-    .readdirSync(__dirname)
-    .filter(file => {
-        return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
-    })
-    .forEach(async file => {
-        import(path.join(`${botDirString}/`, file)).then((m)=>m.default())
-    });
-*/
-
 for (let model of Object.values(db.models)) {
     if ("associate" in model) {
-        model = model as ModelWithAssociate;
-        console.debug(`Associating model ${model.name}`);
+        console.debug(`Associating model ${(model as ModelWithAssociate).name}`);
         (model as ModelWithAssociate).associate();
     }
 }
 
 // Sync the db
-db.sync({ alter: true });
+db.sync();
 
 export default db;
