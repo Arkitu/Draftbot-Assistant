@@ -18,7 +18,6 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
         allowNull: false,
         primaryKey: true
     },
-    description: DataTypes.TEXT,
     data: {
         type: DataTypes.VIRTUAL,
         /**
@@ -35,7 +34,6 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
 
 export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes<Guild>> {
     declare name: string;
-    declare description: string;
     declare data: GuildData;
     declare Trackings?: NonAttribute<Tracking[]>;
     declare createTracking: HasManyCreateAssociationMixin<Tracking>;

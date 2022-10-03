@@ -103,8 +103,6 @@ export const initArgs: ModelAttributes<User, Optional<InferAttributes<User>, nev
             return {...DEFAULT_CONFIG, ...(JSON.parse(this.stringifiedConfig) as Config)};
         },
         set(val: ConfigSetArgs) {
-            console.debug(val);
-            console.debug(JSON.stringify({...this.config, ...val}))
             this.stringifiedConfig = JSON.stringify({...this.config, ...val});
         }
     }
