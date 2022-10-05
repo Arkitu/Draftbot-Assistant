@@ -63,8 +63,6 @@ for (let model of Object.values(db.models)) {
     }
 }
 
-console.debug(...Object.values(db.models))
-
 // Sync the db
 await db.sync();
 
