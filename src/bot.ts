@@ -119,8 +119,9 @@ client.on('messageCreate', (message) => {
 					RemindListeners.petFree(message);
 					RemindListeners.petFeed(message);
 					TrackingListeners.miniEvent(message);
+					RemindListeners.miniEvent(message); // Not with the minievent track because sometimes the result of the minievent comes in another message (gobletsGame for example), without the classical formated author
+					// But it bug so it's temporarlly here
 				}
-				RemindListeners.miniEvent(message); // Not with the minievent track because sometimes the result of the minievent comes in another message (gobletsGame for example), without the classical formated author
 				RemindListeners.guildDaily(message);
 				RemindListeners.daily(message);
 				RemindListeners.vote(message);
