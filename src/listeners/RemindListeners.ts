@@ -142,7 +142,7 @@ export class RemindListeners {
 	static async propo(message: Message) {
 		const user = await db.models.User.findByPk(message.author.id)
 		if (!user) return;
-		const reminders = await user.getPropoReminder({
+		const reminders = await user.getPropoReminders({
 			where: {
 				trigger: message.content
 			}
