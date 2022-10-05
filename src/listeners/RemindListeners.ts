@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import { proposeAutoReminder } from '../bot.js';
-import { TimeStringUtils } from '../Utils';
+import { TimeStringUtils } from '../Utils.js';
 
 export class RemindListeners {	
 	static async event(message: Message) {
