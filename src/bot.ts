@@ -1,13 +1,12 @@
-import { Intents, Collection, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
-import * as Discord from 'discord.js';
+import { Collection, Intents, Interaction, Message, MessageActionRow, MessageButton, Client as DiscordClient } from 'discord.js';
 import { readdirSync } from 'fs';
 import { JsonDB } from 'node-json-db';
 import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { join, dirname } from 'path';
-import './sequelize/models/index.js';
-import { LongReportData, PartialGuildData, ProfileData } from './sequelize/models/tracking.js';
 import { User } from './sequelize/models/user.js';
-import { GoalUnitTranslate } from './sequelize/models/goal.js';
+import { RemindListeners as Remind} from './listeners/RemindListeners.js';
+import { TrackingListeners as Track } from './listeners/TrackingListeners.js';
+import './sequelize/models/index.js';
 
 global.botDir = new URL(import.meta.url);
 global.botDirString = (()=>{
@@ -56,7 +55,7 @@ export function generateTimeDisplay(milliseconds: number): string {
 	return arrayTime.join(" ");
 }
 
-export class Client extends Discord.Client {
+export class Client extends DiscordClient {
 	public commands: Collection<string, any> = new Collection();
 }
 
@@ -80,61 +79,7 @@ client.once('ready', async () => {
 	}, 5000)
 });
 
-// Set listeners
-let cmdListener = async (interaction: Discord.Interaction) => {
-	if (!interaction.isCommand()) return;
-
-	const { commandName } = interaction;
-	const command: any = client.commands.get(commandName);
-
-	if (!command) return;
-
-	log(`${interaction.user.username} execute ${commandName}`);
-
-	command.execute(interaction);
-}
-
-let helpMsgListener = async (msg: Discord.Message) => {
-	if (["help", "$help", "!help", "?help", `<@${client.user.id}>`, `<@${client.user.id}> help`].includes(msg.content.toLowerCase())) {
-		await msg.channel.send("Si vous voulez la liste des commandes, utilisez la commande `/help`");
-	}
-}
-
-let fetchGuildListener = async (msg: Discord.Message) => {
-	if (msg.author.id != "448110812801007618") return;
-	if (!msg.embeds.length) return;
-	if (!msg.embeds[0].title) return;
-    if (!msg.embeds[0].title.startsWith("Guilde ")) return;
-
-	const guild = (await db.models.Guild.findOrCreate({
-		where: {
-			name: msg.embeds[0].title.substring(7)
-		},
-		include: [db.models.Tracking]
-	}))[0];
-
-	let guildData: PartialGuildData = {
-		type: "guild",
-		max_xp: parseInt((msg.embeds[0].fields[1].name.split(" "))[1]),
-		xp: parseInt((msg.embeds[0].fields[1].name.split(" "))[3]),
-		level: parseInt((msg.embeds[0].fields[1].name.split(" "))[6]),
-		description: "",
-	};
-
-	if (isNaN(guildData.level)) guildData.level = 100;
-	if (msg.embeds[0].description) {
-		guildData.description = msg.embeds[0].description.split("`")[1];
-	}
-
-	await guild.createTracking({
-		type: "guild",
-		data: guildData
-	});
-
-	log(`Guild ${guild.name} fetched. Level: ${(await guild.fetchData()).full_level}`);
-}
-
-function getTimeLostByString(timeDisplayed: string): number {
+export function getTimeLostByString(timeDisplayed: string): number {
 	const splitedDisplay = timeDisplayed.split(" H");
 	const lastElement = splitedDisplay[splitedDisplay.length - 1].replace(" Min", "");
 
@@ -144,173 +89,7 @@ function getTimeLostByString(timeDisplayed: string): number {
 	return hours * 3600000 + minutes * 60000;
 }
 
-const eventsMsgListener = async (message: Discord.Message) => {
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (!message.content) return;
-	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(message.content))) return;
-	const user = await db.models.User.findByPk(message.content.slice(message.content.indexOf("<@") + 2, message.content.indexOf(">"))) // get the user
-	if (!user) return;
-	if (!user.config.reminders.auto_proposition.events) return;
-
-	const timeBetweenMinievents: number = constants.getData("/times/betweenMinievents");
-	//A time for the possibility where 1) no alte/no time lost 2)  the player wants to skip alte / losetime with shop right after
-	const reminders = [timeBetweenMinievents];
-
-	if (message.content.includes(constants.getData("/regex/timeLostBigEvent"))) {
-		const splicedMessage = message.content.split(" | ");
-
-		reminders.push(timeBetweenMinievents
-			+ getTimeLostByString(
-				//The time lost is always just before the text
-				splicedMessage[splicedMessage.length - 2]
-					.slice(26, -2)
-			)
-		);
-	}
-	//If it ends by an emoji, there's an alteration
-	if (message.content.endsWith(constants.getData("/regex/emojiEnd"))) {
-		const splitedMessage = message.content.split(" ");
-		reminders.push(timeBetweenMinievents
-			+ constants.getData(`/effectDurations/${splitedMessage[splitedMessage.length - 1]}`)
-		);
-	}
-		
-	await proposeAutoReminder(message, reminders, user);
-};
-
-const minieventMsgListener = async (message: Discord.Message) => {
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (message.embeds.length === 0) return;
-	if(!message.embeds[0].author) return;
-	if (!message.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
-	const userID = message.interaction ? message.interaction.user.id
-		: message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user = await db.models.User.findByPk(userID);
-	if (!user) return;
-	if (!user.config.reminders.auto_proposition.minievents) return;
-	let text = message.embeds[0].description;
-	if (constants.getData("/regex/twoMessagesMinieventsEmojis").some((emoji: string) => text.startsWith(emoji))) return;
-	for (const obj of constants.getData("/regex/possibleTwoMessagesMinievents")) {
-		if (text.startsWith(obj.emoji) && text.endsWith(obj.endsWith)) return;
-	}
-
-	const timeBetweenMinievents: number = constants.getData("/times/betweenMinievents");
-	const reminders = [timeBetweenMinievents];
-
-	if (new RegExp(constants.getData("/regex/hasLoseTimeEmoji")).test(text)) {
-		let loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[0]);
-		if (loseTimeEmojiPosition === -1) {
-			loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[1])
-		}
-		reminders.push(timeBetweenMinievents
-			+ getTimeLostByString(text
-				//Between the end of the '**' and the start of the emoji
-				.slice(text.indexOf("**") + 2, loseTimeEmojiPosition)
-				.replace("**", "")
-			)
-		);
-	}
-
-	//Remove 2nd text.endsWith for the next draftbot update, for now there's a typo on bigBadEvent's head bandage sentence
-	if (text.endsWith(constants.getData("/regex/emojiEnd") || text.endsWith(":head_bandage:."))) {
-		const splitedMessage = text.split(" ");
-		if (constants.getData("/effectDurations").hasOwnProperty(splitedMessage[splitedMessage.length - 1])) {
-			reminders.push(timeBetweenMinievents
-				+ constants.getData(`/effectDurations/${splitedMessage[splitedMessage.length - 1]}`));
-		}
-	}
-
-	await proposeAutoReminder(message, reminders, user);
-};
-
-const guildDailyMessageListener = async (message: Discord.Message) => {
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (!message.interaction) return;
-	if (message.interaction.commandName !== "guilddaily") return;
-
-	const user = await db.models.User.findByPk(message.interaction.user.id);
-	if (!user) return;
-	if (!user.config.reminders.auto_proposition.guilddaily) return;
-
-
-	await proposeAutoReminder(message, [constants.getData("/times/betweenGuildDailies")], user);
-}
-
-const dailyMessageListener = async (message: Discord.Message) => {
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (!message.interaction) return;
-	if (message.interaction.commandName !== "daily") return;
-
-	const user = await db.models.User.findByPk(message.interaction.user.id);
-	if (!user) return;
-	if (!user.config.reminders.auto_proposition.daily) return;
-
-	await proposeAutoReminder(message, [constants.getData("/times/betweenDailies")], user);
-}
-
-const petFeedMessageListener = async (message: Discord.Message) => {
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (message.embeds.length === 0) return;
-	if(!message.embeds[0].author) return;
-	if (!message.embeds[0].author.name.endsWith(constants.getData("/regex/petFeedAuthorEnd"))) return;
-
-	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user = await db.models.User.findByPk(userID);
-	if (!user) return;
-	if (!user.config.reminders.auto_proposition.petfeed) return;
-
-	const reminders: number[] = [];
-	constants.getData("/pets/" + message.embeds[0].description.replace("**", "").split(" ")[0])
-		.forEach((rarity: number) => {
-			reminders.push(rarity * constants.getData("/times/betweenBasicPetFeeds"))
-		});
-
-	await proposeAutoReminder(message, reminders, user);
-}
-
-const petFreeMessageListener = async (message: Discord.Message) => {
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (message.embeds.length === 0) return;
-	if(!message.embeds[0].author) return;
-	if (!message.embeds[0].author.name.endsWith(constants.getData("/regex/petFreeAuthorEnd"))) return;
-	// Get rid of first part of /petfree
-	if (message.interaction) return;
-
-	const userID = message.embeds[0].author.iconURL.split("avatars/")[1].split("/")[0];
-	const user = await db.models.User.findByPk(userID);
-	if (!user) return;
-	if (!user.config.reminders.auto_proposition.petfree) return;
-
-	await proposeAutoReminder(message, [constants.getData("/times/betweenPetFrees")], user);
-}
-
-const voteMessageListener = async (message: Discord.Message) => {
-	if (message.author.id !== config.getData("/draftbot_id")) return;
-	if (!message.interaction) return;
-	if (message.interaction.commandName !== "vote") return;
-
-	const user = await db.models.User.findByPk(message.interaction.user.id);
-	if (!user) return;
-	if (!user.config.reminders.auto_proposition.vote) return;
-
-	await proposeAutoReminder(message, [constants.getData("/times/betweenVotes"), constants.getData("/times/betweenUsefulVotes")], user);
-}
-
-let propoMsgListener = async (message: Discord.Message) => {
-	if (!message.content) return;
-	const user = await db.models.User.findByPk(message.author.id)
-	if (!user) return;
-	const reminders = await user.getPropoReminder({
-		where: {
-			trigger: message.content
-		}
-	})
-	if (!reminders.length) return;
-
-	await proposeAutoReminder(message, reminders.map(r=>r.duration), user)
-}
-
-async function proposeAutoReminder(message: Discord.Message, reminders: number[], author: User) {
+export async function proposeAutoReminder(message: Message, reminders: number[], author: User) {
 	const components = new MessageActionRow();
 	reminders.forEach((time: number) => {
 		components.addComponents(
@@ -330,10 +109,10 @@ async function proposeAutoReminder(message: Discord.Message, reminders: number[]
 	await addReminder(await message.reply({content: `Voulez-vous ajouter un rappel ?`, components: [components]}), author);
 }
 
-async function addReminder(propositionMessage: Discord.Message, author: User) {
-	const listener = async (interaction: Discord.Interaction) => {
+async function addReminder(propositionMessage: Message, author: User) {
+	const listener = async (interaction: Interaction) => {
 		if (!interaction.isButton()) return;
-		if (!(interaction.message instanceof Discord.Message)) return;
+		if (!(interaction.message instanceof Message)) return;
 		if (interaction.message.id != propositionMessage.id) return;
 		if (interaction.user.id != author.discordId) {
 			interaction.reply({content: ":warning: Désolé, vous n'êtes pas la personne à qui est destinée cette proposition", ephemeral: true});
@@ -367,200 +146,54 @@ async function addReminder(propositionMessage: Discord.Message, author: User) {
 	}, 60000);
 }
 
-let longReportListener = async (msg: Discord.Message) => {
-	if (msg.author.id !== config.getData("/draftbot_id")) return;
-	if (!msg.content) return;
-	if (!(new RegExp(constants.getData("/regex/bigEventIssueStart")).test(msg.content))) return;
+async function cmdListener(interaction: Interaction) {
+	if (!interaction.isCommand()) return;
 
-	const user = await db.models.User.findByPk(msg.content.split("<@")[1].split(">")[0])
-	if (!user) return;
-	if (!user.config.tracking.reports) return;
+	const { commandName } = interaction;
+	const command: any = client.commands.get(commandName);
 
-	// Training message : :newspaper: ** Journal de @Arkitu  :** :medal: Points gagnés : ** 358** | :moneybag: Argent gagné : ** 24** | :star: XP gagné : ** 25** | :clock10: Temps perdu : ** 45 Min ** | ⛓️ Vous grimpez jusqu'en haut des échafaudages, mais à l'exception d'un magnifique paysage, vous ne trouvez rien. Après avoir passé quelques minutes à l'admirer, vous repartez.
-	const data: LongReportData = {
-		type: "long_report",
-		points: 0,
-		gold: 0,
-		xp: 0,
-		time: 0,
-		pv: 0,
-		id: `long_report${msg.createdTimestamp}`
-	};
-	for (let e of msg.content.split(":") // str -> array
-		.slice(3) // array
-		.join(":") // array -> str
-		.slice(3) // str
-		.split(" | ") // str -> array
-		.slice(0, -1) // array
-	) {
-		let modif = {
-			name: e.split("**").slice(0, 2)[0].slice(0, -3),
-			value: e.split("**").slice(0, 2)[1].slice(1)
-		}
-		switch (modif.name) {
-			case "🏅 Points gagnés" :
-				data.points += parseInt(modif.value);
-				break;
-			case "💰 Argent gagné" :
-				data.gold += parseInt(modif.value);
-				break;
-			case "💸 Argent perdu" :
-				data.gold -= parseInt(modif.value);
-				break;
-			case "⭐ XP gagné" :
-				data.xp += parseInt(modif.value);
-				break;
-			case "❤️ Vie gagnée" :
-				data.pv += parseInt(modif.value);
-				break;
-			case "💔 Vie perdue" :
-				data.pv -= parseInt(modif.value);
-				break;
-			case "🕙 Temps perdu" :
-				data.time = 0;
-				let time_array = modif.value.split(" ");
-				while (time_array.length > 1) {
-					switch (time_array[1]) {
-						case "H" :
-							data.time += parseInt(time_array[0]) * 3600000;
-							break;
-						case "Min" :
-							data.time += parseInt(time_array[0]) * 60000;
-							break;
-					}
-					time_array.splice(0, 2);
-				}
-				break;
-		}
-	}
+	if (!command) return;
 
-	user.createTracking({
-		type: "long_report",
-		data: data
-	})
+	log(`${interaction.user.username} execute ${commandName}`);
 
-	log("Long repport tracked");
+	command.execute(interaction);
 }
-
-let shortReportListener = async (msg: Discord.Message): Promise<void> => {
-	if (msg.author.id !== config.getData("/draftbot_id")) return;
-	if (msg.embeds.length === 0) return;
-	if(!msg.embeds[0].author) return;
-	if (!msg.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
-	if (!msg.interaction) return;
-
-	const user = await db.models.User.findByPk(msg.interaction.user.id)
-	if (!user) return;
-	if (!user.config.tracking.reports) return;
-
-	user.createTracking({
-		type: "short_report"
-	});
-
-	log("Short repport tracked");
-}
-
-let profileListener = async (msg: Discord.Message): Promise<void> => {
-	if (msg.author.id !== config.getData("/draftbot_id")) return;
-	if (!msg.interaction) return;
-	if (msg.interaction.commandName !== "profile") return;
-	if (msg.interaction.user.username !== msg.embeds[0].title.split(" | ")[1]) return;
-
-	const user = await db.models.User.findByPk(msg.interaction.user.id, {include:[db.models.Goal]})
-	if (!user) return;
-	if (!user.config.tracking.profile) return;
-
-	let embed = msg.embeds[0];
-
-	let splited_embed = {
-		title: embed.title.split(" | "),
-		fields: embed.fields.map(f => {
-			return f.value.split(" | ").map(e => {
-				return {
-					full: e,
-					emoji: e.split(":")[1],
-					value: (() => {
-						if (!e.split(":")[2]) return undefined;
-						let v: string = e.split(":")[2].slice(1)
-						return v;
-					})()
-				}
-			})
-		})
-	}
-
-	let data: ProfileData = {
-		type: "profile",
-		lvl: parseInt(splited_embed.title[2].split(" ")[1]),
-		pv: parseInt(splited_embed.fields[0][0].value.split("/")[0]),
-		max_pv: parseInt(splited_embed.fields[0][0].value.split("/")[1]),
-		xp: parseInt(splited_embed.fields[0][1].value.split("/")[0]),
-		max_xp: parseInt(splited_embed.fields[0][1].value.split("/")[1]),
-		gold: parseInt(splited_embed.fields[0][2].value),
-		energy: parseInt(splited_embed.fields[1][0].value.split("/")[0]),
-		max_energy: parseInt(splited_embed.fields[1][0].value.split("/")[1]),
-		strenght: parseInt(splited_embed.fields[1][1].value),
-		defense: parseInt(splited_embed.fields[1][2].value),
-		speed: parseInt(splited_embed.fields[1][3].value),
-		gems: parseInt(splited_embed.fields[2][0].value),
-		quest_missions_percentage: parseInt(splited_embed.fields[2][1].value),
-		rank: parseInt(splited_embed.fields[3][0].value.split("/")[0]),
-		rank_points: parseInt(splited_embed.fields[3][1].value),
-		class: {
-			name: splited_embed.fields[4][0].value,
-			emoji: `:${splited_embed.fields[4][0].emoji}:`,
-		},
-		guild_name: embed.fields[5].name === "Guilde :" ? splited_embed.fields[5][0].value : null,
-		//Bot crashed if the user didn't have a guild while using the command
-		destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
-	}
-
-	user.createTracking({
-		type: "profile",
-		data: data
-	});
-
-	for (let goal of user.Goals) {
-		if (goal.end < msg.createdTimestamp) {
-			await msg.channel.send({ embeds: [
-				new MessageEmbed()
-					.setColor(config.getData("/main_color"))
-					.setTitle("Expiration de votre objectif")
-					.setDescription(`Votre objectif de ${goal.value} ${
-						GoalUnitTranslate[goal.unit]
-					} a expiré, vous pouvez en définir un nouveau avec \`/set_goal\``)
-			]});
-			goal.destroy();
-		} else if (goal.endValue <= data[goal.unit] ) {
-			await msg.channel.send({ embeds: [
-				new MessageEmbed()
-					.setColor(config.getData("/main_color"))
-					.setTitle("Objectif atteint !")
-					.setDescription(`<@${msg.author.id}>, vous avez atteint votre objectif de ${goal.value} ${
-						GoalUnitTranslate[goal.unit]
-					} !`)
-			]});
-			goal.destroy();
-		}
+async function helpListener(msg: Message) {
+	if (["help", "$help", "!help", "?help", `<@${client.user.id}>`, `<@${client.user.id}> help`].includes(msg.content.toLowerCase())) {
+		await msg.channel.send("Si vous voulez la liste des commandes, utilisez la commande `/help`");
 	}
 }
 
 client.setMaxListeners(0);
 client.on('interactionCreate', cmdListener);
 client.on('messageCreate', (message) => {
-	helpMsgListener(message);
-	fetchGuildListener(message);
-	propoMsgListener(message);
-	longReportListener(message);
-	shortReportListener(message);
-	profileListener(message);
-	eventsMsgListener(message);
-	minieventMsgListener(message);
-	guildDailyMessageListener(message);
-	dailyMessageListener(message);
-	petFeedMessageListener(message);
-	petFreeMessageListener(message);
-	voteMessageListener(message);
+	if (message.author.id === config.getData("/draftbot_id")) {
+		if (message.content) {
+			Remind.event(message);
+
+			Track.event(message);
+		}
+		if (message.interaction) {
+			if (message.embeds.length !== 0) {
+				if (message.embeds[0].author) {
+					Remind.petFree(message);
+					Remind.petFeed(message);
+					Track.miniEvent(message);
+				}
+				Remind.miniEvent(message); // Not with the minievent track because sometimes the result of the minievent comes in another message (gobletsGame for example), without the classical formated author
+				Remind.guildDaily(message);
+				Remind.daily(message);
+				Remind.vote(message);
+				Track.fetchGuild(message);
+				Track.profile(message);
+			}
+		}
+	}
+	else {
+		if (!message.content) return;
+		helpListener(message);
+		Remind.propo(message);
+	}
 });
 
 // Import all the commands from the commands files
