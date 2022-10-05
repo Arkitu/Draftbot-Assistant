@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from "discord.js";
-import { log } from "../bot";
 import { GoalUnitTranslate } from '../sequelize/models/goal';
 import { LongReportData, PartialGuildData, ProfileData } from '../sequelize/models/tracking';
+import { LogUtils } from "../Utils";
 
 export class TrackingListeners {
 	static async fetchGuild(msg: Message) {
@@ -32,7 +32,7 @@ export class TrackingListeners {
 			data: guildData
 		});
 	
-		log(`Guild ${guild.name} fetched. Level: ${(await guild.fetchData()).full_level}`);
+		LogUtils.log(`Guild ${guild.name} fetched. Level: ${(await guild.fetchData()).full_level}`);
 	}
 	
 	static async event(msg: Message) {
@@ -105,7 +105,7 @@ export class TrackingListeners {
 			data: data
 		})
 	
-		log("Long repport tracked");
+		LogUtils.log("Long repport tracked");
 	}
 
 	static async miniEvent(msg: Message): Promise<void> {
@@ -119,7 +119,7 @@ export class TrackingListeners {
 			type: "short_report"
 		});
 	
-		log("Short repport tracked");
+		LogUtils.log("Short repport tracked");
 	}
 	
 	static async profile(msg: Message): Promise<void> {

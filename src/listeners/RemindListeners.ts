@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
-import { getTimeLostByString, proposeAutoReminder } from '../bot';
+import { proposeAutoReminder } from '../bot';
+import { TimeStringUtils } from '../Utils';
 
 export class RemindListeners {	
 	static async event(message: Message) {
@@ -16,7 +17,7 @@ export class RemindListeners {
 			const splicedMessage = message.content.split(" | ");
 	
 			reminders.push(timeBetweenMinievents
-				+ getTimeLostByString(
+				+ TimeStringUtils.getTimeLostByString(
 					//The time lost is always just before the text
 					splicedMessage[splicedMessage.length - 2]
 						.slice(26, -2)
@@ -56,7 +57,7 @@ export class RemindListeners {
 				loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[1])
 			}
 			reminders.push(timeBetweenMinievents
-				+ getTimeLostByString(text
+				+ TimeStringUtils.getTimeLostByString(text
 					//Between the end of the '**' and the start of the emoji
 					.slice(text.indexOf("**") + 2, loseTimeEmojiPosition)
 					.replace("**", "")
