@@ -107,10 +107,11 @@ const hashCorrespondances: {
 
 export async function up() {
     let oldDB = new JsonDB(new Config(`${dirname(import.meta)}/../../../db.json`, true, true, '/'));
+    let i = 0;
     for (let hash in hashCorrespondances) {
+        console.log(`Utilisateur ${i++} / ${Object.keys(hashCorrespondances).length}`);
         let oldUser = oldDB.getData(`/users/${hash}`);
 
-        console.debug(oldUser);
         let config = JSON.parse(JSON.stringify(oldUser.config));
         delete config.reminders.on;
 
@@ -142,11 +143,6 @@ export async function up() {
                 jours: 24 * 60 * 60 * 1000
             }[oldPropoReminder.unit as "secondes" | "minutes" | "heures" | "jours"];
 
-            console.debug(oldUser.config.reminders.on);
-            console.debug(oldPropoReminderTrigger);
-            console.debug(oldPropoReminder);
-            console.debug(multiplier);
-
             user.createPropoReminder({
                 trigger: oldPropoReminderTrigger,
                 duration: multiplier * oldPropoReminder.duration,
@@ -155,8 +151,10 @@ export async function up() {
         }
     }
 
+    i = 0;
     // Create reminders
     for (let oldReminder of oldDB.getData("/reminders")) {
+        console.log(`Rappel ${i++} / ${oldDB.getData("/reminders").length}`);
         let user = (await db.models.User.findOrCreate({
             where: {
                 discordId: oldReminder.author_id
@@ -171,8 +169,10 @@ export async function up() {
         })
     }
 
+    i = 0;
     // Create guilds
     for (let oldGuildName in oldDB.getData("/guilds")) {
+        console.log(`Guilde ${i++} / ${Object.keys(oldDB.getData("/guilds")).length}`);
         let oldGuild = oldDB.getData(`/guilds/${oldGuildName}`);
         let guild = await db.models.Guild.create({
             name: oldGuildName
