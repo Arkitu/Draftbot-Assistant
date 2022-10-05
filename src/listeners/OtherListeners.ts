@@ -1,5 +1,5 @@
 import { Interaction, Message } from "discord.js";
-import { LogUtils } from "../Utils";
+import { LogUtils } from "../Utils.js";
 
 export class OtherListeners {
 	static async command(interaction: Interaction) {

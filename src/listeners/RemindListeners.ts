@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { proposeAutoReminder } from '../bot';
+import { proposeAutoReminder } from '../bot.js';
 import { TimeStringUtils } from '../Utils';
 
 export class RemindListeners {	
@@ -54,12 +54,12 @@ export class RemindListeners {
 		if (new RegExp(constants.getData("/regex/hasLoseTimeEmoji")).test(text)) {
 			let loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[0]);
 			if (loseTimeEmojiPosition === -1) {
-				loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[1])
+				loseTimeEmojiPosition = text.indexOf(constants.getData("/regex/hasLoseTimeEmoji").split("|")[1]);
 			}
 			reminders.push(timeBetweenMinievents
 				+ TimeStringUtils.getTimeLostByString(text
 					//Between the end of the '**' and the start of the emoji
-					.slice(text.indexOf("**") + 2, loseTimeEmojiPosition)
+					.slice(text.indexOf("**") + 2, loseTimeEmojiPosition-1)
 					.replace("**", "")
 				)
 			);

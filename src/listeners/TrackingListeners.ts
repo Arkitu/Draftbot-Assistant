@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from "discord.js";
-import { GoalUnitTranslate } from '../sequelize/models/goal';
-import { LongReportData, PartialGuildData, ProfileData } from '../sequelize/models/tracking';
-import { LogUtils } from "../Utils";
+import { GoalUnitTranslate } from '../sequelize/models/goal.js';
+import { LongReportData, PartialGuildData, ProfileData } from '../sequelize/models/tracking.js';
+import { LogUtils } from "../Utils.js";
 
 export class TrackingListeners {
 	static async fetchGuild(msg: Message) {
