@@ -182,7 +182,7 @@ export async function execute(interaction: CommandInteraction) {
             const deleted = await db.models.PropoReminder.destroy({
                 where: {
                     trigger: opt.trigger,
-                    UserId: user.discordId
+                    UserDiscordId: user.discordId
                 }
             })
             if (deleted) {

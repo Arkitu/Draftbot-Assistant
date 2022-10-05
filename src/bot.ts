@@ -74,8 +74,11 @@ client.once('ready', async () => {
 	setTimeout(async ()=>{
 		// Relauch the stoped reminders
 		for (let reminder of await db.models.Reminder.findAll()) {
-			console.debug(reminder.toJSON())
-			reminder.start()
+			try {
+				await reminder.start()
+			} catch (e) {
+				reminder.destroy();
+			}
 		}
 	}, 5000)
 });

@@ -50,7 +50,7 @@ export interface LongReportData {
 }
 
 export interface PartialGuildData {
-    type: "guild"
+    type: "guild",
     level: number,
     xp: number,
     max_xp: number,
@@ -109,8 +109,13 @@ export const initArgs = {
             return data;
         },
         set(val: ProfileData | LongReportData | PartialGuildData | GuildData | null) {
+            if (!val) {
+                this.stringifiedData = "{}";
+                return;
+            }
             if ("toJSON" in val) {
                 this.stringifiedData = JSON.stringify(val.toJSON());
+                return;
             }
             this.stringifiedData = JSON.stringify(val);
         }
@@ -152,4 +157,5 @@ export function initModel() {
         sequelize: db,
         modelName: 'Tracking',
     });
+    console.log(`Initialized model ${Tracking.name}`);
 }

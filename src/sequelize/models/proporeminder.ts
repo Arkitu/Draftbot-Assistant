@@ -35,7 +35,7 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
     declare trigger: string;
     declare duration: number;
     declare inDm: boolean;
-    declare UserId: ForeignKey<User['discordId']>;
+    declare UserDiscordId: ForeignKey<User['discordId']>;
     declare getUser: BelongsToGetAssociationMixin<User>;
 
     /**
@@ -51,6 +51,7 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
 export function initModel() {
     PropoReminder.init(initArgs, {
         sequelize: db,
-        modelName: 'PropoReminder',
+        modelName: 'PropoReminder'
     });
+    console.log(`Initialized model ${PropoReminder.name}`);
 }

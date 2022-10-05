@@ -65,4 +65,5 @@ export function initModel() {
         sequelize: db,
         modelName: 'Guild',
     });
+    console.log(`Initialized model ${Guild.name}`);
 }

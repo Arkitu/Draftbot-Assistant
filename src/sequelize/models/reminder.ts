@@ -116,4 +116,5 @@ export function initModel() {
         sequelize: db,
         modelName: "Reminder"
     });
+    console.log(`Initialized model ${Reminder.name}`);
 }

@@ -25,7 +25,9 @@
     "postinstall": "./init",
     "start": "node ./dist/start_bot_forever.js",
     "start_once": "node ./dist/bot.js",
-    "deploy_cmds": "node ./dist/deploy_cmds.js"
+    "deploy_cmds": "node ./dist/deploy_cmds.js",
+    "migrate": "node ./dist/sequelize/migrations/migrate.js",
+    "create_tables": "node ./dist/sequelize/models/index.js"
   },
   "author": "Arkitu",
   "license": "ISC",

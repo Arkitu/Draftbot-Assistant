@@ -49,10 +49,10 @@ global.db = new Sequelize({
     logging: false
 });
 
-initUser();
-initReminder();
 initTracking();
 initPropoReminder();
+initUser();
+initReminder();
 initGuild();
 initGoal();
 
@@ -63,7 +63,11 @@ for (let model of Object.values(db.models)) {
     }
 }
 
+console.debug(...Object.values(db.models))
+
 // Sync the db
-db.sync();
+await db.sync();
+
+console.debug("Database synced");
 
 export default db;

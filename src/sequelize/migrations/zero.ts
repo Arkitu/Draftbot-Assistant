@@ -1,7 +1,8 @@
 import { JsonDB } from "node-json-db";
-import { Config } from "node-json-db/dist/lib/JsonDBConfig";
+import { Config } from 'node-json-db/dist/lib/JsonDBConfig.js';
 import { dirname } from "dirname-filename-esm";
 import "../models/index.js";
+import "../../bot.js";
 
 const hashCorrespondances: {
     [key: string]: string
@@ -104,73 +105,88 @@ const hashCorrespondances: {
     "ef190777a90654a554a36a916c607f53": "995322846396039189"
 }
 
-export default {
-    up: async ()=>{
-        let oldDB = new JsonDB(new Config(`${dirname}/../../../db.json`, true, true, '/'));
-        for (let hash in hashCorrespondances) {
-            let oldUser = oldDB.getData(hash);
+export async function up() {
+    let oldDB = new JsonDB(new Config(`${dirname(import.meta)}/../../../db.json`, true, true, '/'));
+    for (let hash in hashCorrespondances) {
+        let oldUser = oldDB.getData(`/users/${hash}`);
 
-            let config = Object.assign({}, oldUser.config);
-            delete config.reminders.on;
+        console.debug(oldUser);
+        let config = JSON.parse(JSON.stringify(oldUser.config));
+        delete config.reminders.on;
 
-            // Create the user
-            let user = await db.models.User.create({
-                discordId: hashCorrespondances[hash],
-                config: config
-            });
+        // Create the user
+        let user = await db.models.User.create({
+            discordId: hashCorrespondances[hash],
+            config: config
+        });
 
-            // Create trackings
-            for (let oldTracking of oldUser.tracking) {
-                user.createTracking({
-                    type: oldTracking.type,
-                    data: oldTracking.data,
-                    createdAt: oldTracking.timestamp
-                })
-            }
-
-            // Create propoReminders
-            for (let oldPropoReminderTrigger in oldUser.config.reminders.on) {
-                let oldPropoReminder = oldUser.config.reminders.on[oldPropoReminderTrigger];
-
-                let multiplier = {
-                    secondes: 1000,
-                    minutes: 60 * 1000,
-                    heures: 60 * 60 * 1000,
-                    jours: 24 * 60 * 60 * 1000
-                }[oldPropoReminder.unit as "secondes" | "minutes" | "heures" | "jours"];
-
-                user.createPropoReminder({
-                    trigger: oldPropoReminder,
-                    duration: multiplier * oldPropoReminder.duration,
-                    inDm: oldPropoReminder.dm
-                })
-            }
-        }
-
-        // Create reminders
-        for (let oldReminder of oldDB.getData("/reminders")) {
-            let user = (await db.models.User.findOrCreate({
-                where: {
-                    discordId: oldReminder.author_id
-                }
-            }))[0];
-
-            user.createReminder({
-                channelId: oldReminder.channel.id,
-                channelIsUser: oldReminder.channel.isUser,
-                deadLineTimestamp: oldReminder.dead_line_timestamp,
-                message: oldReminder.message
+        // Create trackings
+        for (let oldTracking of oldUser.tracking) {
+            user.createTracking({
+                type: oldTracking.type,
+                data: oldTracking.data,
+                createdAt: oldTracking.timestamp
             })
         }
 
-        // Create guilds
-        for (let oldGuild of oldDB.getData("/guilds")) {
-            let guild = await db.models.Guild.create({
-                name: oldGuild.name,
-                description: oldGuild.description
-            });
+        // Create propoReminders
+        for (let oldPropoReminderTrigger in oldUser.config.reminders.on) {
+            if (oldPropoReminderTrigger.includes("/")) continue;
+            if (!oldPropoReminderTrigger) continue;
+            let oldPropoReminder = oldUser.config.reminders.on[oldPropoReminderTrigger];
 
-            let 
+            let multiplier = {
+                secondes: 1000,
+                minutes: 60 * 1000,
+                heures: 60 * 60 * 1000,
+                jours: 24 * 60 * 60 * 1000
+            }[oldPropoReminder.unit as "secondes" | "minutes" | "heures" | "jours"];
+
+            console.debug(oldUser.config.reminders.on);
+            console.debug(oldPropoReminderTrigger);
+            console.debug(oldPropoReminder);
+            console.debug(multiplier);
+
+            user.createPropoReminder({
+                trigger: oldPropoReminderTrigger,
+                duration: multiplier * oldPropoReminder.duration,
+                inDm: oldPropoReminder.dm
+            })
         }
+    }
+
+    // Create reminders
+    for (let oldReminder of oldDB.getData("/reminders")) {
+        let user = (await db.models.User.findOrCreate({
+            where: {
+                discordId: oldReminder.author_id
+            }
+        }))[0];
+
+        user.createReminder({
+            channelId: oldReminder.channel.id,
+            channelIsUser: oldReminder.channel.isUser,
+            deadLineTimestamp: oldReminder.dead_line_timestamp,
+            message: oldReminder.message
+        })
+    }
+
+    // Create guilds
+    for (let oldGuildName in oldDB.getData("/guilds")) {
+        let oldGuild = oldDB.getData(`/guilds/${oldGuildName}`);
+        let guild = await db.models.Guild.create({
+            name: oldGuildName
+        });
+
+        await guild.createTracking({
+            type: "guild",
+            data: {
+                type: "guild",
+                level: Math.floor(oldGuild.level),
+                xp: 0,
+                max_xp: 1,
+                description: oldGuild.description
+            }
+        });
     }
 }

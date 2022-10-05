@@ -79,4 +79,5 @@ export function initModel() {
         sequelize: db,
         modelName: 'Goal',
     });
+    console.log(`Initialized model ${Goal.name}`);
 }
