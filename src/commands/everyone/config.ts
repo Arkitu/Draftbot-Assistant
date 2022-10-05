@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageEmbed, CommandInteraction } from "discord.js";
-import { log_error, generateTimeDisplay } from "../../bot.js";
 import { Includeable } from "sequelize/types/model.js";
+import { LogUtils, TimeStringUtils } from "../../Utils.js";
 
 export const data = new SlashCommandBuilder()
 	.setName("config")
@@ -144,7 +144,7 @@ export async function execute(interaction: CommandInteraction) {
                                 str_propos += "…\n";
                                 break;
                             }
-                            str_propos += `${propo.trigger} : \`${generateTimeDisplay(propo.duration)} ${propo.inDm ? "en DM" : ""}\`\n`;
+                            str_propos += `${propo.trigger} : \`${TimeStringUtils.generateTimeDisplay(propo.duration)} ${propo.inDm ? "en DM" : ""}\`\n`;
                         }
                         if (!str_propos) {
                             str_propos = "Aucune proposition de rappel\n";
@@ -260,7 +260,7 @@ export async function execute(interaction: CommandInteraction) {
             break;
         }
         default: {
-            log_error(`${interaction.user.username} a utilisé une commande inconnue ("/config ${opt.subcommandgroup} ${opt.subcommand}")`);
+            LogUtils.log_error(`${interaction.user.username} a utilisé une commande inconnue ("/config ${opt.subcommandgroup} ${opt.subcommand}")`);
             interaction.editReply(":warning: Cette commande n'existe pas ! Le propriétaire du bot en a été informé.");
             break;
         }

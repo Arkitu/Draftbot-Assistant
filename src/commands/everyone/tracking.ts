@@ -1,13 +1,12 @@
 import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, CommandInteraction } from 'discord.js';
 import { unlink } from 'fs';
-import { log_error } from "../../bot.js";
-import { CommandInteraction } from 'discord.js';
+import { LogUtils } from '../../Utils.js';
 import { User } from '../../sequelize/models/user.js';
 import { ProfileData } from '../../sequelize/models/tracking.js';
 
-export var property_data: {
+export const property_data: {
     [key: string]: {
         "label": string,
         "color": string
@@ -472,6 +471,6 @@ export async function execute(interaction: CommandInteraction) {
             })()} de ${opt.user.username}`)
             .setImage(`attachment://${interaction.user.id}_chart.png`);
         await interaction.editReply({ embeds: [embed], files: [`${botDirString}/../temp/${interaction.user.id}_chart.png`] });
-        unlink(`${botDirString}/../temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
+        unlink(`${botDirString}/../temp/${interaction.user.id}_chart.png`, (err) => { if (err) LogUtils.log_error(err.toString()); });
     }
 }

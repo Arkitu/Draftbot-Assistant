@@ -1,10 +1,9 @@
 import ChartJSImage from 'chart.js-image';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, CommandInteraction } from 'discord.js';
 import { unlink } from 'fs';
-import { log_error } from "../../bot.js";
+import { LogUtils } from '../../Utils.js';
 import { property_data } from './tracking.js';
-import { CommandInteraction } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('tracking_of_everyone')
@@ -232,6 +231,6 @@ export async function execute(interaction: CommandInteraction) {
             })()} de tout le monde`)
             .setImage(`attachment://${interaction.user.id}_chart.png`);
         await interaction.editReply({ embeds: [embed], files: [`${botDirString}/../temp/${interaction.user.id}_chart.png`] });
-        unlink(`${botDirString}/../temp/${interaction.user.id}_chart.png`, (err) => { if (err) log_error(err.toString()); });
+        unlink(`${botDirString}/../temp/${interaction.user.id}_chart.png`, (err) => { if (err) LogUtils.log_error(err.toString()); });
     }
 }
