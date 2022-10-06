@@ -22,7 +22,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "postinstall": "./init",
+    "postinstall": "./init.sh",
+    "init_windows": ".\\init.bat",
     "start": "node ./dist/start_bot_forever.js",
     "start_once": "node ./dist/bot.js",
     "deploy_cmds": "node ./dist/deploy_cmds.js",
