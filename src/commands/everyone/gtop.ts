@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageEmbed, MessageActionRow, MessageButton, Interaction } from 'discord.js';
-import { CommandInteraction } from 'discord.js';
+import { MessageEmbed, MessageActionRow, MessageButton, Interaction, CommandInteraction } from 'discord.js';
 
 async function createGtop(page: number): Promise<{embed: MessageEmbed, components: MessageActionRow[]}> {
 	const embed = new MessageEmbed()

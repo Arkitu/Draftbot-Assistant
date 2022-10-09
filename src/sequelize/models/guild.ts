@@ -10,13 +10,15 @@ import {
     NonAttribute
 } from "sequelize";
 import { GuildData, Tracking } from "./tracking.js";
-import { User } from "./user.js";
 
 export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, never>> = {
     name: {
         type: DataTypes.TEXT,
         allowNull: false,
         primaryKey: true
+    },
+    level: {
+        type: DataTypes.FLOAT({ decimals: 2 })
     },
     data: {
         type: DataTypes.VIRTUAL,
@@ -28,6 +30,13 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
                 throw new Error("Trying to access guild.data but trackings are not loaded or don't exist");
             }
             return this.Trackings.sort((a, b)=>a.createdAt.getTime() - b.createdAt.getTime())[0].data;
+        },
+        set(val: GuildData) {
+            this.level = val.level;
+            this.createTracking({
+                type: "guild",
+                data: val
+            })
         }
     }
 };
@@ -35,6 +44,7 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
 export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes<Guild>> {
     declare name: string;
     declare data: GuildData;
+    declare level: number;
     declare Trackings?: NonAttribute<Tracking[]>;
     declare createTracking: HasManyCreateAssociationMixin<Tracking>;
     declare getTrackings: HasManyGetAssociationsMixin<Tracking>;
