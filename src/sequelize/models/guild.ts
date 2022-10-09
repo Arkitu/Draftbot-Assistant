@@ -18,7 +18,9 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
         primaryKey: true
     },
     level: {
-        type: DataTypes.FLOAT({ decimals: 2 })
+        type: DataTypes.FLOAT({ decimals: 2 }),
+        allowNull: false,
+        defaultValue: 0
     },
     data: {
         type: DataTypes.VIRTUAL,

@@ -1,3 +1,3 @@
-import { up } from './zero.js';
+import { up } from './one.js';
 
 up();
