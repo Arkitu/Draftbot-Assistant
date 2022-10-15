@@ -123,7 +123,7 @@ export async function up() {
 
         // Create trackings
         for (let oldTracking of oldUser.tracking) {
-            user.$createTracking({
+            await user.$createTracking({
                 type: oldTracking.type,
                 data: oldTracking.data,
                 createdAt: oldTracking.timestamp
@@ -143,7 +143,7 @@ export async function up() {
                 jours: 24 * 60 * 60 * 1000
             }[oldPropoReminder.unit as "secondes" | "minutes" | "heures" | "jours"];
 
-            user.$createPropoReminder({
+            await user.$createPropoReminder({
                 trigger: oldPropoReminderTrigger,
                 duration: multiplier * oldPropoReminder.duration,
                 inDm: oldPropoReminder.dm
@@ -161,7 +161,7 @@ export async function up() {
             }
         }))[0];
 
-        user.$createReminder({
+        await user.$createReminder({
             channelId: oldReminder.channel.id,
             channelIsUser: oldReminder.channel.isUser,
             deadLineTimestamp: oldReminder.dead_line_timestamp,
