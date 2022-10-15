@@ -57,8 +57,13 @@ export class Goal extends Model<InferAttributes<Goal>, InferCreationAttributes<G
     declare unit: "lvl" | "gold" | "pv" | "xp" | "gems" | "quest_missions_percentage" | "rank_points";
     declare initValue: number;
     declare value: number;
-    declare UserDiscordId: ForeignKey<User["discordId"]>;
+    declare UserId: ForeignKey<User["id"]>;
     declare getUser: BelongsToGetAssociationMixin<User>;
+
+    $getUser(...opts: Parameters<BelongsToGetAssociationMixin<User>>) {
+        const args = opts[0];
+        return db.models.User.findAll({ ...args, where: { id: this.UserId, ...args.where } });
+    }
 
     get endValue(): NonAttribute<number> {
         return this.initValue + this.value;

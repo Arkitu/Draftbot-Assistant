@@ -1,3 +1,5 @@
-import { up } from './one.js';
+import { up as upZero } from './zero.js';
+import { up as upOne } from './one.js';
 
-up();
+await upZero();
+await upOne();

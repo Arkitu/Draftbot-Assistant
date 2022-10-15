@@ -35,8 +35,12 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
     declare trigger: string;
     declare duration: number;
     declare inDm: boolean;
-    declare UserDiscordId: ForeignKey<User['discordId']>;
-    declare getUser: BelongsToGetAssociationMixin<User>;
+    declare UserId: ForeignKey<User['id']>;
+
+    $getUser(...opts: Parameters<BelongsToGetAssociationMixin<User>>) {
+        const args = opts[0];
+        return db.models.User.findOne({...args, where: {id: this.UserId, ...args.where}});
+    }
 
     /**
      * Helper method for defining associations.

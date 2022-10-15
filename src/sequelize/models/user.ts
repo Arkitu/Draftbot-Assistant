@@ -16,6 +16,7 @@ import { Reminder } from "./reminder.js";
 import { Tracking } from "./tracking.js";
 import { Goal } from "./goal.js";
 import pkg from "dottie";
+import { Models } from "./index.js";
 
 interface Dottie {
     transform: (obj: any)=>any,
@@ -85,7 +86,7 @@ const DEFAULT_CONFIG: Config = {
 }
 
 export const initArgs: ModelAttributes<User, Optional<InferAttributes<User>, never>> = {
-    discordId: {
+    id: {
         type: DataTypes.TEXT,
         primaryKey: true
     },
@@ -109,27 +110,69 @@ export const initArgs: ModelAttributes<User, Optional<InferAttributes<User>, nev
 };
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-    declare discordId: string;
+    declare id: string;
     declare name: string;
     declare stringifiedConfig: string;
     declare config: Config | ConfigSetArgs;
     declare Trackings: NonAttribute<Tracking[]>;
     declare Goals: NonAttribute<Goal[]>;
     declare PropoReminders: NonAttribute<PropoReminder[]>;
-    declare getPropoReminders: HasManyGetAssociationsMixin<PropoReminder>;
-    declare createPropoReminder: HasManyCreateAssociationMixin<PropoReminder>;
-    declare createReminder: HasManyCreateAssociationMixin<Reminder>;
-    declare countReminders: HasManyCountAssociationsMixin;
-    declare createTracking: HasManyCreateAssociationMixin<Tracking>;
-    declare getTrackings: HasManyGetAssociationsMixin<Tracking>;
-    declare createGoal: HasManyCreateAssociationMixin<Goal>;
-    declare countGoals: HasManyCountAssociationsMixin;
+
+    $createPropoReminder(...opts: Parameters<HasManyCreateAssociationMixin<PropoReminder>>) {
+        const args = opts[0];
+        return db.models.PropoReminder.create({UserId: this.id, ...args});
+    }
+
+    $getPropoReminders(...opts: Parameters<HasManyGetAssociationsMixin<PropoReminder>>) {
+        const args = opts[0];
+        return db.models.PropoReminder.findAll({...args, where: {UserId: this.id, ...args.where}});
+    }
+
+    $destroyPropoReminders(...opts: Parameters<Models["PropoReminder"]["destroy"]>) {
+        const args = opts[0];
+        return db.models.PropoReminder.destroy({...args, where: {UserId: this.id, ...args.where}});
+    }
+
+    $createReminder(...opts: Parameters<HasManyCreateAssociationMixin<Reminder>>) {
+        const args = opts[0];
+        return db.models.Reminder.create({UserId: this.id, ...args});
+    }
+
+    $countReminders(...opts: Parameters<HasManyCountAssociationsMixin>) {
+        const args = opts[0];
+        return db.models.Reminder.count({...args, where: {UserId: this.id, ...args.where}});
+    }
+
+    $createTracking(...opts: Parameters<HasManyCreateAssociationMixin<Tracking>>) {
+        const args = opts[0];
+        return db.models.Tracking.create({UserId: this.id, ...args});
+    }
+
+    $destroyTrackings(...opts: Parameters<Models["Tracking"]["destroy"]>) {
+        const args = opts[0];
+        return db.models.Tracking.destroy({...args, where: {UserId: this.id, ...args.where}});
+    }
+
+    $getTrackings(...opts: Parameters<HasManyGetAssociationsMixin<Tracking>>) {
+        const args = opts[0];
+        return db.models.Tracking.findAll({...args, where: {UserId: this.id, ...args.where}});
+    }
+
+    $createGoal(...opts: Parameters<HasManyCreateAssociationMixin<Goal>>) {
+        const args = opts[0];
+        return db.models.Goal.create({UserId: this.id, ...args});
+    }
+
+    $countGoals(...opts: Parameters<HasManyCountAssociationsMixin>) {
+        const args = opts[0];
+        return db.models.Reminder.count({...args, where: {UserId: this.id, ...args.where}});
+    }
 
     /**
      * You need to fetch the user before using user.discordUser. If you're not sure, use `await fetchDiscordUser()` instead 
      */
     get discordUser(): NonAttribute<DiscordUser> {
-        return client.users.cache.get(this.discordId);
+        return client.users.cache.get(this.id);
     }
 
     /**
@@ -147,7 +190,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
      * You need to fetch the user before using user.discordUser
      */
     fetchDiscordUser() {
-        return client.users.fetch(this.discordId);
+        return client.users.fetch(this.id);
     }
 
     async init() {

@@ -125,7 +125,7 @@ export async function execute(interaction: CommandInteraction) {
     }
     const user = (await db.models.User.findOrCreate({
         where: {
-            discordId: interaction.user.id
+            id: interaction.user.id
         },
         include: include
     }))[0];
@@ -169,7 +169,7 @@ export async function execute(interaction: CommandInteraction) {
                 jours: 24 * 60 * 60 * 1000
             }[opt.unit];
 
-            user.createPropoReminder({
+            user.$createPropoReminder({
                 trigger: opt.trigger,
                 duration: opt.duration * multiplier,
                 inDm: opt.in_dm
@@ -179,12 +179,11 @@ export async function execute(interaction: CommandInteraction) {
             break;
         }
         case "reminders/del_custom_propo": {
-            const deleted = await db.models.PropoReminder.destroy({
+            const deleted = await user.$destroyPropoReminders({
                 where: {
-                    trigger: opt.trigger,
-                    UserDiscordId: user.discordId
+                    trigger: opt.trigger
                 }
-            })
+            });
             if (deleted) {
                 interaction.editReply(`La/les proposition(s) pour le message \`${opt.trigger}\` supprimée avec succès !`);
             } else {
@@ -248,9 +247,8 @@ export async function execute(interaction: CommandInteraction) {
             user.save();
 
             if (["reports", "profile"].includes(opt.option)) {
-                db.models.Tracking.destroy({
+                user.$destroyTrackings({
                     where: {
-                        UserDiscordId: user.discordId,
                         type: opt.option
                     }
                 });

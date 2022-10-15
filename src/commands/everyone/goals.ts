@@ -16,7 +16,7 @@ async function createGoals(page: number, discordUser: DiscordUser): Promise<{emb
 		limit: 10,
 		order: db.col('end'),
 		where: {
-			UserDiscordId: discordUser.id
+			UserId: discordUser.id
 		}
 	});
 
@@ -30,11 +30,11 @@ async function createGoals(page: number, discordUser: DiscordUser): Promise<{emb
 
     const user = (await db.models.User.findOrCreate({
         where: {
-            discordId: discordUser.id
+            id: discordUser.id
         }
     }))[0];
 
-    const lastProfile = (await user.getTrackings({
+    const lastProfile = (await user.$getTrackings({
         limit: 1,
         order: [["createdAt", "DESC"]],
         where: {
@@ -54,7 +54,7 @@ async function createGoals(page: number, discordUser: DiscordUser): Promise<{emb
 	if (
 		goals.length > 10
 		&&
-		(page+1)*10 < await user.countGoals()
+		(page+1)*10 < await user.$countGoals()
 	) {
 		buttons.addComponents(
 			new MessageButton()

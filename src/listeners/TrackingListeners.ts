@@ -27,7 +27,7 @@ export class TrackingListeners {
 			guildData.description = msg.embeds[0].description.split("`")[1];
 		}
 	
-		await guild.createTracking({
+		await guild.$createTracking({
 			type: "guild",
 			data: guildData
 		});
@@ -100,7 +100,7 @@ export class TrackingListeners {
 			}
 		}
 	
-		user.createTracking({
+		user.$createTracking({
 			type: "long_report",
 			data: data
 		})
@@ -115,7 +115,7 @@ export class TrackingListeners {
 		if (!user) return;
 		if (!user.config.tracking.reports) return;
 	
-		user.createTracking({
+		user.$createTracking({
 			type: "short_report"
 		});
 	
@@ -176,7 +176,7 @@ export class TrackingListeners {
 			destination: splited_embed.fields[splited_embed.fields.length - 1][0].full
 		}
 	
-		user.createTracking({
+		user.$createTracking({
 			type: "profile",
 			data: data
 		});

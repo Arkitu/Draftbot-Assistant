@@ -58,11 +58,11 @@ export async function execute(interaction: CommandInteraction) {
 
     const user = (await db.models.User.findOrCreate({
         where: {
-            discordId: interaction.user.id
+            id: interaction.user.id
         }
     }))[0]
 
-    user.createReminder({
+    user.$createReminder({
         channelId: channel.id,
         channelIsUser: channel instanceof User,
         deadLineTimestamp: dead_line.getTime(),

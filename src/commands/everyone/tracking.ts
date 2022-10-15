@@ -190,7 +190,7 @@ export async function execute(interaction: CommandInteraction) {
     } else {
         user = (await db.models.User.findOrCreate({
             where: {
-                discordId: opt.user.id
+                id: opt.user.id
             }
         }))[0];
     }
@@ -217,7 +217,7 @@ export async function execute(interaction: CommandInteraction) {
             }
     }
 
-    const trackings = await user.getTrackings({
+    const trackings = await user.$getTrackings({
         where: {
             type: type
         }

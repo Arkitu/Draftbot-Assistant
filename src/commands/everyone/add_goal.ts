@@ -54,11 +54,11 @@ export async function execute(interaction: CommandInteraction) {
 
     const user = (await db.models.User.findOrCreate({
         where: {
-            discordId: interaction.user.id
+            id: interaction.user.id
         }
     }))[0];
 
-    const lastProfile = (await user.getTrackings({
+    const lastProfile = (await user.$getTrackings({
         limit: 1,
         order: [["createdAt", "DESC"]],
         where: {
@@ -71,7 +71,7 @@ export async function execute(interaction: CommandInteraction) {
         return;
     }
 
-    user.createGoal({
+    user.$createGoal({
         start: Date.now(),
         end: Date.now() + opts.duration,
         unit: opts.unit,

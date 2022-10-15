@@ -46,7 +46,7 @@ export async function execute(interaction: CommandInteraction) {
     if (opts.user) {
         fetched = await model.findAll({
             where: {
-                userId: opts.user.id
+                UserId: opts.user.id
             }
         })
     } else {

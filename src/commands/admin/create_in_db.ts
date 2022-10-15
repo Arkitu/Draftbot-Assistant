@@ -29,14 +29,14 @@ export async function execute(interaction: CommandInteraction) {
             if (opts.force) {
                 await db.models.User.destroy({
                     where: {
-                        discordId: interaction.user.id
+                        id: interaction.user.id
                     }
                 })
             }
 
             await db.models.User.findOrCreate({
                 where: {
-                    discordId: interaction.user.id
+                    id: interaction.user.id
                 }
             })
         }

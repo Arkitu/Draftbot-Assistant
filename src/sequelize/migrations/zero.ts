@@ -117,13 +117,13 @@ export async function up() {
 
         // Create the user
         let user = await db.models.User.create({
-            discordId: hashCorrespondances[hash],
+            id: hashCorrespondances[hash],
             config: config
         });
 
         // Create trackings
         for (let oldTracking of oldUser.tracking) {
-            user.createTracking({
+            user.$createTracking({
                 type: oldTracking.type,
                 data: oldTracking.data,
                 createdAt: oldTracking.timestamp
@@ -143,7 +143,7 @@ export async function up() {
                 jours: 24 * 60 * 60 * 1000
             }[oldPropoReminder.unit as "secondes" | "minutes" | "heures" | "jours"];
 
-            user.createPropoReminder({
+            user.$createPropoReminder({
                 trigger: oldPropoReminderTrigger,
                 duration: multiplier * oldPropoReminder.duration,
                 inDm: oldPropoReminder.dm
@@ -157,11 +157,11 @@ export async function up() {
         console.log(`Rappel ${i++} / ${oldDB.getData("/reminders").length}`);
         let user = (await db.models.User.findOrCreate({
             where: {
-                discordId: oldReminder.author_id
+                id: oldReminder.author_id
             }
         }))[0];
 
-        user.createReminder({
+        user.$createReminder({
             channelId: oldReminder.channel.id,
             channelIsUser: oldReminder.channel.isUser,
             deadLineTimestamp: oldReminder.dead_line_timestamp,
@@ -178,7 +178,7 @@ export async function up() {
             name: oldGuildName
         });
 
-        await guild.createTracking({
+        await guild.$createTracking({
             type: "guild",
             data: {
                 type: "guild",

@@ -128,16 +128,26 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
     declare type: "profile" | "long_report" | "short_report" | "guild";
     declare stringifiedData: CreationOptional<string>;
     declare data: ProfileData | LongReportData | GuildData | PartialGuildData | null;
+    declare GuildName: ForeignKey<Guild["name"]>;
     declare getGuild: BelongsToGetAssociationMixin<Guild>;
-    declare UserDiscordId: ForeignKey<User["discordId"]>;
-    declare getUser: BelongsToGetAssociationMixin<User>;
+    declare UserId: ForeignKey<User["id"]>;
     declare createdAt: CreationOptional<Date>;
 
-    getTrackable(): Promise<Guild | User> {
+    $getUser(...opts: Parameters<BelongsToGetAssociationMixin<User>>) {
+        const args = opts[0];
+        return db.models.User.findOne({...args, where: {id: this.UserId, ...args.where}});
+    }
+
+    $getGuild(...opts: Parameters<BelongsToGetAssociationMixin<Guild>>) {
+        const args = opts[0];
+        return db.models.Guild.findOne({...args, where: {name: this.GuildName, ...args.where}});
+    }
+
+    $getTrackable(): Promise<Guild | User> {
         if (this.type === "guild") {
             return this.getGuild();
         } else {
-            return this.getUser();
+            return this.$getUser();
         }
     }
 

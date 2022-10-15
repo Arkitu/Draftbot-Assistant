@@ -35,7 +35,7 @@ export const initArgs: ModelAttributes<Guild, Optional<InferAttributes<Guild>, n
         },
         set(val: GuildData) {
             this.level = val.level;
-            this.createTracking({
+            this.$createTracking({
                 type: "guild",
                 data: val
             })
@@ -48,14 +48,22 @@ export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes
     declare data: GuildData;
     declare level: number;
     declare Trackings?: NonAttribute<Tracking[]>;
-    declare createTracking: HasManyCreateAssociationMixin<Tracking>;
-    declare getTrackings: HasManyGetAssociationsMixin<Tracking>;
+
+    $createTracking(...opts: Parameters<HasManyCreateAssociationMixin<Tracking>>) {
+        const args = opts[0];
+        return db.models.Tracking.create({GuildName: this.name, ...args});
+    }
+
+    $getTrackings(...opts: Parameters<HasManyGetAssociationsMixin<Tracking>>) {
+        const args = opts[0];
+        return db.models.Tracking.findAll({...args, where: {GuildName: this.name, ...args.where}});
+    }
 
     /**
      * You can use guild.data instead if you're sure that trackings are loaded
      */
     async fetchData() {
-        return (await this.getTrackings({
+        return (await this.$getTrackings({
             limit: 1,
             order: [["createdAt", "DESC"]]
         }))[0].data as GuildData;

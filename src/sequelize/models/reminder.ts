@@ -46,8 +46,12 @@ export class Reminder extends Model<InferAttributes<Reminder>, InferCreationAttr
     declare channelIsUser: boolean;
     declare deadLineTimestamp: number;
     declare message: string;
-    declare getUser: BelongsToGetAssociationMixin<User>;
-    declare UserDiscordId: ForeignKey<User["discordId"]>;
+    declare UserId: ForeignKey<User["id"]>;
+
+    $getUser(...opts: Parameters<BelongsToGetAssociationMixin<User>>) {
+        const args = opts[0];
+        return db.models.User.findOne({...args, where: {id: this.UserId, ...args.where}});
+    }
 
     fetchChannel() {
         return client.channels.fetch(this.channelId);
@@ -89,7 +93,7 @@ export class Reminder extends Model<InferAttributes<Reminder>, InferCreationAttr
 
     async sendReminderMessage(opts: { embed: MessageEmbed }) {
         await this.fetchChannel();
-        const user = await this.getUser();
+        const user = await this.$getUser();
         await user.fetchDiscordUser();
         if (this.channel instanceof DMChannel) {
             this.channel.send({ embeds: [opts.embed] });

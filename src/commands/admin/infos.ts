@@ -21,7 +21,7 @@ export async function execute(interaction: CommandInteraction) {
         case 'tracked':
             interaction.editReply(`${await db.models.Tracking.count({
                 distinct: true,
-                col: "userId"
+                col: "UserId"
             })} utilisateurs suivis`);
             break;
         case 'tracked_events':

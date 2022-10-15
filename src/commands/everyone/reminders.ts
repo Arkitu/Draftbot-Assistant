@@ -14,7 +14,7 @@ async function createReminders(page: number, user: DiscordUser): Promise<{embed:
 		limit: 10,
 		order: db.col('deadLineTimestamp'),
 		where: {
-			UserDiscordId: user.id
+			UserId: user.id
 		}
 	});
 
@@ -27,17 +27,17 @@ async function createReminders(page: number, user: DiscordUser): Promise<{embed:
 	}
 
 	for (let reminder of reminders) {
-		embed.addField(
-			reminder.message,
-			`id: ${reminder.id} | déclanchement <t:${reminder.deadLineTimestamp}:R> | salon: <${["#", "@"][+reminder.channelIsUser]}${reminder.channelId}>`
-		)
+		embed.addFields([{
+			name: reminder.message,
+			value: `id: ${reminder.id} | déclanchement <t:${reminder.deadLineTimestamp}:R> | salon: <${["#", "@"][+reminder.channelIsUser]}${reminder.channelId}>`
+		}])
 	}
 
 	if (
 		reminders.length > 10
 		&&
 		(page+1)*10 < await db.models.Reminder.count({
-			where: { UserDiscordId: user.id }
+			where: { UserId: user.id }
 		})
 	) {
 		buttons.addComponents(

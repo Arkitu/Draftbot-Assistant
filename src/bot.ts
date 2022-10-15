@@ -73,7 +73,7 @@ async function addReminder(propositionMessage: Message, author: User) {
 		if (!interaction.isButton()) return;
 		if (!(interaction.message instanceof Message)) return;
 		if (interaction.message.id != propositionMessage.id) return;
-		if (interaction.user.id != author.discordId) {
+		if (interaction.user.id != author.id) {
 			interaction.reply({content: ":warning: Désolé, vous n'êtes pas la personne à qui est destinée cette proposition", ephemeral: true});
 			return;
 		}
@@ -85,9 +85,9 @@ async function addReminder(propositionMessage: Message, author: User) {
 
 		interaction.update({content: "Rappel ajouté !", components: []});
 		const endDate = interaction.message.createdTimestamp + parseInt(interaction.customId);
-		author.createReminder({
+		author.$createReminder({
 			channelId: author.config.reminders.auto_proposition.in_dm
-				? author.discordId : propositionMessage.channel.id,
+				? author.id : propositionMessage.channel.id,
 			channelIsUser: author.config.reminders.auto_proposition.in_dm,
 			deadLineTimestamp: endDate,
 			message: `Vous avez ajouté un rappel il y a ${TimeStringUtils.generateTimeDisplay(parseInt(interaction.customId))}`
