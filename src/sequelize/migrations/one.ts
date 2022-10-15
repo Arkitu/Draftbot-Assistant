@@ -6,6 +6,6 @@ export async function up() {
     for (const guild of await db.models.Guild.findAll()) {
         const data = await guild.fetchData();
         guild.data = data;
-        guild.save();
+        await guild.save();
     }
 }

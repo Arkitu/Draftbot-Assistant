@@ -147,7 +147,7 @@ export async function up() {
                 trigger: oldPropoReminderTrigger,
                 duration: multiplier * oldPropoReminder.duration,
                 inDm: oldPropoReminder.dm
-            })
+            });
         }
     }
 
