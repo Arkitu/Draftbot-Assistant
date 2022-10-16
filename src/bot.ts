@@ -105,37 +105,39 @@ async function addReminder(propositionMessage: Message, author: User) {
 	}, 60000);
 }
 
-client.setMaxListeners(0);
-client.on('interactionCreate', OtherListeners.command);
-client.on('messageCreate', (message) => {
-	if (message.author.id === config.getData("/draftbot_id")) {
-		if (message.content) {
-			RemindListeners.event(message);
-			TrackingListeners.event(message);
-		}
-		if (message.interaction) {
-			if (message.embeds.length !== 0) {
-				if (message.embeds[0].author) {
-					RemindListeners.petFree(message);
-					RemindListeners.petFeed(message);
-					TrackingListeners.miniEvent(message);
-					RemindListeners.miniEvent(message); // Not with the minievent track because sometimes the result of the minievent comes in another message (gobletsGame for example), without the classical formated author
-					// But it bug so it's temporarlly here
+export function createListeners() {
+	client.setMaxListeners(0);
+	client.on('interactionCreate', OtherListeners.command);
+	client.on('messageCreate', (message) => {
+		if (message.author.id === config.getData("/draftbot_id")) {
+			if (message.content) {
+				RemindListeners.event(message);
+				TrackingListeners.event(message);
+			}
+			if (message.interaction) {
+				if (message.embeds.length !== 0) {
+					if (message.embeds[0].author) {
+						RemindListeners.petFree(message);
+						RemindListeners.petFeed(message);
+						TrackingListeners.miniEvent(message);
+						RemindListeners.miniEvent(message); // Not with the minievent track because sometimes the result of the minievent comes in another message (gobletsGame for example), without the classical formated author
+						// But it bug so it's temporarlly here
+					}
+					RemindListeners.guildDaily(message);
+					RemindListeners.daily(message);
+					RemindListeners.vote(message);
+					TrackingListeners.fetchGuild(message);
+					TrackingListeners.profile(message);
 				}
-				RemindListeners.guildDaily(message);
-				RemindListeners.daily(message);
-				RemindListeners.vote(message);
-				TrackingListeners.fetchGuild(message);
-				TrackingListeners.profile(message);
 			}
 		}
-	}
-	else {
-		if (!message.content) return;
-		RemindListeners.propo(message);
-		OtherListeners.help(message);
-	}
-});
+		else {
+			if (!message.content) return;
+			RemindListeners.propo(message);
+			OtherListeners.help(message);
+		}
+	});
+}
 
 // Import all the commands from the commands files
 client.commands = new Collection();

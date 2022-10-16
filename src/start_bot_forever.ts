@@ -7,7 +7,7 @@ const botDirString = (()=>{
 	return urlArray.join("/");
 })()
 
-let monitor: Monitor = new Monitor(`${botDirString}/bot.js`, {
+let monitor: Monitor = new Monitor(`${botDirString}/start.js`, {
     max: Infinity,
     silent: false
 });
