@@ -1,3 +1,3 @@
-import { up as upZero } from './zero.js';
+import { up as upOne } from './zero.js';
 
-await upZero();
+await upOne();
