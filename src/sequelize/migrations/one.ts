@@ -8,4 +8,5 @@ export async function up() {
         guild.data = data;
         await guild.save();
     }
+    console.log("Migration complete.");
 }
