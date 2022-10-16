@@ -1,8 +1,6 @@
 import {
     DataTypes,
     Model,
-    ModelAttributes,
-    Optional,
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,

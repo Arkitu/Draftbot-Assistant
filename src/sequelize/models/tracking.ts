@@ -1,14 +1,10 @@
 import {
     DataTypes,
     Model,
-    ModelAttributes,
-    Optional,
     InferAttributes,
     InferCreationAttributes,
-    HasManyCreateAssociationMixin,
     CreationOptional,
     BelongsToGetAssociationMixin,
-    NonAttribute,
     ForeignKey
 } from "sequelize";
 import { Guild } from "./guild.js";

@@ -2,17 +2,12 @@ import { DMChannel, MessageEmbed, TextBasedChannel } from "discord.js";
 import {
     DataTypes,
     Model,
-    ModelAttributes,
-    Optional,
     InferAttributes,
     InferCreationAttributes,
-    HasManyCreateAssociationMixin,
     CreationOptional,
     BelongsToGetAssociationMixin,
     NonAttribute,
-    ForeignKey,
-    Sequelize
-} from "sequelize";
+    ForeignKey} from "sequelize";
 import { User } from "./user.js";
 
 export const initArgs = {
