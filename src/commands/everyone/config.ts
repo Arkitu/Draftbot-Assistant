@@ -191,7 +191,7 @@ export async function execute(interaction: CommandInteraction) {
             }
             break;
         }
-        case "reminders/switch_custom_propo": {
+        case "reminders/switch_command_propo": {
             let trigger = opt.trigger as "events" | "minievents" | "guilddaily" | "daily" | "petfeed" | "petfree" | "vote";
             user.setConfig({
                 reminders: {
