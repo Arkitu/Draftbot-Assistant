@@ -61,7 +61,7 @@ export class Goal extends Model<InferAttributes<Goal>, InferCreationAttributes<G
     declare getUser: BelongsToGetAssociationMixin<User>;
 
     $getUser(...opts: Parameters<BelongsToGetAssociationMixin<User>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.User.findAll({ ...args, where: { id: this.UserId, ...args.where } });
     }
 

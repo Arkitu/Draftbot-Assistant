@@ -119,52 +119,52 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare PropoReminders: NonAttribute<PropoReminder[]>;
 
     $createPropoReminder(...opts: Parameters<HasManyCreateAssociationMixin<PropoReminder>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.PropoReminder.create({UserId: this.id, ...args});
     }
 
     $getPropoReminders(...opts: Parameters<HasManyGetAssociationsMixin<PropoReminder>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.PropoReminder.findAll({...args, where: {UserId: this.id, ...args.where}});
     }
 
     $destroyPropoReminders(...opts: Parameters<Models["PropoReminder"]["destroy"]>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.PropoReminder.destroy({...args, where: {UserId: this.id, ...args.where}});
     }
 
     $createReminder(...opts: Parameters<HasManyCreateAssociationMixin<Reminder>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Reminder.create({UserId: this.id, ...args});
     }
 
     $countReminders(...opts: Parameters<HasManyCountAssociationsMixin>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Reminder.count({...args, where: {UserId: this.id, ...args.where}});
     }
 
     $createTracking(...opts: Parameters<HasManyCreateAssociationMixin<Tracking>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Tracking.create({UserId: this.id, ...args});
     }
 
     $destroyTrackings(...opts: Parameters<Models["Tracking"]["destroy"]>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Tracking.destroy({...args, where: {UserId: this.id, ...args.where}});
     }
 
     $getTrackings(...opts: Parameters<HasManyGetAssociationsMixin<Tracking>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Tracking.findAll({...args, where: {UserId: this.id, ...args.where}});
     }
 
     $createGoal(...opts: Parameters<HasManyCreateAssociationMixin<Goal>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Goal.create({UserId: this.id, ...args});
     }
 
     $countGoals(...opts: Parameters<HasManyCountAssociationsMixin>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Reminder.count({...args, where: {UserId: this.id, ...args.where}});
     }
 

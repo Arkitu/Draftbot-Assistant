@@ -134,12 +134,12 @@ export class Tracking extends Model<InferAttributes<Tracking>, InferCreationAttr
     declare createdAt: CreationOptional<Date>;
 
     $getUser(...opts: Parameters<BelongsToGetAssociationMixin<User>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.User.findOne({...args, where: {id: this.UserId, ...args.where}});
     }
 
     $getGuild(...opts: Parameters<BelongsToGetAssociationMixin<Guild>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Guild.findOne({...args, where: {name: this.GuildName, ...args.where}});
     }
 

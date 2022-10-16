@@ -38,7 +38,7 @@ export class PropoReminder extends Model<InferAttributes<PropoReminder>, InferCr
     declare UserId: ForeignKey<User['id']>;
 
     $getUser(...opts: Parameters<BelongsToGetAssociationMixin<User>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.User.findOne({...args, where: {id: this.UserId, ...args.where}});
     }
 

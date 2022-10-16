@@ -50,12 +50,12 @@ export class Guild extends Model<InferAttributes<Guild>, InferCreationAttributes
     declare Trackings?: NonAttribute<Tracking[]>;
 
     $createTracking(...opts: Parameters<HasManyCreateAssociationMixin<Tracking>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Tracking.create({GuildName: this.name, ...args});
     }
 
     $getTrackings(...opts: Parameters<HasManyGetAssociationsMixin<Tracking>>) {
-        const args = opts[0];
+        const args = opts[0] || {};
         return db.models.Tracking.findAll({...args, where: {GuildName: this.name, ...args.where}});
     }
 
