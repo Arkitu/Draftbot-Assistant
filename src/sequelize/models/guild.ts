@@ -63,6 +63,8 @@ export class Guild extends Model<
     ...opts: Parameters<HasManyCreateAssociationMixin<Tracking>>
   ) {
     const args = opts[0] || {};
+    this.level = (args.data as GuildData).level;
+    this.save();
     return db.models.Tracking.create({ GuildName: this.name, ...args });
   }
 
