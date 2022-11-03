@@ -38,7 +38,7 @@ async function createGtop(page: number): Promise<{embed: MessageEmbed, component
 					break;
 			}
 		}
-		description += `${emoji}${i + 1} **${guilds[i].name}** | \`Niveau ${Math.round((await guilds[i].fetchData()).level*100)/100}\`\n`;
+		description += `${emoji}${i + 1} **${guilds[i].name}** | \`Niveau ${guilds[i].level}\`\n`;
 	}
 	embed.setDescription(description);
 
