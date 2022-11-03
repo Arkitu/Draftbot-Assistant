@@ -1,3 +1,3 @@
-import { up as upOne } from './one.js';
+import { up as upTwo } from './two.js';
 
-await upOne();
+await upTwo();

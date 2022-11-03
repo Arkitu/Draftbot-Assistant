@@ -21,7 +21,7 @@ export const initArgs: ModelAttributes<
     primaryKey: true,
   },
   level: {
-    type: DataTypes.FLOAT({ decimals: 2 }),
+    type: DataTypes.FLOAT(3, 2),
     allowNull: false,
     defaultValue: 0,
   },
@@ -41,7 +41,6 @@ export const initArgs: ModelAttributes<
       )[0].data;
     },
     set(val: GuildData) {
-      this.level = val.level;
       this.$createTracking({
         type: "guild",
         data: val,
