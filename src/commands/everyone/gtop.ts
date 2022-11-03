@@ -17,7 +17,7 @@ async function createGtop(page: number): Promise<{embed: MessageEmbed, component
 	let description = "";
 
 	for (let i = 0; i < guilds.length; i++) {
-		let emoji;
+		let emoji = "⚫";
 		if (page === 0) {
 			switch (i) {
 				case 0:
@@ -32,9 +32,6 @@ async function createGtop(page: number): Promise<{embed: MessageEmbed, component
 				case 3:
 				case 4:
 					emoji = "🎖️";
-					break;
-				default:
-					emoji = "⚫";
 					break;
 			}
 		}
