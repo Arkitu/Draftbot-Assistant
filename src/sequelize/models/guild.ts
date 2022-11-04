@@ -9,7 +9,7 @@ import {
   HasManyGetAssociationsMixin,
   NonAttribute,
 } from "sequelize";
-import { GuildData, Tracking } from "./tracking.js";
+import { GuildData, PartialGuildData, Tracking } from "./tracking.js";
 
 export const initArgs: ModelAttributes<
   Guild,
@@ -62,8 +62,8 @@ export class Guild extends Model<
     ...opts: Parameters<HasManyCreateAssociationMixin<Tracking>>
   ) {
     const args = opts[0] || {};
-    let data = args.data as GuildData;
-    this.level = data.level + (data.xp / data.max_xp);
+    let data = new GuildData(args.data as PartialGuildData);
+    this.level = data.full_level;
     this.save();
     return db.models.Tracking.create({ GuildName: this.name, ...args });
   }
