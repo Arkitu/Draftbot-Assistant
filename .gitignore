@@ -4,3 +4,5 @@
 /config.json
 /db.json
 /db.sqlite
+/.idea
+yarn.lock
