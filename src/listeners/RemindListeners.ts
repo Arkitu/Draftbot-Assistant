@@ -78,7 +78,7 @@ export class RemindListeners {
 	};
 	
 	static async guildDaily(message: Message) {
-		if (message.interaction.commandName !== "guilddaily") return;
+		if (message.interaction.commandName !== "guilddailybonus") return;
 	
 		const user = await db.models.User.findByPk(message.interaction.user.id);
 		if (!user) return;
@@ -89,7 +89,7 @@ export class RemindListeners {
 	}
 	
 	static async daily(message: Message) {
-		if (message.interaction.commandName !== "daily") return;
+		if (message.interaction.commandName !== "dailybonus") return;
 	
 		const user = await db.models.User.findByPk(message.interaction.user.id);
 		if (!user) return;
