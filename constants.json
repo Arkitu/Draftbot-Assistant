@@ -31,7 +31,7 @@
         ":scream:": 600000
     },
     "times": {
-        "betweenMinievents": 600000,
+        "betweenMinievents": 585000,
         "betweenDailies": 79200000,
         "betweenBasicPetFeeds": 3600000,
         "betweenPetFrees": 3600000,
