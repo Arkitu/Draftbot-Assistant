@@ -119,9 +119,6 @@ export function createListeners() {
 					if (message.embeds[0].author) {
 						RemindListeners.petFree(message);
 						RemindListeners.petFeed(message);
-						TrackingListeners.miniEvent(message);
-						RemindListeners.miniEvent(message); // Not with the minievent track because sometimes the result of the minievent comes in another message (gobletsGame for example), without the classical formated author
-						// But it bug so it's temporarlly here
 					}
 					RemindListeners.guildDaily(message);
 					RemindListeners.daily(message);
@@ -137,6 +134,15 @@ export function createListeners() {
 			OtherListeners.help(message);
 		}
 	});
+	client.on("messageUpdate", (message: Message) => { // Because they're deferred
+		if (message.author.id !== config.getData("/draftbot_id")) return;
+		if (message.interaction) {
+			RemindListeners.miniEvent(message);
+		}
+		if (message.embeds.length !== 0 && message.embeds[0].author) {
+			TrackingListeners.miniEvent(message);
+		}
+	})
 }
 
 // Import all the commands from the commands files
