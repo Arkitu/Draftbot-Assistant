@@ -137,10 +137,10 @@ export function createListeners() {
 	client.on("messageUpdate", (message: Message) => { // Because they're deferred
 		if (message.author.id !== config.getData("/draftbot_id")) return;
 		if (message.interaction) {
-			RemindListeners.miniEvent(message);
+			TrackingListeners.miniEvent(message);
 		}
 		if (message.embeds.length !== 0 && message.embeds[0].author) {
-			TrackingListeners.miniEvent(message);
+			RemindListeners.miniEvent(message);
 		}
 	})
 }
