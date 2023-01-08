@@ -109,6 +109,8 @@ export class TrackingListeners {
 	}
 
 	static async miniEvent(msg: Message): Promise<void> {
+		if (!msg.embeds.length) return;
+		if (!msg.embeds[0].author) return;
 		if (!msg.embeds[0].author.name.startsWith(constants.getData("/regex/minieventAuthorStart"))) return;
 	
 		const user = await db.models.User.findByPk(msg.interaction.user.id)
