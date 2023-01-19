@@ -15,15 +15,24 @@ export const data = new SlashCommandBuilder()
       .setName('channel')
       .setDescription('Le channel dans lequel envoyer le message (default: channel actuel)')
       .setRequired(false)
+  )
+  .addStringOption(option =>
+    option
+      .setName('channel_id')
+      .setDescription('Le channel dans lequel envoyer le message (default: channel actuel)')
+      .setRequired(false)
   );
-
 
 export async function execute(interaction: CommandInteraction) {
   await interaction.deferReply({ ephemeral: true });
   const opts = {
     content: interaction.options.getString('content', true),
-    channel: interaction.options.getChannel('channel', false) || interaction.channel
+    channel: interaction.options.getChannel('channel', false) || interaction.channel,
+    channel_id: interaction.options.getString('channel_id', false)
   };
+  if (opts.channel_id) {
+    opts.channel = interaction.guild.channels.cache.get(opts.channel_id);
+  }
   try {
     await (opts.channel as TextBasedChannel).send(opts.content);
     interaction.editReply('Message envoyé !');
