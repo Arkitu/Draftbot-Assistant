@@ -19,7 +19,7 @@ export const data = new SlashCommandBuilder()
 
 
 export async function execute(interaction: CommandInteraction) {
-  await interaction.deferReply();
+  await interaction.deferReply({ ephemeral: true });
   const opts = {
     content: interaction.options.getString('content', true),
     channel: interaction.options.getChannel('channel', false) || interaction.channel
