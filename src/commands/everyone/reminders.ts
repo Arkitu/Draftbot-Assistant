@@ -39,7 +39,7 @@ async function createReminders(
     embed.addFields([
       {
         name: reminder.message,
-        value: `id: ${reminder.id} | déclanchement <t:${Math.round(
+        value: `id: ${reminder.id} | déclenchement <t:${Math.round(
           reminder.deadLineTimestamp / 1000
         )}:R> | salon: <${["#", "@"][+reminder.channelIsUser]}${
           reminder.channelId
